@@ -69,3 +69,8 @@ Here a command remotely invoked via reflection
 }
 </pre>
 
+## Dirty tricks
+
+* The Updatable ResultSets are fetched one by one
+* RowId is handled as RowId when present, converted to long/String/byte[] if founded matching
+
