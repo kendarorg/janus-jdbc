@@ -69,6 +69,15 @@ Here a command remotely invoked via reflection
 }
 </pre>
 
+The things are
+
+* "name":"value"  parameter content
+* ":name:":"JAVA_CLASS" parameter type
+* "[name]":"1,10" array dimensions
+* "_key":"value" key of hashmap
+* "_value":"value" value of hashmap
+* "_":"value" value of array
+
 ## Dirty tricks
 
 * The Updatable ResultSets are fetched one by one
