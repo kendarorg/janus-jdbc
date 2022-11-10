@@ -10,3 +10,62 @@ and exposes them via String data
 
 So using the driver means
 
+* Passing a "real" connection string to the db like "jdbc:h2:mem:test"
+* Connect to the Janus-server like "jdbc:janus:http://localhost/db?fetchSize=3&charset=UTF-8"
+* Look all messages passing
+
+## Implementation
+
+### Server
+
+Actually only a "fake" implementation exists on tests: JsonServer
+
+* private JdbcCommand getIjCommand(JdbcCommand command) translate the commands to serializable
+* private JdbcResult getIjResult(JdbcResult command) translate the results to serializable
+
+### Serialization
+
+A custom serializer is built to guarantee the type integrity. You can implement wetheaver you want: JsonTypedSerializer
+
+An example of what is serialized
+
+<pre>
+{
+	"command": {
+		"database": "jdbc:janus:http://localhost/db?fetchSize=3&charset=UTF-8",
+		":database:": "java.lang.String",
+		"clientinfo": [{
+			"_key": "janus.client.address",
+			":_key:": "java.lang.String",
+			"_value": "192.168.1.20",
+			":_value:": "java.lang.String"
+		}, {
+			"_key": "janus.client.name",
+			":_key:": "java.lang.String",
+			"_value": "XPS15-KENDAR",
+			":_value:": "java.lang.String"
+		}],
+		":clientinfo:": "java.util.Properties"
+	},
+	":command:": "org.kendar.janus.cmd.connection.ConnectionConnect"
+}
+</pre>
+
+Here a command remotely invoked via reflection
+
+<pre>
+{
+	"command": {
+		"name": "cancel",
+		":name:": "java.lang.String",
+		"paramtype": [],
+		":paramtype:": "[Ljava.lang.Class;",
+		"[paramtype]": "0",
+		"parameters": [],
+		":parameters:": "[Ljava.lang.Object;",
+		"[parameters]": "0"
+	},
+	":command:": "org.kendar.janus.cmd.Exec"
+}
+</pre>
+
