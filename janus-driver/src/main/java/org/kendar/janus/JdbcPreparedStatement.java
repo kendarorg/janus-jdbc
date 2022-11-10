@@ -327,6 +327,33 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
         setParameter(parameterIndex,new RowIdParameter(x,parameterIndex));
     }
 
+
+    @Override
+    public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
+        this.setParameter(parameterIndex, new CharacterStreamParameter().fromReader(reader,length).withColumnIndex(parameterIndex));
+    }
+
+    @Override
+    public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
+        this.setParameter(parameterIndex, new CharacterStreamParameter().fromReader(reader).withColumnIndex(parameterIndex));
+    }
+
+    @Override
+    public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
+        this.setParameter(parameterIndex, new CharacterStreamParameter().fromReader(reader,(int)length).withColumnIndex(parameterIndex));
+    }
+
+
+    @Override
+    public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
+        setCharacterStream(parameterIndex,value);
+    }
+
+    @Override
+    public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
+        setCharacterStream(parameterIndex,value,length);
+    }
+
     //TODO implement
 
 
@@ -334,11 +361,6 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public ParameterMetaData getParameterMetaData() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -353,11 +375,6 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     }
 
     @Override
-    public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
         throw new UnsupportedOperationException();
     }
@@ -367,15 +384,6 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
 
 
 
@@ -397,10 +405,6 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
 
 
-    @Override
-    public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public void setRef(int parameterIndex, Ref x) throws SQLException {

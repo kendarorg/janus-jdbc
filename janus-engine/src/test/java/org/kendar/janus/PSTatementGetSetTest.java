@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.kendar.janus.utils.TestBase;
 
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -362,6 +363,39 @@ public class PSTatementGetSetTest extends TestBase {
 
 
         assertEquals(expectedTimestamp, rs.getObject(4,Timestamp.class));
+
+    }
+
+    @Test
+    public void testinsertCharacterStream() throws SQLException, IOException {
+        var conn = driver.connect(CONNECT_URL,null);
+        try (PreparedStatement st = conn.prepareStatement(
+                "create table if not exists CLOBTAB (ID integer, DATA CLOB)")) {
+            st.executeUpdate();
+        }
+        int mb =1;
+
+        var resultBytes = getCharacters( mb);
+
+
+        PreparedStatement st = conn.prepareStatement(
+                "insert into CLOBTAB (ID, DATA) values (?, ?)");
+
+        st.setInt(1, mb);
+        st.setCharacterStream(2, new CharArrayReader(resultBytes),100);
+        st.executeUpdate();
+
+        var stmt = conn.createStatement();
+        ResultSet rs = null;
+        if (stmt.execute("SELECT DATA FROM CLOBTAB")) {
+            rs = stmt.getResultSet();
+        }
+        assertNotNull(rs);
+        rs.next();
+        var data = rs.getClob(1);
+        assertEquals(100, IOUtils.toByteArray(data.getAsciiStream()).length);
+        data = rs.getClob("data");
+        assertEquals(100, IOUtils.toByteArray(data.getAsciiStream()).length);
 
     }
 }

@@ -14,6 +14,11 @@ public abstract class SimpleParameter<T> implements PreparedStatementParameter {
 
     }
 
+    public SimpleParameter<T> withColumnIndex(int columnIndex){
+        this.columnIndex = columnIndex;
+        return this;
+    }
+
     public SimpleParameter(T value, int columnIndex){
 
         this.value = value;
