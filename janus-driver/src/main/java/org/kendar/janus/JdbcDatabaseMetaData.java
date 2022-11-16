@@ -1,12 +1,30 @@
 package org.kendar.janus;
 
+import org.kendar.janus.cmd.Exec;
+import org.kendar.janus.engine.Engine;
+import org.kendar.janus.results.ObjectResult;
+
 import java.sql.*;
 
 public class JdbcDatabaseMetaData implements DatabaseMetaData {
+    private JdbcConnection connection;
+    private Engine engine;
+
+    public JdbcDatabaseMetaData(){
+
+    }
+
+    public JdbcDatabaseMetaData(JdbcConnection jdbcConnection, Engine engine) {
+        connection = jdbcConnection;
+        this.engine = engine;
+    }
+
     //TODO Implements
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
-        return false;
+        return ((ObjectResult)engine.execute(new Exec(
+                        "allProceduresAreCallable")
+                ,connection.getTraceId(),connection.getTraceId())).getResult();
     }
 
     @Override

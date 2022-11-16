@@ -1,12 +1,14 @@
 package org.kendar.janus;
 
 import org.kendar.janus.cmd.Close;
+import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.connection.ConnectionCreateStatement;
 import org.kendar.janus.cmd.connection.ConnectionPrepareStatement;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
+import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.StatementResult;
 import org.kendar.janus.types.JdbcArray;
 import org.kendar.janus.types.JdbcBlob;
@@ -164,17 +166,25 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new Exec(
+                        "setAutoCommit")
+                        .withTypes(boolean.class)
+                        .withParameters(autoCommit)
+                ,getTraceId(),getTraceId());
     }
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getAutoCommit")
+                ,this.getTraceId(),getTraceId())).getResult();
     }
 
     @Override
     public void commit() throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new Exec(
+                        "commit")
+                ,this.getTraceId(),getTraceId());
     }
 
     @Override
@@ -184,7 +194,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        throw new UnsupportedOperationException();
+        return new JdbcDatabaseMetaData(this);
     }
 
     @Override
@@ -224,7 +234,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        //TODO
     }
 
 
