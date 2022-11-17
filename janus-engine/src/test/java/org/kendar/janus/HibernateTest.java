@@ -8,6 +8,9 @@ import org.kendar.janus.utils.TestBase;
 
 import java.sql.SQLException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class HibernateTest  extends TestBase {
 
     @BeforeEach
@@ -26,9 +29,13 @@ public class HibernateTest  extends TestBase {
         var em = sessionFactory.createEntityManager();
         em.getTransaction().begin();
         var st = new SimpleTable();
-        st.setValue("TEST");
+        st.setContent("TEST");
         em.persist(st);
         em.getTransaction().commit();
-        em.close();
+        //em.close();
+
+        //var em2 = sessionFactory.createEntityManager();
+        var results = em.createQuery("SELECT e FROM SimpleTable e WHERE e.content='test'").getResultList();
+        assertEquals(1,results.size());
     }
 }

@@ -5,28 +5,28 @@ import javax.persistence.*;
 @Entity
 @Table(name="SIMPLE_TABLE")
 public class SimpleTable {
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public String getValue() {
-        return value;
+    public String getContent() {
+        return content;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private Long id;
+    private long id;
 
 
-    @Column(name = "value")
-    private String value;
+    @Column(name = "content")
+    private String content;
 }

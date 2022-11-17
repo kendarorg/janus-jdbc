@@ -238,7 +238,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -369,12 +369,12 @@ public class JdbcConnection implements Connection {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new UnsupportedOperationException();
+        return (T)this;
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new UnsupportedOperationException();
+        return iface.isAssignableFrom(JdbcConnection.class);
     }
 
     public long getTraceId() {

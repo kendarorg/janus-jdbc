@@ -46,7 +46,11 @@ public class JdbcTypesConverter {
         if(ClassUtils.isAssignable(resultObject.getClass(), ResultSet.class)){
             var rstst = (ResultSet)resultObject;
             var stmt = (Statement)rstst.getStatement();
-            var maxRows = stmt.getMaxRows();
+            var maxRows = 0;
+
+            if(stmt!=null) {
+                maxRows = stmt.getMaxRows();
+            }
             if(maxRows==0){
                 maxRows = engine.getMaxRows();
             }
