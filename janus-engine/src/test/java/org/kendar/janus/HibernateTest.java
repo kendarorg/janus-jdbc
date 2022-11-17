@@ -32,10 +32,10 @@ public class HibernateTest  extends TestBase {
         st.setContent("TEST");
         em.persist(st);
         em.getTransaction().commit();
-        //em.close();
+        em.close();
 
-        //var em2 = sessionFactory.createEntityManager();
-        var results = em.createQuery("SELECT e FROM SimpleTable e WHERE e.content='test'").getResultList();
+        var em2 = sessionFactory.createEntityManager();
+        var results = em2.createQuery("SELECT e FROM SimpleTable e WHERE e.content='TEST'").getResultList();
         assertEquals(1,results.size());
     }
 }
