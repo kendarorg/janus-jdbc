@@ -1,5 +1,6 @@
 package org.kendar.janus.results;
 
+import org.kendar.janus.JdbcStatement;
 import org.kendar.janus.serialization.TypedSerializer;
 
 import java.sql.ResultSetMetaData;
@@ -113,12 +114,12 @@ public class ResultSetMetaDataResult implements JdbcResult, ResultSetMetaData {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        return (T)this;
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
+        return iface.isAssignableFrom(ResultSetMetaDataResult.class);
     }
 
     @Override

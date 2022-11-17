@@ -1,6 +1,7 @@
 package org.kendar.janus.utils;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.kendar.janus.JdbcDatabaseMetaData;
 import org.kendar.janus.JdbcResultSet;
 import org.kendar.janus.JdbcResultsetMetaData;
 import org.kendar.janus.engine.Engine;
@@ -36,11 +37,20 @@ public class JdbcTypesConverter {
             var result = new JdbcResultsetMetaData();
             result.initialize(rstst);
             return result;
+        }if(ClassUtils.isAssignable(resultObject.getClass(), DatabaseMetaData.class)){
+            var rstst = (DatabaseMetaData)resultObject;
+            var result = new JdbcDatabaseMetaData();
+            result.setTraceId(traceId);
+            return result;
         }
         if(ClassUtils.isAssignable(resultObject.getClass(), ResultSet.class)){
             var rstst = (ResultSet)resultObject;
             var stmt = (Statement)rstst.getStatement();
-            var maxRows = stmt.getMaxRows();
+            var maxRows = 0;
+
+            if(stmt!=null) {
+                maxRows = stmt.getMaxRows();
+            }
             if(maxRows==0){
                 maxRows = engine.getMaxRows();
             }

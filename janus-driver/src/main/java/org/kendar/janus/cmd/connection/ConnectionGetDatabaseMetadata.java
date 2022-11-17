@@ -1,17 +1,17 @@
-package org.kendar.janus.cmd.statement;
+package org.kendar.janus.cmd.connection;
 
 import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-public class StatementGetGeneratedKeys implements JdbcCommand {
+public class ConnectionGetDatabaseMetadata implements JdbcCommand {
     @Override
     public Object execute(JdbcContext context, Long uid) throws SQLException {
-        var resultSet = ((Statement)context.get(uid)).getGeneratedKeys();
-        return resultSet;
+        var connection = (Connection)context.get(uid);
+        return connection.getMetaData();
     }
 
     @Override
@@ -20,13 +20,12 @@ public class StatementGetGeneratedKeys implements JdbcCommand {
     }
 
     @Override
-    public JdbcCommand deserialize(TypedSerializer input) {
+    public JdbcCommand deserialize(TypedSerializer builder) {
         return this;
     }
 
-
     @Override
     public String toString() {
-        return "StatementGetGeneratedKeys{}";
+        return "ConnectionGetDatabaseMetadata{}";
     }
 }

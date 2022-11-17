@@ -34,4 +34,9 @@ public class Close implements JdbcCommand {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "Close{}";
+    }
 }

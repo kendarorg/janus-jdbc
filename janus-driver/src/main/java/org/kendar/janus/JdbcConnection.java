@@ -1,12 +1,16 @@
 package org.kendar.janus;
 
 import org.kendar.janus.cmd.Close;
+import org.kendar.janus.cmd.Exec;
+import org.kendar.janus.cmd.connection.ConnectionPrepareCall;
 import org.kendar.janus.cmd.connection.ConnectionCreateStatement;
+import org.kendar.janus.cmd.connection.ConnectionGetDatabaseMetadata;
 import org.kendar.janus.cmd.connection.ConnectionPrepareStatement;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
+import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.StatementResult;
 import org.kendar.janus.types.JdbcArray;
 import org.kendar.janus.types.JdbcBlob;
@@ -62,6 +66,16 @@ public class JdbcConnection implements Connection {
         return getJdbcStatement(command);
     }
 
+
+
+    @Override
+    public DatabaseMetaData getMetaData() throws SQLException {
+        var command = new ConnectionGetDatabaseMetadata();
+        var metadata = (JdbcDatabaseMetaData)engine.execute(command,getTraceId(),getTraceId());
+        metadata.initialize(this,engine);
+        return metadata;
+    }
+
     @Override
     public void close() throws SQLException {
         if (!this.isClosed()) {
@@ -89,6 +103,8 @@ public class JdbcConnection implements Connection {
                 command.getHoldability())
                 .withSql(command.getSql());
     }
+
+
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         var command = new ConnectionPrepareStatement(sql);
@@ -135,6 +151,7 @@ public class JdbcConnection implements Connection {
 
 
 
+
     @Override
     public Clob createClob() throws SQLException {
         return new JdbcClob();
@@ -154,36 +171,59 @@ public class JdbcConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
-        throw new UnsupportedOperationException();
+        var command = (ConnectionPrepareCall)new ConnectionPrepareCall()
+                .withSql(sql);
+        return getJdbcCallableStatement(command);
+    }
+
+    private JdbcCallableStatement getJdbcCallableStatement(ConnectionPrepareCall command) throws SQLException {
+        var statement = (StatementResult)engine.execute(command,getTraceId(),getTraceId());
+        return (JdbcCallableStatement)new JdbcCallableStatement(this, engine,
+                statement.getTraceId(),
+                statement.getMaxRows(),
+                statement.getQueryTimeout(),
+                command.getType(),
+                command.getConcurrency(),
+                command.getHoldability()
+        )
+                .withSql(command.getSql());
+
     }
 
     @Override
     public String nativeSQL(String sql) throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "nativeSQL")
+                        .withTypes(String.class)
+                        .withParameters(sql)
+                ,getTraceId(),getTraceId())).getResult();
     }
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new Exec(
+                        "setAutoCommit")
+                        .withTypes(boolean.class)
+                        .withParameters(autoCommit)
+                ,getTraceId(),getTraceId());
     }
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getAutoCommit")
+                ,this.getTraceId(),getTraceId())).getResult();
     }
 
     @Override
     public void commit() throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new Exec(
+                        "commit")
+                ,this.getTraceId(),getTraceId());
     }
 
     @Override
     public void rollback() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DatabaseMetaData getMetaData() throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -219,12 +259,12 @@ public class JdbcConnection implements Connection {
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        //TODO
     }
 
 
@@ -232,7 +272,11 @@ public class JdbcConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        throw new UnsupportedOperationException();
+        var command = (ConnectionPrepareCall) new ConnectionPrepareCall()
+                .withSql(sql)
+                .withType(ResultSetType.valueOf(resultSetType))
+                .withConcurrency(ResultSetConcurrency.valueOf(resultSetConcurrency));
+        return getJdbcCallableStatement(command);
     }
 
     @Override
@@ -278,7 +322,12 @@ public class JdbcConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        throw new UnsupportedOperationException();
+        var command = (ConnectionPrepareCall) new ConnectionPrepareCall()
+                .withSql(sql)
+                .withType(ResultSetType.valueOf(resultSetType))
+                .withConcurrency(ResultSetConcurrency.valueOf(resultSetConcurrency))
+                .withHoldability(ResultSetHoldability.valueOf(resultSetHoldability));
+        return getJdbcCallableStatement(command);
     }
 
 
@@ -350,12 +399,12 @@ public class JdbcConnection implements Connection {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new UnsupportedOperationException();
+        return (T)this;
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new UnsupportedOperationException();
+        return iface.isAssignableFrom(JdbcConnection.class);
     }
 
     public long getTraceId() {

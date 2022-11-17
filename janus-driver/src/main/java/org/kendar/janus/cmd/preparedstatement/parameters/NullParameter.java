@@ -44,4 +44,13 @@ public class NullParameter implements PreparedStatementParameter {
         typeName =builder.read("typeName");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "NullParameter{" +
+                "\n\tcolumnIndex=" + columnIndex +
+                ", \n\ttypeName='" + typeName + '\'' +
+                ", \n\tsqlType=" + sqlType +
+                '}';
+    }
 }

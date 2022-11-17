@@ -386,11 +386,11 @@ public class JdbcStatement implements Statement {
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+
     }
 }

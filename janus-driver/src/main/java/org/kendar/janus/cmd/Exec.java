@@ -93,4 +93,18 @@ public class Exec implements JdbcCommand {
             throw ExceptionsWrapper.toSQLException(ex);
         }
     }
+
+    @Override
+    public String toString() {
+        var result = "Exec{" +
+                "\n\tname='" + name + '\'';
+        if(paramType!=null && paramType.length>0) {
+            result += ", \n\tparamType=" + Arrays.toString(paramType);
+        }
+        if(parameters!=null && parameters.length>0) {
+            result+= ", \n\tparameters=" + Arrays.toString(parameters);
+        }
+        result+= '}';
+        return result;
+    }
 }

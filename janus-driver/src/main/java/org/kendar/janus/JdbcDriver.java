@@ -34,9 +34,18 @@ public class JdbcDriver implements Driver {
             log.error("Unable to register IjDriver", e);
         }
     }
+    private static Engine testEngine;
+
+    public static void setTestEngine(Engine testEngineP){
+        testEngine = testEngineP;
+    }
 
     public JdbcDriver(){
-        engine = new DriverEngine();
+        if(testEngine!=null){
+            engine =testEngine;
+        }else {
+            engine = new DriverEngine();
+        }
     }
 
     public JdbcDriver(Engine engine){

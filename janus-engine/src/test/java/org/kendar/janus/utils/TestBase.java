@@ -1,5 +1,7 @@
 package org.kendar.janus.utils;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.kendar.janus.JdbcDriver;
 import org.kendar.janus.server.JsonServer;
 import org.kendar.janus.server.ServerEngine;
@@ -11,8 +13,9 @@ import java.sql.*;
 public class TestBase {
     protected final String CONNECT_URL = "jdbc:janus:http://localhost/db?fetchSize=3&charset=UTF-8";
     protected Driver driver;
-    private ServerEngine serverEngine;
-    private JsonServer jsonServer;
+    protected ServerEngine serverEngine;
+    protected JsonServer jsonServer;
+    protected SessionFactory sessionFactory;
 
     protected void beforeEach() {
         serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
@@ -122,5 +125,34 @@ public class TestBase {
             result[i] = (byte) chars[i];
         }
         return result;
+    }
+
+    protected void setupHibernate(Class<?> ... tables){
+        JdbcDriver.setTestEngine(jsonServer);
+        var hibernateConfig = new Configuration();
+
+            /*
+            Properties properties = new Properties();
+properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+properties.put("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
+properties.put("hibernate.connection.url", "jdbc:mysql://localhost:3306/kode12");
+properties.put("hibernate.connection.username", "root");
+properties.put("hibernate.connection.password", "root");
+properties.put("show_sql", "true");
+properties.put("hbm2ddl.auto", "update");
+configuration.setProperties(properties);
+             */
+
+        hibernateConfig.setProperty("hibernate.connection.driver_class", "org.kendar.janus.JdbcDriver");
+        hibernateConfig.setProperty("hibernate.connection.url", CONNECT_URL);
+        hibernateConfig.setProperty("hibernate.connection.username", "sa");
+        hibernateConfig.setProperty("hibernate.connection.password", "sa");
+        hibernateConfig.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        hibernateConfig.setProperty("show_sql", "true");
+        hibernateConfig.setProperty("hibernate.hbm2ddl.auto", "update");
+        for(var table:tables){
+            hibernateConfig.addAnnotatedClass(table);
+        }
+        sessionFactory = hibernateConfig.buildSessionFactory();
     }
 }

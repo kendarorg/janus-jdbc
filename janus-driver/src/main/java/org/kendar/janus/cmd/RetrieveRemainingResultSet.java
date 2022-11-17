@@ -62,8 +62,16 @@ public class RetrieveRemainingResultSet implements JdbcCommand {
     @Override
     public JdbcCommand deserialize(TypedSerializer input) {
 
-        return new RetrieveRemainingResultSet(
-                (int)input.read("columnCount"),
-                (int)input.read("maxRows"));
+        columnCount =input.read("columnCount");
+        maxRows = input.read("maxRows");
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "RetrieveRemainingResultSet{" +
+                "\n\tcolumnCount=" + columnCount +
+                ", \n\tmaxRows=" + maxRows +
+                '}';
     }
 }

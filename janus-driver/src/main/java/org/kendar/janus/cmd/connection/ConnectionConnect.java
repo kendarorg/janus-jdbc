@@ -80,4 +80,13 @@ public class ConnectionConnect implements JdbcCommand {
         ConnectionConnect that = (ConnectionConnect) o;
         return database.equals(that.database) && Objects.equals(properties, that.properties) && Objects.equals(clientInfo, that.clientInfo);
     }
+
+    @Override
+    public String toString() {
+        return "ConnectionConnect{" +
+                "\n\tdatabase='" + database + '\'' +
+                ", \n\tproperties=" + properties +
+                ", \n\tclientInfo=" + clientInfo +
+                '}';
+    }
 }

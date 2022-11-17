@@ -42,4 +42,11 @@ public class PreparedStatementExecuteBatch implements JdbcCommand {
         batches = builder.read("batches");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "PreparedStatementExecuteBatch{" +
+                "batches=" + batches +
+                '}';
+    }
 }
