@@ -1,8 +1,10 @@
 package org.kendar.janus.server;
 
+import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.JdbcResult;
+import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.serialization.JsonTypedSerializer;
 
 import java.sql.SQLException;
@@ -19,7 +21,27 @@ public class JsonServer implements Engine {
     @Override
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid) throws SQLException {
         JdbcCommand deserialized = getIjCommand(command);
+
+        if(deserialized instanceof Exec){
+            System.out.println("INPUT Exec "+((Exec)deserialized).getName());
+        }else{
+            System.out.println("INPUT "+deserialized.getClass().getSimpleName());
+        }
         var result = engine.execute(deserialized,connectionId,uid);
+        if(result instanceof ObjectResult){
+            var res =((ObjectResult)result).getResult();
+            if(res==null){
+                System.out.println("\tOUTPUT null");
+            }else{
+                System.out.println("\tOUTPUT "+res.getClass().getSimpleName());
+            }
+        }else{
+            if(result==null){
+                System.out.println("\tOUTPUT null");
+            }else{
+                System.out.println("\tOUTPUT "+result.getClass().getSimpleName());
+            }
+        }
         return getIjResult(result);
     }
 
@@ -51,6 +73,7 @@ public class JsonServer implements Engine {
     private JdbcCommand getIjCommand(JdbcCommand command) {
         var ser = serializer.newInstance();
         ser.write("command", command);
+
         var serialized = ser.getSerialized();
         var deser = serializer.newInstance();
         deser.deserialize(serialized);

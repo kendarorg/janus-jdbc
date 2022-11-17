@@ -3,6 +3,7 @@ package org.kendar.janus;
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.connection.ConnectionCreateStatement;
+import org.kendar.janus.cmd.connection.ConnectionGetDatabaseMetadata;
 import org.kendar.janus.cmd.connection.ConnectionPrepareStatement;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
@@ -64,6 +65,16 @@ public class JdbcConnection implements Connection {
         return getJdbcStatement(command);
     }
 
+
+
+    @Override
+    public DatabaseMetaData getMetaData() throws SQLException {
+        var command = new ConnectionGetDatabaseMetadata();
+        var metadata = (JdbcDatabaseMetaData)engine.execute(command,getTraceId(),getTraceId());
+        metadata.initialize(this,engine);
+        return metadata;
+    }
+
     @Override
     public void close() throws SQLException {
         if (!this.isClosed()) {
@@ -91,6 +102,8 @@ public class JdbcConnection implements Connection {
                 command.getHoldability())
                 .withSql(command.getSql());
     }
+
+
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         var command = new ConnectionPrepareStatement(sql);
@@ -134,6 +147,7 @@ public class JdbcConnection implements Connection {
                 .withColumnNames(columnNames);
         return getJdbcPreparedStatement(command);
     }
+
 
 
 
@@ -190,11 +204,6 @@ public class JdbcConnection implements Connection {
     @Override
     public void rollback() throws SQLException {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DatabaseMetaData getMetaData() throws SQLException {
-        return new JdbcDatabaseMetaData(this);
     }
 
     @Override
