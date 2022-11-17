@@ -6,7 +6,9 @@ import org.kendar.janus.JdbcDriver;
 import org.kendar.janus.server.JsonServer;
 import org.kendar.janus.server.ServerEngine;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 
@@ -17,12 +19,16 @@ public class TestBase {
     protected JsonServer jsonServer;
     protected SessionFactory sessionFactory;
 
-    protected void beforeEach() {
+    protected void beforeEach() throws SQLException {
         serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
         jsonServer = new JsonServer(serverEngine);
         driver = (Driver)new JdbcDriver(jsonServer);
     }
-
+    protected InputStreamReader getInputStreamReader(int kb) throws IOException {
+        var bytes = getBytes(kb);
+        var inputStream = new ByteArrayInputStream(bytes);
+        return new InputStreamReader(inputStream);
+    }
 
     protected Object invokeGet(Object ps, String method,Object index) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         var realTypes = new Class<?>[1];

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PStatementTest extends TestBase {
 
     @BeforeEach
-    protected void beforeEach(){
+    protected void beforeEach() throws SQLException {
         super.beforeEach();
     }
     @AfterEach
