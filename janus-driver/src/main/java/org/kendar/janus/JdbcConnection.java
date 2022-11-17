@@ -2,6 +2,7 @@ package org.kendar.janus;
 
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
+import org.kendar.janus.cmd.connection.ConnectionPrepareCall;
 import org.kendar.janus.cmd.connection.ConnectionCreateStatement;
 import org.kendar.janus.cmd.connection.ConnectionGetDatabaseMetadata;
 import org.kendar.janus.cmd.connection.ConnectionPrepareStatement;
@@ -170,12 +171,32 @@ public class JdbcConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
-        throw new UnsupportedOperationException();
+        var command = (ConnectionPrepareCall)new ConnectionPrepareCall()
+                .withSql(sql);
+        return getJdbcCallableStatement(command);
+    }
+
+    private JdbcCallableStatement getJdbcCallableStatement(ConnectionPrepareCall command) throws SQLException {
+        var statement = (StatementResult)engine.execute(command,getTraceId(),getTraceId());
+        return (JdbcCallableStatement)new JdbcCallableStatement(this, engine,
+                statement.getTraceId(),
+                statement.getMaxRows(),
+                statement.getQueryTimeout(),
+                command.getType(),
+                command.getConcurrency(),
+                command.getHoldability()
+        )
+                .withSql(command.getSql());
+
     }
 
     @Override
     public String nativeSQL(String sql) throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "nativeSQL")
+                        .withTypes(String.class)
+                        .withParameters(sql)
+                ,getTraceId(),getTraceId())).getResult();
     }
 
     @Override
@@ -251,7 +272,11 @@ public class JdbcConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        throw new UnsupportedOperationException();
+        var command = (ConnectionPrepareCall) new ConnectionPrepareCall()
+                .withSql(sql)
+                .withType(ResultSetType.valueOf(resultSetType))
+                .withConcurrency(ResultSetConcurrency.valueOf(resultSetConcurrency));
+        return getJdbcCallableStatement(command);
     }
 
     @Override
@@ -297,7 +322,12 @@ public class JdbcConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        throw new UnsupportedOperationException();
+        var command = (ConnectionPrepareCall) new ConnectionPrepareCall()
+                .withSql(sql)
+                .withType(ResultSetType.valueOf(resultSetType))
+                .withConcurrency(ResultSetConcurrency.valueOf(resultSetConcurrency))
+                .withHoldability(ResultSetHoldability.valueOf(resultSetHoldability));
+        return getJdbcCallableStatement(command);
     }
 
 
