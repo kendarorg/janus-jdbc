@@ -49,4 +49,12 @@ public abstract class PreparedStatementExecuteBase implements JdbcCommand {
         parameters = input.read("parameters");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName()+"{" +
+                "\n\tsql='" + sql + '\'' +
+                ", \n\tparameters=" + parameters +
+                '}';
+    }
 }

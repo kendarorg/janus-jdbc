@@ -39,4 +39,11 @@ public class StatementExecuteBatch implements JdbcCommand {
         batches = builder.read("batches");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "StatementExecuteBatch{" +
+                "batches=" + batches +
+                '}';
+    }
 }

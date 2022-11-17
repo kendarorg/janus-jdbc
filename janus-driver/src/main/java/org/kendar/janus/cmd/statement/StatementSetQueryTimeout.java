@@ -40,4 +40,11 @@ public class StatementSetQueryTimeout implements JdbcCommand {
         queryTimeout = builder.read("queryTimeout");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "StatementSetQueryTimeout{" +
+                "queryTimeout=" + queryTimeout +
+                '}';
+    }
 }

@@ -22,23 +22,19 @@ public class JsonServer implements Engine {
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid) throws SQLException {
         JdbcCommand deserialized = getIjCommand(command);
 
-        if(deserialized instanceof Exec){
-            System.out.println("INPUT Exec "+((Exec)deserialized).getName());
-        }else{
-            System.out.println("INPUT "+deserialized.getClass().getSimpleName());
-        }
+        System.out.println("============================================");
+        System.out.println("INPUT "+deserialized);
         var result = engine.execute(deserialized,connectionId,uid);
+
         if(result instanceof ObjectResult){
             var res =((ObjectResult)result).getResult();
-            if(res==null){
-                System.out.println("\tOUTPUT null");
-            }else{
+            if(res!=null){
+                System.out.println("--------------------------------------------");
                 System.out.println("\tOUTPUT "+res.getClass().getSimpleName());
             }
         }else{
-            if(result==null){
-                System.out.println("\tOUTPUT null");
-            }else{
+            if(result!=null){
+                System.out.println("--------------------------------------------");
                 System.out.println("\tOUTPUT "+result.getClass().getSimpleName());
             }
         }

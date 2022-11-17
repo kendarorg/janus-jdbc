@@ -39,4 +39,12 @@ public abstract class SimpleParameter<T> implements PreparedStatementParameter {
         this.value = input.read("value");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName()+ "{" +
+                "\n\tvalue=" + value +
+                ", \n\tcolumnIndex=" + columnIndex +
+                '}';
+    }
 }

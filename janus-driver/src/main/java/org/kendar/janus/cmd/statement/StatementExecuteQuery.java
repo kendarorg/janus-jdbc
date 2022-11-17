@@ -57,4 +57,12 @@ public class StatementExecuteQuery implements JdbcCommand {
     public void setResultSetType(ResultSetType resultSetType) {
         this.resultSetType = resultSetType;
     }
+
+    @Override
+    public String toString() {
+        return "StatementExecuteQuery{" +
+                "\n\tsql='" + sql + '\'' +
+                ", \n\tresultSetType=" + resultSetType +
+                '}';
+    }
 }

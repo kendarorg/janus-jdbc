@@ -13,6 +13,15 @@ import java.sql.SQLException;
 public class ConnectionCreateStatement implements JdbcCommand {
     private ResultSetType type;
 
+    @Override
+    public String toString() {
+        return "ConnectionCreateStatement{" +
+                "\n\ttype=" + type +
+                ", \n\tconcurrency=" + concurrency +
+                ", \n\tholdability=" + holdability +
+                '}';
+    }
+
     public ResultSetType getType() {
         return type;
     }

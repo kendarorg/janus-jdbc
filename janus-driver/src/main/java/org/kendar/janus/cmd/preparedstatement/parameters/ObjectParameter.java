@@ -46,4 +46,14 @@ public class ObjectParameter implements PreparedStatementParameter {
         scaleOrLength =builder.read("scaleOrLength");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "ObjectParameter{" +
+                "\n\tvalue=" + value +
+                ", \n\tcolumnIndex=" + columnIndex +
+                ", \n\ttargetSqlType=" + targetSqlType +
+                ", \n\tscaleOrLength=" + scaleOrLength +
+                '}';
+    }
 }

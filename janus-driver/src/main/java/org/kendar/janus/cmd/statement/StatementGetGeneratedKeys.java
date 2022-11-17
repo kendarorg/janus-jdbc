@@ -23,4 +23,10 @@ public class StatementGetGeneratedKeys implements JdbcCommand {
     public JdbcCommand deserialize(TypedSerializer input) {
         return this;
     }
+
+
+    @Override
+    public String toString() {
+        return "StatementGetGeneratedKeys{}";
+    }
 }

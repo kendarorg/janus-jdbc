@@ -40,4 +40,11 @@ public class StatementSetMaxRows implements JdbcCommand {
         maxRows = builder.read("maxRows");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "StatementSetMaxRows{" +
+                "maxRows=" + maxRows +
+                '}';
+    }
 }

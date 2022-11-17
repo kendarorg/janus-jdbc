@@ -23,4 +23,9 @@ public class ConnectionGetDatabaseMetadata implements JdbcCommand {
     public JdbcCommand deserialize(TypedSerializer builder) {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "ConnectionGetDatabaseMetadata{}";
+    }
 }

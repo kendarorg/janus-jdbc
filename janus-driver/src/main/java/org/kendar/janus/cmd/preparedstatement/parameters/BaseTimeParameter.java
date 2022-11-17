@@ -30,4 +30,13 @@ public abstract class BaseTimeParameter<T> extends SimpleParameter<T>{
         this.calendar = input.read("calendar");
         return this;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName()+"{" +
+                "\n\tcalendar=" + calendar +
+                ", \n\tvalue=" + value +
+                ", \n\tcolumnIndex=" + columnIndex +
+                '}';
+    }
 }
