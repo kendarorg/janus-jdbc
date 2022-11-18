@@ -471,7 +471,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void abort(Executor executor) throws SQLException {
-        throw new UnsupportedOperationException();
+        this.close();
     }
 
     @Override

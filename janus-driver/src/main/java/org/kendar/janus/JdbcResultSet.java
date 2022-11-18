@@ -1548,18 +1548,28 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return (T)value;
     }
 
+
+    @Override
+    public void updateNString(int columnIndex, String nString) throws SQLException {
+        updateString(columnIndex,nString);
+    }
+
+    @Override
+    public void updateNString(String columnLabel, String nString) throws SQLException {
+        updateString(columnLabel,nString);
+    }
     //TODO Implements
 
 
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+
     }
 
     @Override
@@ -1720,15 +1730,6 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void updateNString(int columnIndex, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNString(String columnLabel, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
