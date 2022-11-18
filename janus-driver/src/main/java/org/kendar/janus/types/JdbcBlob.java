@@ -133,7 +133,7 @@ public class JdbcBlob extends BigFieldBase<byte[],JdbcBlob,Blob,InputStream> imp
 
     @Override
     public long position(byte[] pattern, long start) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?position");
     }
 
     @Override

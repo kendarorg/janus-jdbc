@@ -474,10 +474,7 @@ public class JdbcConnection implements Connection {
         this.close();
     }
 
-    @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
+
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
@@ -487,5 +484,10 @@ public class JdbcConnection implements Connection {
     @Override
     public void clearWarnings() throws SQLException {
         //TODO
+    }
+
+    @Override
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        throw new UnsupportedOperationException("?setNetworkTimeout");
     }
 }

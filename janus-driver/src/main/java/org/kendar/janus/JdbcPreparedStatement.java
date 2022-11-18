@@ -1,5 +1,7 @@
 package org.kendar.janus;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CharSequenceReader;
 import org.kendar.janus.cmd.preparedstatement.*;
 import org.kendar.janus.cmd.preparedstatement.parameters.*;
 import org.kendar.janus.engine.Engine;
@@ -13,10 +15,14 @@ import org.kendar.janus.types.JdbcNClob;
 import org.kendar.janus.types.JdbcSQLXML;
 import org.kendar.janus.utils.ExceptionsWrapper;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -364,29 +370,37 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
 
 
-    @Override
-    public ParameterMetaData getParameterMetaData() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            setClob(parameterIndex,targetReader,length);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
+        setBlob(parameterIndex,x,length);
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            setClob(parameterIndex,targetReader);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
+        setBlob(parameterIndex,x);
     }
 
 
@@ -395,17 +409,29 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException();
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            setClob(parameterIndex,targetReader,length);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
     }
 
     @Override
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException();
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.UTF_8));
+            setClob(parameterIndex,targetReader,length);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException();
+        setBlob(parameterIndex,x,length);
     }
 
 
@@ -413,6 +439,12 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setRef(int parameterIndex, Ref x) throws SQLException {
-        throw new UnsupportedOperationException();
+        this.setParameter( new RefParameter().withValue(x).withColumnIndex(parameterIndex));
+    }
+
+
+    @Override
+    public ParameterMetaData getParameterMetaData() throws SQLException {
+        throw new UnsupportedOperationException("?getParameterMetaData");
     }
 }

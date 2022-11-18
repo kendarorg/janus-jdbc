@@ -5,7 +5,7 @@ import org.kendar.janus.results.JdbcResult;
 
 public class DriverEngine implements Engine {
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid){
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?execute");
     }
 
     @Override

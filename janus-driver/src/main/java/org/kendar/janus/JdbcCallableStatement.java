@@ -16,8 +16,10 @@ import org.kendar.janus.types.JdbcSQLXML;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -678,7 +680,7 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
     public void setAsciiStream(String parameterName, InputStream x, int length) throws SQLException {
         try {
             var buffer = IOUtils.toByteArray(x);
-            Reader targetReader = new CharSequenceReader(new String(buffer));
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
             setClob(parameterName,targetReader,length);
         } catch (IOException e) {
             throw new SQLException(e);
@@ -695,7 +697,7 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
     public void setAsciiStream(String parameterName, InputStream x, long length) throws SQLException {
         try {
             var buffer = IOUtils.toByteArray(x);
-            Reader targetReader = new CharSequenceReader(new String(buffer));
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
             setClob(parameterName,targetReader,length);
         } catch (IOException e) {
             throw new SQLException(e);
@@ -716,7 +718,7 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
     public void setAsciiStream(String parameterName, InputStream x) throws SQLException {
         try {
             var buffer = IOUtils.toByteArray(x);
-            Reader targetReader = new CharSequenceReader(new String(buffer));
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
             setClob(parameterName,targetReader);
         } catch (IOException e) {
             throw new SQLException(e);
