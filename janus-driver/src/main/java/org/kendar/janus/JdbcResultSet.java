@@ -1094,8 +1094,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return false;
     }
 
-    private Boolean retrieveRemaningResultSet() throws SQLException {
+    private Boolean retrieveRemaningResultSet(int ) throws SQLException {
         var nextResult = false;
+        //FIXME WHEN PREVIOUS SHOULD GET THE CURRENT
+        XXXX
         var result = (RemainingResultSetResult)engine.execute(
                 new RetrieveRemainingResultSet(
                         this.columnCount,
@@ -1472,7 +1474,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public int getRow() throws SQLException {
-        return this.cursor + 1;
+        var res = this.cursor + 1;
+        return res;
     }
 
     @Override
@@ -1579,6 +1582,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public boolean absolute(int row) throws SQLException {
+        row-=1;
+
         if(row<cursor) {
             mustNotBeForwardOnly();
         }
@@ -1593,11 +1598,25 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public boolean relative(int rows) throws SQLException {
-
+        if(rows ==0){
+            return true;
+        }
         if(rows>0){
-            return absolute(cursor+rows);
+            var maxPos = cursor+rows;
+            while(cursor<maxPos){
+                if(!next()){
+                    return false;
+                }
+            }
+            return true;
         }else if(rows<0) {
             mustNotBeForwardOnly();
+            while(rows<0) {
+                var res = this.previous();
+                if(res==false)return false;
+                rows++;
+            }
+            return true;
         }
         return false;
     }
@@ -1605,7 +1624,15 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public boolean previous() throws SQLException {
         mustNotBeForwardOnly();
-        throw new UnsupportedOperationException("?previous");
+        boolean result = ((ObjectResult)engine.execute(new Exec(
+                        "previous")
+                ,connection.getTraceId(),getTraceId())).getResult();
+        if(result==false)return false;
+        var recursor = cursor;
+        recursor--;;
+        retrieveRemaningResultSet();
+        cursor = recursor;
+        return true;
     }
 
     @Override

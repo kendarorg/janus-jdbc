@@ -205,7 +205,6 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
                     parameters
             );
             var result = (ObjectResult)this.engine.execute(command,connection.getTraceId(),getTraceId());
-
             return result.getResult();
         }
         catch (SQLException e) {
