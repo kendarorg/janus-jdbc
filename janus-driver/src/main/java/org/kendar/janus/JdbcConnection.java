@@ -382,30 +382,26 @@ public class JdbcConnection implements Connection {
         engine.execute(command,this.traceId,traceId);
     }
 
-    @Override
-    public SQLWarning getWarnings() throws SQLException {
-        return null;
-    }
-
-    @Override
-    public void clearWarnings() throws SQLException {
-        //TODO
-    }
-
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "isReadOnly")
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
     public String getCatalog() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getCatalog")
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getTransactionIsolation")
+                , this.traceId, traceId)).getResult();
     }
 
 
@@ -413,37 +409,64 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getTypeMap")
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new Exec(
+                        "setTypeMap")
+                        .withParameters(map)
+                        .withTypes(Map.class)
+                , this.traceId, traceId);
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getHoldability")
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
     public boolean isValid(int timeout) throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "isValid")
+                        .withParameters(timeout)
+                        .withTypes(int.class)
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
     public String getClientInfo(String name) throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getClientInfo")
+                        .withParameters(name)
+                        .withTypes(String.class)
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getClientInfo")
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
     public String getSchema() throws SQLException {
-        throw new UnsupportedOperationException();
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getSchema")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public int getNetworkTimeout() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getNetworkTimeout")
+                , this.traceId, traceId)).getResult();
     }
 
     @Override
@@ -457,7 +480,12 @@ public class JdbcConnection implements Connection {
     }
 
     @Override
-    public int getNetworkTimeout() throws SQLException {
-        throw new UnsupportedOperationException();
+    public SQLWarning getWarnings() throws SQLException {
+        return null;
+    }
+
+    @Override
+    public void clearWarnings() throws SQLException {
+        //TODO
     }
 }

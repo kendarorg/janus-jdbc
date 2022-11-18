@@ -59,6 +59,19 @@ public class StatementTest extends TestBase {
     }
 
 
+    @Test
+    public void testStatementExecuteQueryGEtObject() throws  SQLException {
+        createFooTableWithField("testStatementExecuteQuery");
+        var conn = driver.connect(CONNECT_URL,null);
+        var stmt = conn.createStatement();
+        var rs = stmt.executeQuery("SELECT foo FROM bar WHERE foo = 'testStatementExecuteQuery'");
+
+
+        while(rs.next()){
+            assertEquals("testStatementExecuteQuery",(String)rs.getObject(1));
+        }
+
+    }
 
     @Test
     void testGetResultSet() throws SQLException {

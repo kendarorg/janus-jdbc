@@ -19,6 +19,19 @@ public class TestBase {
     protected JsonServer jsonServer;
     protected SessionFactory sessionFactory;
 
+    protected Connection createFooTable() throws SQLException {
+        var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        String createStatement = "create table if not exists bar  (foo varchar(50))";
+
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate(createStatement);
+        return conn;
+    }
+
+    protected void createFooTableWithField(String value) throws SQLException {
+        var conn = createFooTable();
+        conn.createStatement().execute("INSERT INTO bar (foo) VALUES('" + value + "')");
+    }
     protected void beforeEach() throws SQLException {
         serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
         jsonServer = new JsonServer(serverEngine);
