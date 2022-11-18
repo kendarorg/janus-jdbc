@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.CharArrayReader;
 import java.io.Reader;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -34,5 +35,11 @@ public class CharacterStreamParameter extends SimpleParameter<char[]>{
     public void load(PreparedStatement preparedStatement) throws SQLException {
 
         preparedStatement.setCharacterStream(columnIndex, new CharArrayReader(this.value));
+    }
+
+    @Override
+    public void load(CallableStatement callableStatement) throws SQLException {
+        if(hasColumnName())callableStatement.setCharacterStream(columnName,new CharArrayReader(this.value));
+        else load((PreparedStatement) callableStatement);
     }
 }

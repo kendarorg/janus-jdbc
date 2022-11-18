@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.kendar.janus.JdbcDatabaseMetaData;
 import org.kendar.janus.JdbcResultSet;
 import org.kendar.janus.JdbcResultsetMetaData;
+import org.kendar.janus.JdbcSavepoint;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
@@ -23,6 +24,18 @@ public class JdbcTypesConverter {
         }
         if(ClassUtils.isPrimitiveOrWrapper(resultObject.getClass())){
             return new ObjectResult(resultObject);
+        }
+        if(ClassUtils.isAssignable(resultObject.getClass(), Savepoint.class)){
+            var result = new JdbcSavepoint();
+            result.setTraceId(traceId);
+            var ori = (Savepoint)resultObject;
+            try {
+                result.setSavePointId(ori.getSavepointId());
+            }catch (Exception ex){}
+            try {
+                result.setSavePointName(ori.getSavepointName());
+            }catch (Exception ex){}
+            return result;
         }
         if(ClassUtils.isAssignable(resultObject.getClass(), Statement.class)){
             var stmt = (Statement)resultObject;

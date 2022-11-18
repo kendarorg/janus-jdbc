@@ -17,6 +17,13 @@ public class JdbcStruct implements Struct, TypedSerializable {
 
     }
 
+    public JdbcStruct fromData(String sqlTypeName,Object[] attributes){
+
+        this.sqlTypeName = sqlTypeName;
+        this.attributes = attributes;
+        return this;
+    }
+
     public JdbcStruct fromStruct(Struct struct) throws SQLException {
         sqlTypeName = struct.getSQLTypeName();
         attributes = struct.getAttributes();
