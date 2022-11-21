@@ -93,16 +93,16 @@ public class StatementTest extends TestBase {
         conn.close();
     }
 
-
-    @Test
-    void notSupportingScrollSensitive() throws SQLException, InterruptedException {
-        createSimpleTable();
-
-        var conn = driver.connect(CONNECT_URL,null);
-        assertThrows(SQLException.class,()->conn.createStatement(
-                ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_READ_ONLY));
-    }
+//
+//    @Test
+//    void notSupportingScrollSensitive() throws SQLException, InterruptedException {
+//        createSimpleTable();
+//
+//        var conn = driver.connect(CONNECT_URL,null);
+//        assertThrows(SQLException.class,()->conn.createStatement(
+//                ResultSet.TYPE_SCROLL_SENSITIVE,
+//                ResultSet.CONCUR_READ_ONLY));
+//    }
 
     private static Stream<Arguments> supportingConcurUpdatableData() throws MalformedURLException {
         return Stream.of(

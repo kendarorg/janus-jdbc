@@ -1395,7 +1395,6 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void deleteRow() throws SQLException {
-        mustBeUpdatable();
         engine.execute(new Exec("deleteRow"),connection.getTraceId(),getTraceId());
     }
 
