@@ -1,6 +1,6 @@
 ## Janus Jdbc-Json-Jdbc Transparent Proxy Driver-On Development
 
-Actually with 56% coverage
+Actually with 44% coverage
 
 The project is born as a future extension of [HttpAnsweringMachine](https://github.com/kendarorg/HttpAnsweringMachine) (on github too)
 
