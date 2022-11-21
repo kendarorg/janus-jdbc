@@ -59,17 +59,17 @@ public class JdbcSQLXML extends BigFieldBase<String,JdbcSQLXML, SQLXML, String> 
 
     @Override
     public OutputStream setBinaryStream() throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?setBinaryStream");
     }
 
     @Override
     public Writer setCharacterStream() throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?setCharacterStream");
     }
 
     @Override
     public <T extends Result> T setResult(Class<T> resultClass) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("setResult");
     }
 
 

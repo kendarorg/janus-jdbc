@@ -13,6 +13,9 @@ public class JdbcNClob extends BigFieldBase<char[],JdbcNClob, NClob, Reader> imp
     }
 
 
+    private static final long   MIN_POS  = 1L;
+    private static final long   MAX_POS  = MIN_POS + (long) Integer.MAX_VALUE;
+
 
     @Override
     protected char[] sqlObjectToDataArray(NClob input, long length) throws SQLException, IOException {
@@ -129,17 +132,65 @@ public class JdbcNClob extends BigFieldBase<char[],JdbcNClob, NClob, Reader> imp
 
     @Override
     public long position(String searchstr, long start) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?position");
     }
 
     @Override
     public long position(Clob searchstr, long start) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?position");
     }
 
     @Override
     public Writer setCharacterStream(long pos) throws SQLException {
-        throw new UnsupportedOperationException();
+        return new CharArrayWriter() {
+
+            private boolean closed;
+
+            public synchronized void close() {
+
+                if (closed) {
+                    return;
+                }
+
+                closed = true;
+
+                char[] bytes  = super.buf;
+                int    length = super.count;
+
+                super.buf   = new char[0];
+                super.count = 0;
+
+                try {
+                    setChars(pos, bytes, 0, length);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    super.close();
+                }
+            }
+        };
+    }
+
+    public int setChars(long pos, char[] bytes, int offset, int len) throws SQLException {
+        final int index = (int) (pos - MIN_POS);
+        if(data==null){
+            data = new char[0];
+        }
+        final int dlen  = data.length;
+
+        if (index > dlen - len) {
+            char[] temp = new char[index + len];
+
+            System.arraycopy(data, 0, temp, 0, dlen);
+
+            data = temp;
+            temp = null;
+        }
+
+        System.arraycopy(bytes, offset, data, index, len);
+        this.length = data.length;
+
+        return len;
     }
 
     @Override

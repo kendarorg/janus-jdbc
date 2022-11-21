@@ -15,6 +15,7 @@ public class UpdateSpecialObject  implements JdbcCommand {
     private Object value;
     private Class<?> type;
     private long connectionId;
+    private Integer scaleOrLength;
 
     public UpdateSpecialObject withValue(Object value,Class<?> type){
         this.value = value;
@@ -49,22 +50,28 @@ public class UpdateSpecialObject  implements JdbcCommand {
 
         var resultSet = (ResultSet)context.get(uid);
         var connection = (Connection)context.get(connectionId);
-        if(ClassUtils.isAssignable(type, NClob.class)){
+        if(value ==null){
+            updateNull(resultSet,connection);
+        }else if(scaleOrLength!=null){
+            if(hasColumnName()) resultSet.updateObject(columnName,value,scaleOrLength);
+            else resultSet.updateObject(columnIndex,value,scaleOrLength);
+        }else if(ClassUtils.isAssignable(type, NClob.class)){
             updateNClob(resultSet, connection);
-        }
-        if(ClassUtils.isAssignable(type, Clob.class)){
+        }else if(ClassUtils.isAssignable(type, Clob.class)){
             updateClob(resultSet, connection);
-        }
-        if(ClassUtils.isAssignable(type, Blob.class)){
+        }else if(ClassUtils.isAssignable(type, Blob.class)){
             updateBlob(resultSet,connection);
-        }
-        if(ClassUtils.isAssignable(type, SQLXML.class)){
+        }else if(ClassUtils.isAssignable(type, SQLXML.class)){
             updateSQLXML(resultSet,connection);
-        }
-        if(ClassUtils.isAssignable(type, Array.class)){
+        }else if(ClassUtils.isAssignable(type, Array.class)){
             updateArray(resultSet,connection);
         }
         return null;
+    }
+
+    private void updateNull(ResultSet resultSet, Connection connection) throws SQLException {
+        if(hasColumnName()) resultSet.updateNull(columnName);
+        else resultSet.updateNull(columnIndex);
     }
 
     private void updateArray(ResultSet resultSet, Connection connection) throws SQLException{
@@ -125,11 +132,20 @@ public class UpdateSpecialObject  implements JdbcCommand {
 
     @Override
     public void serialize(TypedSerializer builder) {
-
+        builder.write("type",type);
+        builder.write("columnName",columnName);
+        builder.write("value",value);
+        builder.write("scaleOrLength",scaleOrLength);
+        builder.write("columnIndex",columnIndex);
     }
 
     @Override
     public JdbcCommand deserialize(TypedSerializer builder) {
+        type = builder.read("type");
+        columnName = builder.read("columnName");
+        value = builder.read("value");
+        scaleOrLength = builder.read("scaleOrLength");
+        columnIndex = builder.read("columnIndex");
         return null;
     }
 
@@ -139,7 +155,13 @@ public class UpdateSpecialObject  implements JdbcCommand {
                 "columnName='" + columnName + '\'' +
                 ", columnIndex=" + columnIndex +
                 ", value=" + value +
+                ", scaleOrLength=" + scaleOrLength +
                 ", type=" + type +
                 '}';
+    }
+
+    public JdbcCommand withScaleOrLength(int scaleOrLength) {
+        this.scaleOrLength = scaleOrLength;
+        return this;
     }
 }

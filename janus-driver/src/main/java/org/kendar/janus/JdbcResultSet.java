@@ -1645,17 +1645,28 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void setFetchDirection(int direction) throws SQLException {
-        throw new UnsupportedOperationException("?setFetchDirection");
+        engine.execute(new Exec(
+                        "setFetchDirection")
+                        .withTypes(int.class)
+                        .withParameters(direction)
+                ,connection.getTraceId(),getTraceId());
     }
 
     @Override
     public int getFetchDirection() throws SQLException {
-        throw new UnsupportedOperationException("?getFetchDirection");
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getFetchDirection")
+                ,connection.getTraceId(),getTraceId())).getResult();
     }
 
     @Override
     public void setFetchSize(int rows) throws SQLException {
-        throw new UnsupportedOperationException("?setFetchSize");
+
+        engine.execute(new Exec(
+                        "setFetchSize")
+                        .withTypes(int.class)
+                        .withParameters(rows)
+                ,connection.getTraceId(),getTraceId());
     }
 
 
@@ -1949,18 +1960,33 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateObject(int columnIndex, Object x, int scaleOrLength) throws SQLException {
-        throw new UnsupportedOperationException();
+        if(x==null){
+            updateNull(columnIndex);
+            return;
+        }
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withIndex(columnIndex)
+                        .withValue(x,x.getClass())
+                        .withScaleOrLength(scaleOrLength)
+                ,connection.getTraceId(),getTraceId());
     }
 
     @Override
     public void updateObject(int columnIndex, Object x) throws SQLException {
-        throw new UnsupportedOperationException();
+        if(x==null){
+            updateNull(columnIndex);
+            return;
+        }
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withIndex(columnIndex)
+                        .withValue(x,x.getClass())
+                ,connection.getTraceId(),getTraceId());
     }
 
 
     @Override
     public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException("?getObject");
+        throw new UnsupportedOperationException("?getObject map");
     }
 
     @Override
