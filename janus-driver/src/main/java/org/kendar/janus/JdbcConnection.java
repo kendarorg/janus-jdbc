@@ -2,6 +2,7 @@ package org.kendar.janus;
 
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
+import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.connection.*;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
