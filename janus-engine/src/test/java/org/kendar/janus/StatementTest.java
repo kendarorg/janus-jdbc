@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class StatementTest extends TestBase {
 
     @BeforeEach
-    protected void beforeEach(){
+    protected void beforeEach() throws SQLException {
         super.beforeEach();
     }
     @AfterEach
@@ -59,6 +59,19 @@ public class StatementTest extends TestBase {
     }
 
 
+    @Test
+    public void testStatementExecuteQueryGEtObject() throws  SQLException {
+        createFooTableWithField("testStatementExecuteQuery");
+        var conn = driver.connect(CONNECT_URL,null);
+        var stmt = conn.createStatement();
+        var rs = stmt.executeQuery("SELECT foo FROM bar WHERE foo = 'testStatementExecuteQuery'");
+
+
+        while(rs.next()){
+            assertEquals("testStatementExecuteQuery",(String)rs.getObject(1));
+        }
+
+    }
 
     @Test
     void testGetResultSet() throws SQLException {
@@ -80,16 +93,16 @@ public class StatementTest extends TestBase {
         conn.close();
     }
 
-
-    @Test
-    void notSupportingScrollSensitive() throws SQLException, InterruptedException {
-        createSimpleTable();
-
-        var conn = driver.connect(CONNECT_URL,null);
-        assertThrows(SQLException.class,()->conn.createStatement(
-                ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_READ_ONLY));
-    }
+//
+//    @Test
+//    void notSupportingScrollSensitive() throws SQLException, InterruptedException {
+//        createSimpleTable();
+//
+//        var conn = driver.connect(CONNECT_URL,null);
+//        assertThrows(SQLException.class,()->conn.createStatement(
+//                ResultSet.TYPE_SCROLL_SENSITIVE,
+//                ResultSet.CONCUR_READ_ONLY));
+//    }
 
     private static Stream<Arguments> supportingConcurUpdatableData() throws MalformedURLException {
         return Stream.of(
@@ -98,55 +111,56 @@ public class StatementTest extends TestBase {
                         new String[]{"'A'","'B'"},
                         new Object[]{"A","A_NEW","C_NEW","B"},
                         new Class<?>[]{String.class},
-                        "String"),
+                        "String",""),
                 Arguments.of(
                         "BIGINT",
                         new String[]{"10","20"},
                         new Object[]{10L,11L,31L,20L},
                         new Class<?>[]{long.class},
-                        "Long"),
+                        "Long",""),
                 Arguments.of(
                         "SMALLINT",
                         new String[]{"10","20"},
                         new Object[]{(short)10,(short)11,(short)31,(short)20},
                         new Class<?>[]{short.class},
-                        "Short"),
+                        "Short",""),
                 Arguments.of(
                         "INTEGER",
                         new String[]{"10","20"},
                         new Object[]{10,11,31,20},
                         new Class<?>[]{int.class},
-                        "Int"),
+                        "Int",""),
                 Arguments.of(
                         "REAL",
                         new String[]{"10","20"},
                         new Object[]{10F,11F,31F,20F},
                         new Class<?>[]{float.class},
-                        "Float"),
+                        "Float",""),
                 Arguments.of(
                         "DOUBLE PRECISION",
                         new String[]{"10","20"},
                         new Object[]{10.0,11.0,31.0,20.0},
                         new Class<?>[]{double.class},
-                        "Double"),
+                        "Double",""),
                 Arguments.of(
                         "NUMERIC",
                         new String[]{"10","20"},
                         new Object[]{BigDecimal.valueOf(10),BigDecimal.valueOf(11),BigDecimal.valueOf(31),BigDecimal.valueOf(20)},
                         new Class<?>[]{BigDecimal.class},
-                        "BigDecimal")
+                        "BigDecimal",".0")
 
         );
     }
     @ParameterizedTest
     @MethodSource("supportingConcurUpdatableData")
-    void supportingConcurUpdatable(String sqlType,String[] inserts,Object[] data,Class<?>[] input,String method) throws SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    void supportingConcurUpdatable(String sqlType,String[] inserts,Object[] data,Class<?>[] input,String method,
+        String suffix) throws SQLException, InterruptedException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         //FIXME: https://www.tutorialspoint.com/what-is-concur-updatable-resultset-in-jdbc-explain
         var dbc = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
         dbc.createStatement().execute("create table if not exists " +
                 "persons(" +
                 "id IDENTITY NOT NULL PRIMARY KEY, " +
-                "name varchar(255));");
+                "name "+sqlType+");");
         dbc.createStatement().execute("INSERT INTO persons(NAME) VALUES ("+inserts[0]+");");
         dbc.createStatement().execute("INSERT INTO persons(NAME) VALUES ("+inserts[1]+");");
 
@@ -165,11 +179,11 @@ public class StatementTest extends TestBase {
 
         var rs = statement.executeQuery("SELECT * FROM persons ORDER BY NAME ASC");
         assertTrue(rs.next());
-        assertEquals(aString,invokeGet(rs, method, "name").toString());
+        assertEquals(aString+suffix,invokeGet(rs, method, "name").toString());
 
         rs.beforeFirst();
         assertTrue(rs.next());
-        assertEquals(aString,invokeGet(rs, method, "name").toString());
+        assertEquals(aString+suffix,invokeGet(rs, method, "name").toString());
         invokeUpdate(rs,input,new Object[]{a_newValue},method,"name");
         rs.updateRow();
 
@@ -188,13 +202,13 @@ public class StatementTest extends TestBase {
         assertEquals(a_newString,invokeGet(rs, method, "name").toString());
 
         assertTrue(rs.next());
-        assertEquals(bString,invokeGet(rs, method, "name").toString());
+        assertEquals(bString+suffix,invokeGet(rs, method, "name").toString());
 
         var rs3 = statement.executeQuery("SELECT * FROM persons ORDER BY NAME ASC");
         assertTrue(rs3.next());
         assertEquals(a_newString,invokeGet(rs3, method, "name").toString());
         assertTrue(rs3.next());
-        assertEquals(bString,invokeGet(rs3, method, "name").toString());
+        assertEquals(bString+suffix,invokeGet(rs3, method, "name").toString());
         assertTrue(rs3.next());
         assertEquals(c_newString,invokeGet(rs3, method, "name").toString());
     }

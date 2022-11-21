@@ -2,20 +2,15 @@ package org.kendar.janus;
 
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
-import org.kendar.janus.cmd.connection.ConnectionPrepareCall;
-import org.kendar.janus.cmd.connection.ConnectionCreateStatement;
-import org.kendar.janus.cmd.connection.ConnectionGetDatabaseMetadata;
-import org.kendar.janus.cmd.connection.ConnectionPrepareStatement;
+import org.kendar.janus.cmd.Exec;
+import org.kendar.janus.cmd.connection.*;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.StatementResult;
-import org.kendar.janus.types.JdbcArray;
-import org.kendar.janus.types.JdbcBlob;
-import org.kendar.janus.types.JdbcClob;
-import org.kendar.janus.types.JdbcNClob;
+import org.kendar.janus.types.*;
 
 import java.sql.*;
 import java.util.Map;
@@ -224,99 +219,20 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void rollback() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isReadOnly() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setCatalog(String catalog) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getCatalog() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setTransactionIsolation(int level) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getTransactionIsolation() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public SQLWarning getWarnings() throws SQLException {
-        return null;
-    }
-
-    @Override
-    public void clearWarnings() throws SQLException {
-        //TODO
+        engine.execute(new Exec(
+                        "rollback")
+                ,this.traceId,traceId);
     }
 
 
-
-
-    @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        var command = (ConnectionPrepareCall) new ConnectionPrepareCall()
-                .withSql(sql)
-                .withType(ResultSetType.valueOf(resultSetType))
-                .withConcurrency(ResultSetConcurrency.valueOf(resultSetConcurrency));
-        return getJdbcCallableStatement(command);
-    }
-
-    @Override
-    public Map<String, Class<?>> getTypeMap() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public void setHoldability(int holdability) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getHoldability() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Savepoint setSavepoint() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Savepoint setSavepoint(String name) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void rollback(Savepoint savepoint) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new Exec(
+                        "setHoldability")
+                        .withParameters(holdability)
+                        .withTypes(int.class)
+                , this.traceId, traceId);
     }
 
 
@@ -334,32 +250,33 @@ public class JdbcConnection implements Connection {
 
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isValid(int timeout) throws SQLException {
-        throw new UnsupportedOperationException();
+        return new JdbcSQLXML();
     }
 
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        throw new UnsupportedOperationException();
+        try {
+            engine.execute(new Exec(
+                            "setClientInfo")
+                            .withParameters(name,value)
+                            .withTypes(String.class,String.class)
+                    , this.traceId, traceId);
+        } catch (SQLException e) {
+            throw new SQLClientInfoException();
+        }
     }
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getClientInfo(String name) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Properties getClientInfo() throws SQLException {
-        throw new UnsupportedOperationException();
+        try {
+            engine.execute(new Exec(
+                            "setClientInfo")
+                            .withParameters(properties)
+                            .withTypes(Properties.class)
+                    , this.traceId, traceId);
+        } catch (SQLException e) {
+            throw new SQLClientInfoException();
+        }
     }
 
     @Override
@@ -369,32 +286,16 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        throw new UnsupportedOperationException();
+        return new JdbcStruct().fromData(typeName, attributes);
     }
 
     @Override
     public void setSchema(String schema) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSchema() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void abort(Executor executor) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getNetworkTimeout() throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new Exec(
+                        "setSchema")
+                        .withParameters(schema)
+                        .withTypes(String.class)
+                , this.traceId, traceId);
     }
 
     @Override
@@ -413,5 +314,181 @@ public class JdbcConnection implements Connection {
 
     public void setTraceId(long traceId) {
         this.traceId = traceId;
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) throws SQLException {
+        engine.execute(new Exec(
+                        "setReadOnly")
+                        .withParameters(readOnly)
+                        .withTypes(boolean.class)
+                ,this.traceId,traceId);
+    }
+
+    @Override
+    public void setCatalog(String catalog) throws SQLException {
+        engine.execute(new Exec(
+                        "setCatalog")
+                        .withParameters(catalog)
+                        .withTypes(String.class)
+                , this.traceId, traceId);
+    }
+
+    @Override
+    public void setTransactionIsolation(int level) throws SQLException {
+        engine.execute(new Exec(
+                        "setTransactionIsolation")
+                        .withParameters(level)
+                        .withTypes(int.class)
+                , this.traceId, traceId);
+    }
+    @Override
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+        var command = (ConnectionPrepareCall) new ConnectionPrepareCall()
+                .withSql(sql)
+                .withType(ResultSetType.valueOf(resultSetType))
+                .withConcurrency(ResultSetConcurrency.valueOf(resultSetConcurrency));
+        return getJdbcCallableStatement(command);
+    }
+
+
+
+    @Override
+    public Savepoint setSavepoint() throws SQLException {
+        return (JdbcSavepoint)engine.execute(new Exec(
+                        "setSavepoint")
+                , this.traceId, traceId);
+    }
+
+    @Override
+    public Savepoint setSavepoint(String name) throws SQLException {
+        return (JdbcSavepoint)engine.execute(new Exec(
+                        "setSavepoint")
+                        .withTypes(String.class)
+                        .withParameters(name)
+                , this.traceId, traceId);
+    }
+
+    @Override
+    public void rollback(Savepoint savepoint) throws SQLException {
+        var jdbcSavepoint = (JdbcSavepoint)savepoint;
+        var command = new ConnectionRollbackSavepoint(jdbcSavepoint.getTraceId());
+        engine.execute(command,this.traceId,traceId);
+    }
+
+    @Override
+    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+        var jdbcSavepoint = (JdbcSavepoint)savepoint;
+        var command = new ConnectionReleaseSavepoint(jdbcSavepoint.getTraceId());
+        engine.execute(command,this.traceId,traceId);
+    }
+
+
+    @Override
+    public boolean isReadOnly() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "isReadOnly")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public String getCatalog() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getCatalog")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public int getTransactionIsolation() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getTransactionIsolation")
+                , this.traceId, traceId)).getResult();
+    }
+
+
+
+
+    @Override
+    public Map<String, Class<?>> getTypeMap() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getTypeMap")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+        engine.execute(new Exec(
+                        "setTypeMap")
+                        .withParameters(map)
+                        .withTypes(Map.class)
+                , this.traceId, traceId);
+    }
+
+    @Override
+    public int getHoldability() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getHoldability")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public boolean isValid(int timeout) throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "isValid")
+                        .withParameters(timeout)
+                        .withTypes(int.class)
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public String getClientInfo(String name) throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getClientInfo")
+                        .withParameters(name)
+                        .withTypes(String.class)
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public Properties getClientInfo() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getClientInfo")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public String getSchema() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getSchema")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public int getNetworkTimeout() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "getNetworkTimeout")
+                , this.traceId, traceId)).getResult();
+    }
+
+    @Override
+    public void abort(Executor executor) throws SQLException {
+        this.close();
+    }
+
+
+
+    @Override
+    public SQLWarning getWarnings() throws SQLException {
+        return null;
+    }
+
+    @Override
+    public void clearWarnings() throws SQLException {
+        //TODO
+    }
+
+    @Override
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        throw new UnsupportedOperationException("?setNetworkTimeout");
     }
 }

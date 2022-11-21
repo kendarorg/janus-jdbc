@@ -3,9 +3,10 @@ package org.kendar.janus.types;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.Clob;
+import java.sql.Connection;
 import java.sql.SQLException;
 
-public class JdbcClob extends BigFieldBase<char[],JdbcClob, Clob, Reader> implements Clob{
+public class JdbcClob extends BigFieldBase<char[],JdbcClob, Clob, Reader> implements Clob,JdbcType{
     public JdbcClob(){
 
     }
@@ -136,5 +137,16 @@ public class JdbcClob extends BigFieldBase<char[],JdbcClob, Clob, Reader> implem
     @Override
     public Writer setCharacterStream(long pos) throws SQLException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object toNativeObject(Connection connection) throws SQLException {
+        var result = connection.createClob();
+        try {
+            result.setCharacterStream(0).write(data);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+        return result;
     }
 }

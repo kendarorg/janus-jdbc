@@ -6,7 +6,9 @@ import org.kendar.janus.JdbcDriver;
 import org.kendar.janus.server.JsonServer;
 import org.kendar.janus.server.ServerEngine;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 
@@ -17,12 +19,29 @@ public class TestBase {
     protected JsonServer jsonServer;
     protected SessionFactory sessionFactory;
 
-    protected void beforeEach() {
+    protected Connection createFooTable() throws SQLException {
+        var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        String createStatement = "create table if not exists bar  (foo varchar(50))";
+
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate(createStatement);
+        return conn;
+    }
+
+    protected void createFooTableWithField(String value) throws SQLException {
+        var conn = createFooTable();
+        conn.createStatement().execute("INSERT INTO bar (foo) VALUES('" + value + "')");
+    }
+    protected void beforeEach() throws SQLException {
         serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
         jsonServer = new JsonServer(serverEngine);
         driver = (Driver)new JdbcDriver(jsonServer);
     }
-
+    protected InputStreamReader getInputStreamReader(int kb) throws IOException {
+        var bytes = getBytes(kb);
+        var inputStream = new ByteArrayInputStream(bytes);
+        return new InputStreamReader(inputStream);
+    }
 
     protected Object invokeGet(Object ps, String method,Object index) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         var realTypes = new Class<?>[1];

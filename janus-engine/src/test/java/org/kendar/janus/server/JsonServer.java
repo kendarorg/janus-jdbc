@@ -8,6 +8,7 @@ import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.serialization.JsonTypedSerializer;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class JsonServer implements Engine {
     private final JsonTypedSerializer serializer;
@@ -54,6 +55,31 @@ public class JsonServer implements Engine {
     @Override
     public String getCharset() {
         throw new RuntimeException();
+    }
+
+    @Override
+    public UUID startRecording() {
+        return engine.startRecording();
+    }
+
+    @Override
+    public void cleanRecordings() {
+        engine.cleanRecordings();
+    }
+
+    @Override
+    public void stopRecording(UUID id) {
+engine.stopRecording(id);
+    }
+
+    @Override
+    public void startReplaying(UUID id) {
+engine.startReplaying(id);
+    }
+
+    @Override
+    public void stopReplaying(UUID id) {
+engine.stopReplaying(id);
     }
 
     private JdbcResult getIjResult(JdbcResult command) {

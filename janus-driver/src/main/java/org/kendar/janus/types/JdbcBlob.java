@@ -5,12 +5,13 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.sql.Blob;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 /*
 https://github.com/h2database/h2database/blob/45b609dec0e45125e6a93f85c9018d34551332a1/h2/src/main/org/h2/jdbc/JdbcBlob.java
  */
-public class JdbcBlob extends BigFieldBase<byte[],JdbcBlob,Blob,InputStream> implements Blob  {
+public class JdbcBlob extends BigFieldBase<byte[],JdbcBlob,Blob,InputStream> implements Blob,JdbcType  {
 
 
     public JdbcBlob(){
@@ -133,11 +134,22 @@ public class JdbcBlob extends BigFieldBase<byte[],JdbcBlob,Blob,InputStream> imp
 
     @Override
     public long position(byte[] pattern, long start) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?position");
     }
 
     @Override
     public long position(Blob pattern, long start) throws SQLException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object toNativeObject(Connection connection) throws SQLException {
+        var result = connection.createBlob();
+        try {
+            result.setBinaryStream(0).write(data);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+        return result;
     }
 }

@@ -6,6 +6,7 @@ import org.kendar.janus.server.JdbcContext;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class PreparedStatementExecuteBase implements JdbcCommand {

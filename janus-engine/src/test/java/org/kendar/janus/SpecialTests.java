@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.kendar.janus.enums.ResultSetConcurrency;
+import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.server.JsonServer;
 import org.kendar.janus.server.ServerEngine;
 import org.kendar.janus.utils.TestBase;
@@ -25,7 +27,7 @@ public class SpecialTests extends TestBase {
 
 
     @BeforeEach
-    protected void beforeEach(){
+    protected void beforeEach() throws SQLException {
         super.beforeEach();
     }
     @AfterEach
@@ -283,4 +285,88 @@ public class SpecialTests extends TestBase {
         name = rs.getString("name");
         assertEquals("C",name);
     }
+
+    @Test
+    public void absolutePosition() throws SQLException {
+        setupTablesForPosition();
+
+
+        //Registering the Driver
+        var con = driver.connect(CONNECT_URL,null);
+
+        System.out.println("Connection established......");
+        //Creating the Statement
+        Statement stmt = con.createStatement(ResultSetType.SCROLL_INSENSITIVE.getValue(),
+                ResultSetConcurrency.CONCUR_READ_ONLY.getValue());
+        //Query to retrieve records
+        String query = "Select * from MyPlayers";
+        //Executing the query
+        ResultSet rs = stmt.executeQuery(query);
+        assertEquals(0,rs.getRow());
+        //Moving the cursor to 3rd position
+        rs.absolute(3);
+        assertEquals("Kumara",rs.getString("first_name"));
+        assertEquals(3,rs.getRow());
+        //Moving the pointer 2 positions forward from the current
+        rs.relative(2);
+        assertEquals(5,rs.getRow());
+        assertEquals("Rohit",rs.getString("first_name"));
+        //Moving the pointer 3 positions backwards from the current
+        rs.relative(-3);
+        assertEquals(2,rs.getRow());
+        assertEquals("Jonathan",rs.getString("first_name"));
+
+        rs.relative(-2);
+        assertEquals(1,rs.getRow());
+        assertEquals("Shikhar",rs.getString("first_name"));
+    }
+
+    private void setupTablesForPosition() throws SQLException {
+        var dbc = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        dbc.createStatement().execute("CREATE TABLE MyPlayers(\n" +
+                "   ID INTEGER ,\n" +
+                "   First_Name VARCHAR(255),\n" +
+                "   Last_Name VARCHAR(255),\n" +
+                "   Date_Of_Birth date,\n" +
+                "   Place_Of_Birth VARCHAR(255),\n" +
+                "   Country VARCHAR(255)" +
+                ");");
+        dbc.createStatement().executeUpdate("insert into MyPlayers values(1, 'Shikhar', 'Dhawan', ('1981-12-05'), 'Delhi', 'India');");
+        dbc.createStatement().executeUpdate("insert into MyPlayers values(2, 'Jonathan', 'Trott', ('1981-04-22'), 'CapeTown', 'SouthAfrica');");
+        dbc.createStatement().executeUpdate("insert into MyPlayers values(3, 'Kumara', 'Sangakkara', ('1977-10-27'), 'Matale', 'Srilanka');");
+        dbc.createStatement().executeUpdate("insert into MyPlayers values(4, 'Virat', 'Kohli', ('1988-11-05'), 'Delhi', 'India');");
+        dbc.createStatement().executeUpdate("insert into MyPlayers values(5, 'Rohit', 'Sharma', ('1987-04-30'), 'Nagpur', 'India');");
+        dbc.createStatement().executeUpdate("insert into MyPlayers values(6, 'Ravindra', 'Jadeja', ('1988-12-06'), 'Nagpur', 'India');");
+        dbc.createStatement().executeUpdate("insert into MyPlayers values(7, 'James', 'Anderson', ('1982-06-30'), 'Burnley', 'England');");
+    }
+
+
+
+    @Test
+    public void lastPosition() throws SQLException {
+        setupTablesForPosition();
+
+        var con = driver.connect(CONNECT_URL,null);
+
+        System.out.println("Connection established......");
+        //Creating the Statement
+        Statement stmt = con.createStatement(ResultSetType.SCROLL_INSENSITIVE.getValue(),
+                ResultSetConcurrency.CONCUR_READ_ONLY.getValue());
+        //Query to retrieve records
+        String query = "Select * from MyPlayers";
+        //Executing the query
+        ResultSet rs = stmt.executeQuery(query);
+        assertEquals(0,rs.getRow());
+        //Moving the cursor to 3rd position
+        rs.last();
+        assertEquals(7,rs.getRow());
+        assertEquals("James",rs.getString("first_name"));
+
+
+        rs.first();
+        assertEquals(1,rs.getRow());
+        assertEquals("Shikhar",rs.getString("first_name"));
+    }
+
+    //TODO DElete hole https://www.ibm.com/docs/en/db2-for-zos/12?topic=cjrudsdjs-testing-whether-current-row-resultset-is-delete-hole-update-hole-in-jdbc-application
 }

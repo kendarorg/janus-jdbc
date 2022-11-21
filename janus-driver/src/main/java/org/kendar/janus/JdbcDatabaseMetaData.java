@@ -1,6 +1,7 @@
 package org.kendar.janus;
 
 import org.kendar.janus.cmd.Exec;
+import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.results.ObjectResult;

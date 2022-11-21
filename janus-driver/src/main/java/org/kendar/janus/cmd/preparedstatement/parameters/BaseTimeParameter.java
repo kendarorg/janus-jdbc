@@ -10,13 +10,9 @@ public abstract class BaseTimeParameter<T> extends SimpleParameter<T>{
     public BaseTimeParameter(){
 
     }
-
-    public BaseTimeParameter(T value, int parameterIndex) {
-        super(value,parameterIndex);
-    }
-    public BaseTimeParameter(T value, int parameterIndex, Calendar calendar) {
-        this(value,parameterIndex);
+    public BaseTimeParameter<T> withCalendar(Calendar calendar){
         this.calendar = calendar;
+        return this;
     }
     @Override
     public void serialize(TypedSerializer builder) {

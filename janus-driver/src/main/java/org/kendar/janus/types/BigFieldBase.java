@@ -10,6 +10,14 @@ import java.lang.reflect.Array;
 import java.sql.SQLException;
 
 public abstract class BigFieldBase<T,K,J,S> implements TypedSerializable {
+    public T getData() {
+        return data;
+    }
+
+    public long getLength() {
+        return length;
+    }
+
     protected T data;
     protected long length;
 

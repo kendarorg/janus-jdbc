@@ -5,6 +5,7 @@ import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.RetrieveRemainingResultSet;
 import org.kendar.janus.cmd.resultset.ResultSetGetMetaData;
+import org.kendar.janus.cmd.resultset.UpdateSpecialObject;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
@@ -14,12 +15,16 @@ import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.RemainingResultSetResult;
 import org.kendar.janus.serialization.TypedSerializer;
+import org.kendar.janus.types.JdbcBlob;
+import org.kendar.janus.types.JdbcClob;
+import org.kendar.janus.types.JdbcNClob;
 import org.kendar.janus.types.JdbcRowId;
 import org.kendar.janus.utils.JdbcTypesConverter;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.*;
 import java.util.*;
@@ -1081,7 +1086,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             return true;
         }
         if(!lastRow){
-            Boolean nextResult = retrieveRemaningResultSet();
+            Boolean nextResult = retrieveRemaningResultSet(false);
             if (nextResult == null) return false;
             return nextResult;
         }
@@ -1089,15 +1094,21 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return false;
     }
 
-    private Boolean retrieveRemaningResultSet() throws SQLException {
+    private Boolean retrieveRemaningResultSet(boolean isPrevious ) throws SQLException {
         var nextResult = false;
+
         var result = (RemainingResultSetResult)engine.execute(
                 new RetrieveRemainingResultSet(
                         this.columnCount,
-                        this.maxRows),
+                        isPrevious?1:this.maxRows,
+                        isPrevious),
                 this.connection.getTraceId(),
                 this.traceId);
-        rows.addAll(result.getRows());
+        if(isPrevious){
+            rows.set(cursor,result.getRows().get(0));
+        }else {
+            rows.addAll(result.getRows());
+        }
         lastRow = result.isLastRow();
 
         if(rows == null || rows.size()==0) return null;
@@ -1384,7 +1395,6 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void deleteRow() throws SQLException {
-        mustBeUpdatable();
         engine.execute(new Exec("deleteRow"),connection.getTraceId(),getTraceId());
     }
 
@@ -1467,7 +1477,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public int getRow() throws SQLException {
-        return this.cursor + 1;
+        var res = this.cursor + 1;
+        return res;
     }
 
     @Override
@@ -1548,22 +1559,34 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return (T)value;
     }
 
+
+    @Override
+    public void updateNString(int columnIndex, String nString) throws SQLException {
+        updateString(columnIndex,nString);
+    }
+
+    @Override
+    public void updateNString(String columnLabel, String nString) throws SQLException {
+        updateString(columnLabel,nString);
+    }
     //TODO Implements
 
 
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+
     }
 
     @Override
     public boolean absolute(int row) throws SQLException {
+        row-=1;
+
         if(row<cursor) {
             mustNotBeForwardOnly();
         }
@@ -1578,11 +1601,30 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public boolean relative(int rows) throws SQLException {
-
+        if(rows ==0){
+            return true;
+        }
         if(rows>0){
-            return absolute(cursor+rows);
+            var maxPos = cursor+rows;
+            while(cursor<maxPos){
+                if(!next()){
+                    return false;
+                }
+            }
+            return true;
         }else if(rows<0) {
             mustNotBeForwardOnly();
+            while(rows<0) {
+                var res = this.previous();
+                if(cursor==0){
+                    return false;
+                }
+                if(res==false) {
+                    return false;
+                }
+                rows++;
+            }
+            return true;
         }
         return false;
     }
@@ -1590,22 +1632,30 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public boolean previous() throws SQLException {
         mustNotBeForwardOnly();
-        throw new UnsupportedOperationException();
+        boolean result = ((ObjectResult)engine.execute(new Exec(
+                        "previous")
+                ,connection.getTraceId(),getTraceId())).getResult();
+        if(result==false)return false;
+        var recursor = cursor;
+        recursor--;;
+        retrieveRemaningResultSet(true);
+        cursor = recursor;
+        return true;
     }
 
     @Override
     public void setFetchDirection(int direction) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?setFetchDirection");
     }
 
     @Override
     public int getFetchDirection() throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?getFetchDirection");
     }
 
     @Override
     public void setFetchSize(int rows) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?setFetchSize");
     }
 
 
@@ -1631,18 +1681,271 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateAsciiStream(int columnIndex, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException();
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            updateClob(columnIndex,targetReader,length);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
     }
 
     @Override
     public void updateBinaryStream(int columnIndex, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException();
+        updateBlob(columnIndex,x,length);
     }
 
     @Override
     public void updateCharacterStream(int columnIndex, Reader x, int length) throws SQLException {
-        throw new UnsupportedOperationException();
+        updateClob(columnIndex,x,length);
     }
+
+
+
+
+    @Override
+    public void updateBlob(int columnIndex, Blob x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withIndex(columnIndex)
+                        .withValue(x,Blob.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+
+    @Override
+    public void updateBlob(String columnLabel, Blob x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withName(columnLabel)
+                        .withValue(x,Blob.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+
+    @Override
+    public void updateClob(int columnIndex, Clob x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withIndex(columnIndex)
+                        .withValue(x,Clob.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+
+    @Override
+    public void updateClob(String columnLabel, Clob x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withName(columnLabel)
+                        .withValue(x,Clob.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+    @Override
+    public void updateNClob(int columnIndex, NClob x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withIndex(columnIndex)
+                        .withValue(x,Blob.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+
+    @Override
+    public void updateNClob(String columnLabel, NClob x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withName(columnLabel)
+                        .withValue(x,NClob.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+
+    @Override
+    public void updateSQLXML(int columnIndex, SQLXML x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withIndex(columnIndex)
+                        .withValue(x,SQLXML.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+
+    @Override
+    public void updateSQLXML(String columnLabel, SQLXML x) throws SQLException {
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withName(columnLabel)
+                        .withValue(x,SQLXML.class)
+                ,connection.getTraceId(),getTraceId());
+    }
+
+
+
+    @Override
+    public void updateBlob(int columnIndex, InputStream inputStream, long length) throws SQLException {
+        updateBlob(columnIndex,new JdbcBlob().fromSource(inputStream,length));
+    }
+
+    @Override
+    public void updateBlob(String columnLabel, InputStream inputStream, long length) throws SQLException {
+        updateBlob(columnLabel,new JdbcBlob().fromSource(inputStream,length));
+    }
+
+    @Override
+    public void updateClob(int columnIndex, Reader reader, long length) throws SQLException {
+        updateClob(columnIndex,new JdbcClob().fromSource(reader,length));
+    }
+
+    @Override
+    public void updateClob(String columnLabel, Reader reader, long length) throws SQLException {
+        updateClob(columnLabel,new JdbcClob().fromSource(reader,length));
+    }
+
+    @Override
+    public void updateNClob(int columnIndex, Reader reader, long length) throws SQLException {
+        updateClob(columnIndex,new JdbcNClob().fromSource(reader,length));
+    }
+
+    @Override
+    public void updateNClob(String columnLabel, Reader reader, long length) throws SQLException {
+        updateClob(columnLabel,new JdbcNClob().fromSource(reader,length));
+    }
+    @Override
+    public void updateBlob(int columnIndex, InputStream inputStream) throws SQLException {
+        updateBlob(columnIndex,new JdbcBlob().fromSource(inputStream));
+    }
+
+    @Override
+    public void updateBlob(String columnLabel, InputStream inputStream) throws SQLException {
+        updateBlob(columnLabel,new JdbcBlob().fromSource(inputStream));
+    }
+
+    @Override
+    public void updateClob(int columnIndex, Reader reader) throws SQLException {
+        updateClob(columnIndex,new JdbcClob().fromSource(reader));
+    }
+
+    @Override
+    public void updateClob(String columnLabel, Reader reader) throws SQLException {
+        updateClob(columnLabel,new JdbcClob().fromSource(reader));
+    }
+
+    @Override
+    public void updateNClob(int columnIndex, Reader reader) throws SQLException {
+        updateNClob(columnIndex,new JdbcNClob().fromSource(reader));
+    }
+
+    @Override
+    public void updateNClob(String columnLabel, Reader reader) throws SQLException {
+        updateNClob(columnLabel,new JdbcNClob().fromSource(reader));
+    }
+
+
+    @Override
+    public void updateAsciiStream(int columnIndex, InputStream x, long length) throws SQLException {
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            updateClob(columnIndex,targetReader,length);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    @Override
+    public void updateAsciiStream(String columnLabel, InputStream x, long length) throws SQLException {
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            updateClob(columnLabel,targetReader,length);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+    }
+
+
+
+    @Override
+    public void updateAsciiStream(int columnIndex, InputStream x) throws SQLException {
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            updateClob(columnIndex,targetReader);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    @Override
+    public void updateAsciiStream(String columnLabel, InputStream x) throws SQLException {
+        try {
+            var buffer = IOUtils.toByteArray(x);
+            Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
+            updateClob(columnLabel,targetReader);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    @Override
+    public void updateNCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
+        updateCharacterStream(columnIndex,x,length);
+    }
+
+    @Override
+    public void updateNCharacterStream(String columnLabel, Reader x, long length) throws SQLException {
+        updateCharacterStream(columnLabel,x,length);
+    }
+    @Override
+    public void updateNCharacterStream(int columnIndex, Reader x) throws SQLException {
+        updateCharacterStream(columnIndex,x);
+    }
+
+    @Override
+    public void updateNCharacterStream(String columnLabel, Reader x) throws SQLException {
+        updateCharacterStream(columnLabel,x);
+    }
+
+
+    @Override
+    public void updateCharacterStream(String columnLabel, Reader reader) throws SQLException {
+        updateClob(columnLabel,reader);
+    }
+
+    @Override
+    public void updateCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
+        updateClob(columnIndex,x,length);
+    }
+    @Override
+    public void updateCharacterStream(String columnLabel, Reader x, long length) throws SQLException {
+        updateClob(columnLabel,x,length);
+    }
+
+    @Override
+    public void updateBinaryStream(int columnIndex, InputStream x, long length) throws SQLException {
+        updateBlob(columnIndex,x,length);
+    }
+
+    @Override
+    public void updateBinaryStream(String columnLabel, InputStream x, long length) throws SQLException {
+        updateBlob(columnLabel,x,length);
+    }
+
+
+    @Override
+    public void updateBinaryStream(int columnIndex, InputStream x) throws SQLException {
+        updateBlob(columnIndex,x);
+    }
+
+    @Override
+    public void updateCharacterStream(int columnIndex, Reader x) throws SQLException {
+        updateClob(columnIndex,x);
+    }
+
+    @Override
+    public void updateBinaryStream(String columnLabel, InputStream x) throws SQLException {
+        updateBlob(columnLabel,x);
+    }
+
+    @Override
+    public Reader getCharacterStream(int columnIndex) throws SQLException {
+        return getClob(columnIndex).getCharacterStream();
+    }
+
+
+    @Override
+    public String getCursorName() throws SQLException {
+        throw new UnsupportedOperationException("getCursorName");
+    }
+
+
 
     @Override
     public void updateObject(int columnIndex, Object x, int scaleOrLength) throws SQLException {
@@ -1657,12 +1960,12 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?getObject");
     }
 
     @Override
     public Ref getRef(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("?getRef");
     }
 
 
@@ -1681,224 +1984,28 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     }
 
     @Override
-    public void updateBlob(int columnIndex, Blob x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBlob(String columnLabel, Blob x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateClob(int columnIndex, Clob x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateClob(String columnLabel, Clob x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void updateArray(int columnIndex, Array x) throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withIndex(columnIndex)
+                        .withValue(x,Array.class)
+                ,connection.getTraceId(),getTraceId());
     }
 
     @Override
     public void updateArray(String columnLabel, Array x) throws SQLException {
-        throw new UnsupportedOperationException();
+        engine.execute(new UpdateSpecialObject(connection.getTraceId())
+                        .withName(columnLabel)
+                        .withValue(x,Array.class)
+                ,connection.getTraceId(),getTraceId());
     }
 
     @Override
     public void updateRowId(int columnIndex, RowId x) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("updateRowId");
     }
 
     @Override
     public void updateRowId(String columnLabel, RowId x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNString(int columnIndex, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNString(String columnLabel, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNClob(String columnLabel, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateSQLXML(String columnLabel, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNCharacterStream(String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateAsciiStream(int columnIndex, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBinaryStream(int columnIndex, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateAsciiStream(String columnLabel, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBinaryStream(String columnLabel, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateCharacterStream(String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBlob(int columnIndex, InputStream inputStream, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBlob(String columnLabel, InputStream inputStream, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateClob(int columnIndex, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateClob(String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNClob(int columnIndex, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNClob(String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNCharacterStream(int columnIndex, Reader x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNCharacterStream(String columnLabel, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateAsciiStream(int columnIndex, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBinaryStream(int columnIndex, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateCharacterStream(int columnIndex, Reader x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateAsciiStream(String columnLabel, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBinaryStream(String columnLabel, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateCharacterStream(String columnLabel, Reader reader) throws SQLException {
-
-    }
-
-    @Override
-    public void updateBlob(int columnIndex, InputStream inputStream) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateBlob(String columnLabel, InputStream inputStream) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateClob(int columnIndex, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateClob(String columnLabel, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNClob(int columnIndex, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateNClob(String columnLabel, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-
-
-    @Override
-    public String getCursorName() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Reader getCharacterStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("updateRowId");
     }
 }

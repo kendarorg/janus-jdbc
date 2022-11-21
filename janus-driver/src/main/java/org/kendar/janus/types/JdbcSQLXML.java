@@ -6,10 +6,11 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 
-public class JdbcSQLXML extends BigFieldBase<String,JdbcSQLXML, SQLXML, String> implements SQLXML{
+public class JdbcSQLXML extends BigFieldBase<String,JdbcSQLXML, SQLXML, String> implements SQLXML,JdbcType{
     @Override
     protected String sqlObjectToDataArray(SQLXML input, long length) throws SQLException, IOException {
         return input.getString();
@@ -69,5 +70,17 @@ public class JdbcSQLXML extends BigFieldBase<String,JdbcSQLXML, SQLXML, String> 
     @Override
     public <T extends Result> T setResult(Class<T> resultClass) throws SQLException {
         throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public Object toNativeObject(Connection connection) throws SQLException {
+        var result = connection.createSQLXML();
+        try {
+            result.setCharacterStream().write(data);
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+        return result;
     }
 }
