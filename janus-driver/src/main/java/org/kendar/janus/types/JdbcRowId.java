@@ -4,11 +4,14 @@ import org.apache.commons.lang3.ClassUtils;
 import org.kendar.janus.serialization.TypedSerializable;
 import org.kendar.janus.serialization.TypedSerializer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.sql.RowId;
+import java.sql.SQLException;
 
-public class JdbcRowId  implements TypedSerializable, RowId {
+public class JdbcRowId  implements TypedSerializable, RowId,JdbcType {
 
     public Object getOriginalValue() {
         return originalValue;
@@ -64,6 +67,12 @@ public class JdbcRowId  implements TypedSerializable, RowId {
         originalValue = builder.read("originalValue");
         string = builder.read("string");
         hashCode = builder.read("hashCode");
+        return this;
+    }
+
+
+    @Override
+    public Object toNativeObject(Connection connection) throws SQLException {
         return this;
     }
 }

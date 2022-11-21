@@ -14,15 +14,17 @@ public class RetrieveRemainingResultSet implements JdbcCommand {
 
     private int columnCount;
     private int maxRows;
+    private boolean currentRow;
 
     public RetrieveRemainingResultSet(){
 
     }
 
-    public RetrieveRemainingResultSet(int columnCount, int maxRows) {
+    public RetrieveRemainingResultSet(int columnCount, int maxRows,boolean currentRow) {
 
         this.columnCount = columnCount;
         this.maxRows = maxRows;
+        this.currentRow = currentRow;
     }
 
     @Override
@@ -32,21 +34,31 @@ public class RetrieveRemainingResultSet implements JdbcCommand {
         var rs = (ResultSet)context.get(uid);
         var rowsCount = 0;
         var lastRow = false;
-        while(rs.next()){
-
+        if(currentRow){
             var row = new ArrayList<Object>();
             for(var i=0;i<this.columnCount;i++){
                 row.add(JdbcTypesConverter.convertToSerializable(rs.getObject(i+1)));
             }
             rows.add(row);
             rowsCount++;
-            if(rowsCount>=maxRows){
-                break;
-            }
+            lastRow = false;
+        }else {
+            while (rs.next()) {
 
-        }
-        if(rowsCount==0){
-            lastRow = true;
+                var row = new ArrayList<Object>();
+                for (var i = 0; i < this.columnCount; i++) {
+                    row.add(JdbcTypesConverter.convertToSerializable(rs.getObject(i + 1)));
+                }
+                rows.add(row);
+                rowsCount++;
+                if (rowsCount >= maxRows) {
+                    break;
+                }
+
+            }
+            if (rowsCount == 0) {
+                lastRow = true;
+            }
         }
         result.setLastRow(lastRow);
         result.setRows(rows);
@@ -57,6 +69,7 @@ public class RetrieveRemainingResultSet implements JdbcCommand {
     public void serialize(TypedSerializer builder) {
         builder.write("columnCount",columnCount);
         builder.write("maxRows",maxRows);
+        builder.write("currentRow",currentRow);
     }
 
     @Override
@@ -64,6 +77,7 @@ public class RetrieveRemainingResultSet implements JdbcCommand {
 
         columnCount =input.read("columnCount");
         maxRows = input.read("maxRows");
+        currentRow = input.read("currentRow");
         return this;
     }
 
@@ -72,6 +86,7 @@ public class RetrieveRemainingResultSet implements JdbcCommand {
         return "RetrieveRemainingResultSet{" +
                 "\n\tcolumnCount=" + columnCount +
                 ", \n\tmaxRows=" + maxRows +
+                ", \n\tcurrentRow=" + currentRow +
                 '}';
     }
 }

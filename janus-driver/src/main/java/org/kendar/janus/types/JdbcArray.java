@@ -5,13 +5,10 @@ import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.utils.JdbcArrayTypeTranslator;
 import org.kendar.janus.utils.SqlTypes;
 
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Struct;
+import java.sql.*;
 import java.util.Map;
 
-public class JdbcArray implements Array,TypedSerializable {
+public class JdbcArray implements Array,TypedSerializable,JdbcType {
     private String baseTypeName;
     private int baseType;
     private Object array;
@@ -119,5 +116,10 @@ public class JdbcArray implements Array,TypedSerializable {
     @Override
     public void free() throws SQLException {
         this.array = null;
+    }
+
+    @Override
+    public Object toNativeObject(Connection connection) throws SQLException {
+        return connection.createArrayOf(baseTypeName,(Object[])array);
     }
 }

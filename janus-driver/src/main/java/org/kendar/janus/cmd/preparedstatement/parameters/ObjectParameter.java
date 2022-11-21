@@ -1,11 +1,15 @@
 package org.kendar.janus.cmd.preparedstatement.parameters;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.kendar.janus.cmd.preparedstatement.PreparedStatementParameter;
 import org.kendar.janus.serialization.TypedSerializer;
+import org.kendar.janus.types.JdbcBlob;
+import org.kendar.janus.types.JdbcNClob;
+import org.kendar.janus.types.JdbcSQLXML;
+import org.kendar.janus.types.JdbcType;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 
 public class ObjectParameter implements PreparedStatementParameter {
     private Object value;
@@ -16,6 +20,7 @@ public class ObjectParameter implements PreparedStatementParameter {
     private boolean out;
 
     private String typeName;
+    private boolean serializable=false;
 
 
     public ObjectParameter withTargetSqlType(int targetSqlType){
@@ -46,8 +51,36 @@ public class ObjectParameter implements PreparedStatementParameter {
         return this;
     }
 
-    public ObjectParameter withValue(Object value){
-        this.value = value;
+    public ObjectParameter withValue(Object value) throws SQLException {
+        if(value==null){
+            return this;
+        }
+        var objClass =value.getClass();
+        if(ClassUtils.isPrimitiveOrWrapper(objClass)) {
+            this.value = value;
+        }else if(ClassUtils.isAssignable(objClass, JdbcType.class)) {
+            this.value = value;
+        }else if(ClassUtils.isAssignable(objClass, InputStream.class)) {
+            var jdbcBlob = new JdbcBlob().fromSource((InputStream)value);
+            this.value = jdbcBlob;
+        }else if(ClassUtils.isAssignable(objClass, Reader.class)) {
+            var jdbcBlob = new JdbcNClob().fromSource((Reader)value);
+            this.value = jdbcBlob;
+        }else{
+            try {
+                var byteArrayOutputStream
+                        = new ByteArrayOutputStream();
+                var objectOutputStream
+                        = new ObjectOutputStream(byteArrayOutputStream);
+                objectOutputStream.writeObject(value);
+                objectOutputStream.flush();
+                objectOutputStream.close();
+                this.value = byteArrayOutputStream.toByteArray();
+                serializable = true;
+            }catch(Exception ex){
+                throw new SQLException(ex);
+            }
+        }
         return this;
     }
 
@@ -56,26 +89,49 @@ public class ObjectParameter implements PreparedStatementParameter {
         return this;
     }
 
+    private Object toLocalObject(Statement statement) throws SQLException {
+        if(serializable){
+            try {
+                var byteArrayOutputStream
+                        = new ByteArrayInputStream((byte[])value);
+                var objectOutputStream
+                        = new ObjectInputStream(byteArrayOutputStream);
+                return objectOutputStream.readObject();
+            }catch(Exception ex){
+                throw new SQLException(ex);
+            }
+        }
+        var objClass = value.getClass();
+        if(ClassUtils.isPrimitiveOrWrapper(objClass)) {
+            return value;
+        }else if(ClassUtils.isAssignable(objClass, JdbcType.class)) {
+            return ((JdbcType)value).toNativeObject(statement.getConnection());
+        }
+        throw new SQLException("Inconvertible type "+objClass.getName());
+    }
+
     @Override
     public void load(PreparedStatement preparedStatement) throws SQLException {
+        var real = toLocalObject(preparedStatement);
         if(targetSqlType==null) {
-            preparedStatement.setObject(columnIndex,value);
+            preparedStatement.setObject(columnIndex,real);
         }else if(scaleOrLength==null){
-            preparedStatement.setObject(columnIndex,value,targetSqlType);
+            preparedStatement.setObject(columnIndex,real,targetSqlType);
         }else{
-            preparedStatement.setObject(columnIndex,value,targetSqlType,scaleOrLength);
+            preparedStatement.setObject(columnIndex,real,targetSqlType,scaleOrLength);
         }
     }
 
     @Override
     public void load(CallableStatement callableStatement) throws SQLException {
         if(columnName!=null && !columnName.isEmpty()) {
+            var real = toLocalObject(callableStatement);
             if (targetSqlType == null) {
-                callableStatement.setObject(columnName, value);
+                callableStatement.setObject(columnName, real);
             } else if (scaleOrLength == null) {
-                callableStatement.setObject(columnName, value, targetSqlType);
+                callableStatement.setObject(columnName, real, targetSqlType);
             } else {
-                callableStatement.setObject(columnName, value, targetSqlType, scaleOrLength);
+                callableStatement.setObject(columnName, real, targetSqlType, scaleOrLength);
             }
         }else{
             load((PreparedStatement) callableStatement);
@@ -105,6 +161,7 @@ public class ObjectParameter implements PreparedStatementParameter {
         builder.write("scaleOrLength",scaleOrLength);
         builder.write("columnName",columnName);
         builder.write("typeName",typeName);
+        builder.write("serializable",serializable);
         builder.write("out",out);
     }
 
@@ -116,6 +173,7 @@ public class ObjectParameter implements PreparedStatementParameter {
         scaleOrLength =builder.read("scaleOrLength");
         columnName =builder.read("columnName");
         typeName =builder.read("typeName");
+        serializable =builder.read("serializable");
         out =builder.read("out");
         return this;
     }

@@ -86,6 +86,7 @@ public class JdbcTypesConverter {
 
     public static Object convertToSerializable(Object object) throws SQLException {
         if(object==null) return null;
+        var obClass= object.getClass();
         if(ClassUtils.isAssignable(object.getClass(),Struct.class)){
             return new JdbcStruct().fromStruct((Struct)object);
         }else if(ClassUtils.isAssignable(object.getClass(),Array.class)){

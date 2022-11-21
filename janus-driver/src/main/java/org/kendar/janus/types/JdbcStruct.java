@@ -3,11 +3,13 @@ package org.kendar.janus.types;
 import org.kendar.janus.serialization.TypedSerializable;
 import org.kendar.janus.serialization.TypedSerializer;
 
+import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.Map;
 
-public class JdbcStruct implements Struct, TypedSerializable {
+public class JdbcStruct implements Struct, TypedSerializable,JdbcType {
     private String sqlTypeName;
     private Object[] attributes;
 
@@ -58,4 +60,12 @@ public class JdbcStruct implements Struct, TypedSerializable {
         attributes = builder.read("attributes");
         return this;
     }
+
+
+
+    @Override
+    public Object toNativeObject(Connection connection) throws SQLException {
+        return connection.createStruct(sqlTypeName,attributes);
+    }
+
 }

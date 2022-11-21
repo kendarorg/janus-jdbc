@@ -3,11 +3,12 @@ package org.kendar.janus.types;
 import org.kendar.janus.serialization.TypedSerializable;
 import org.kendar.janus.serialization.TypedSerializer;
 
+import java.sql.Connection;
 import java.sql.Ref;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class JdbcRef implements Ref, TypedSerializable {
+public class JdbcRef implements Ref, TypedSerializable,JdbcType {
 
     private String baseTypeName;
 
@@ -51,5 +52,10 @@ public class JdbcRef implements Ref, TypedSerializable {
         javaObject = builder.read("javaObject");
         baseTypeName = builder.read("baseTypeName");
         return this;
+    }
+
+    @Override
+    public Object toNativeObject(Connection connection) throws SQLException {
+        throw new UnsupportedOperationException();
     }
 }

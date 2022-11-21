@@ -1086,7 +1086,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             return true;
         }
         if(!lastRow){
-            Boolean nextResult = retrieveRemaningResultSet();
+            Boolean nextResult = retrieveRemaningResultSet(false);
             if (nextResult == null) return false;
             return nextResult;
         }
@@ -1094,17 +1094,21 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return false;
     }
 
-    private Boolean retrieveRemaningResultSet(int ) throws SQLException {
+    private Boolean retrieveRemaningResultSet(boolean isPrevious ) throws SQLException {
         var nextResult = false;
-        //FIXME WHEN PREVIOUS SHOULD GET THE CURRENT
-        XXXX
+
         var result = (RemainingResultSetResult)engine.execute(
                 new RetrieveRemainingResultSet(
                         this.columnCount,
-                        this.maxRows),
+                        isPrevious?1:this.maxRows,
+                        isPrevious),
                 this.connection.getTraceId(),
                 this.traceId);
-        rows.addAll(result.getRows());
+        if(isPrevious){
+            rows.set(cursor,result.getRows().get(0));
+        }else {
+            rows.addAll(result.getRows());
+        }
         lastRow = result.isLastRow();
 
         if(rows == null || rows.size()==0) return null;
@@ -1613,7 +1617,12 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             mustNotBeForwardOnly();
             while(rows<0) {
                 var res = this.previous();
-                if(res==false)return false;
+                if(cursor==0){
+                    return false;
+                }
+                if(res==false) {
+                    return false;
+                }
                 rows++;
             }
             return true;
@@ -1630,7 +1639,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         if(result==false)return false;
         var recursor = cursor;
         recursor--;;
-        retrieveRemaningResultSet();
+        retrieveRemaningResultSet(true);
         cursor = recursor;
         return true;
     }

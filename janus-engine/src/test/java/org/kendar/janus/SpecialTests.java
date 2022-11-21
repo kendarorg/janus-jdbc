@@ -330,5 +330,9 @@ public class SpecialTests extends TestBase {
         rs.relative(-3);
         assertEquals(2,rs.getRow());
         assertEquals("Jonathan",rs.getString("first_name"));
+
+        rs.relative(-2);
+        assertEquals(1,rs.getRow());
+        assertEquals("Shikhar",rs.getString("first_name"));
     }
 }
