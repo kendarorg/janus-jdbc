@@ -11,6 +11,10 @@ import org.kendar.janus.utils.LoggerWrapper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -68,6 +72,12 @@ public class ServerEngine implements Engine {
 
     @Override
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid) throws SQLException {
+        if(isReplaying){
+            var recording = recordings.get(currentRecording);
+            var result = recording.get((int)replayIndex);
+            replayIndex++;
+            return (JdbcResult) result.getResponse();
+        }
         JdbcResult result = null;
         Object resultObject = null;
         Long traceId = null;
@@ -80,7 +90,19 @@ public class ServerEngine implements Engine {
             traceId = getTraceId();
             contexts.get(connectionId).put(traceId,resultObject);
         }
-        return JdbcTypesConverter.convertResult(this,resultObject,connectionId,traceId);
+        var toret = JdbcTypesConverter.convertResult(this,resultObject,connectionId,traceId);
+        if(isRecording){
+            var recording = recordings.get(currentRecording);
+            var rr = new ResponseRequest();
+            var jdbcRequest = new JdbcRequest();
+            jdbcRequest.setCommand(command);
+            jdbcRequest.setConnectionId(connectionId);
+            jdbcRequest.setConnectionId(uid);
+            rr.setRequest(jdbcRequest);
+            rr.setResponse(toret);
+            recording.add(rr);
+        }
+        return toret;
     }
 
     @Override
@@ -96,6 +118,44 @@ public class ServerEngine implements Engine {
     @Override
     public String getCharset() {
         return charset;
+    }
+
+    private HashMap<UUID,List<ResponseRequest>> recordings = new HashMap<>();
+    private boolean isRecording =false;
+    private boolean isReplaying =false;
+    private UUID currentRecording = null;
+    private long replayIndex = 0;
+    @Override
+    public UUID startRecording() {
+        var id = UUID.randomUUID();
+        recordings.put(id,new ArrayList<>());
+        currentRecording = id;
+        isRecording = true;
+        return id;
+    }
+
+    @Override
+    public void stopRecording(UUID id) {
+        isRecording = false;
+        currentRecording = null;
+    }
+
+    @Override
+    public void startReplaying(UUID id) {
+        currentRecording = id;
+        isReplaying = true;
+        replayIndex =0;
+    }
+
+    @Override
+    public void stopReplaying(UUID id) {
+        currentRecording = id;
+        isReplaying = false;
+    }
+
+    @Override
+    public void cleanRecordings(){
+        recordings.clear();
     }
 
 

@@ -14,6 +14,8 @@ So using the driver means
 * Connect to the Janus-server like "jdbc:janus:http://localhost/db?fetchSize=3&charset=UTF-8"
 * Look all messages passing
 
+Tested (poorly but tested) with Hibernate
+
 ## Implementation
 
 ### Server
@@ -22,6 +24,8 @@ Actually only a "fake" implementation exists on tests: JsonServer
 
 * private JdbcCommand getIjCommand(JdbcCommand command) translate the commands to serializable
 * private JdbcResult getIjResult(JdbcResult command) translate the results to serializable
+
+Simple index based reproduction of dataset interactions
 
 ### Serialization
 
