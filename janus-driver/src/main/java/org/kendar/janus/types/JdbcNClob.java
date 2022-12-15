@@ -203,4 +203,10 @@ public class JdbcNClob extends BigFieldBase<char[],JdbcNClob, NClob, Reader> imp
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        if(this.data==null)return "<closed>";
+        return "'"+new String(this.data)+"'";
+    }
 }

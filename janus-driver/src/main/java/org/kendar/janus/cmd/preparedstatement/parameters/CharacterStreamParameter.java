@@ -13,6 +13,9 @@ public class CharacterStreamParameter extends SimpleParameter<char[]>{
         try{
             var tmp= IOUtils.toCharArray(reader);
             var maxLen = (int)Math.min(length,tmp.length);
+            if(maxLen<0){
+                maxLen = (int)Math.max(length,tmp.length);
+            }
             this.value = new char[maxLen];
             System.arraycopy(tmp, 0, value, 0, maxLen);
 

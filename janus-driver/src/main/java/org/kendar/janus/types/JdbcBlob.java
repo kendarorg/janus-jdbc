@@ -4,6 +4,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -151,5 +153,46 @@ public class JdbcBlob extends BigFieldBase<byte[],JdbcBlob,Blob,InputStream> imp
             throw new SQLException(e);
         }
         return result;
+    }
+    public String toString() {
+        if(this.data==null)return "<closed>";
+
+        return encode(this.data);
+    }
+
+    private static final char[] LOOKUP_TABLE_LOWER = new char[]{0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66};
+    private static final char[] LOOKUP_TABLE_UPPER = new char[]{0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46};
+
+    private static String encode(byte[] byteArray, boolean upperCase, ByteOrder byteOrder) {
+
+        // our output size will be exactly 2x byte-array length
+        final char[] buffer = new char[byteArray.length * 2];
+
+        // choose lower or uppercase lookup table
+        final char[] lookup = upperCase ? LOOKUP_TABLE_UPPER : LOOKUP_TABLE_LOWER;
+
+        int index;
+        for (int i = 0; i < byteArray.length; i++) {
+            // for little endian we count from last to first
+            index = (byteOrder == ByteOrder.BIG_ENDIAN) ? i : byteArray.length - i - 1;
+
+            // extract the upper 4 bit and look up char (0-A)
+            buffer[i << 1] = lookup[(byteArray[index] >> 4) & 0xF];
+            // extract the lower 4 bit and look up char (0-A)
+            buffer[(i << 1) + 1] = lookup[(byteArray[index] & 0xF)];
+        }
+        var partial= new String(buffer);
+        var sb = new StringBuilder();
+        for(var i=0;i<buffer.length;i+=2){
+            sb.append("X'");
+            sb.append(buffer[i]);
+            sb.append(buffer[i+1]);
+            sb.append("'");
+        }
+        return sb.toString();
+    }
+
+    private static String encode(byte[] byteArray) {
+        return encode(byteArray, false, ByteOrder.BIG_ENDIAN);
     }
 }

@@ -559,7 +559,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
-        return (byte[])getFieldById(columnIndex);
+        var result = getFieldById(columnIndex);
+        if(result.getClass()==JdbcBlob.class){
+            return ((JdbcBlob)result).getData();
+        }
+        return (byte[])result;
     }
 
     private static Date getPureDate(long milliSeconds) {
@@ -659,6 +663,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public String getString(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==JdbcClob.class){
+            return new String(((JdbcClob)result).getData());
+        }else if(result.getClass()==JdbcNClob.class){
+            return new String(((JdbcNClob)result).getData());
+        }
         return result.toString();
     }
 

@@ -199,4 +199,10 @@ public class JdbcClob extends BigFieldBase<char[],JdbcClob, Clob, Reader> implem
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        if(this.data==null)return "<closed>";
+        return "'"+new String(this.data)+"'";
+    }
 }
