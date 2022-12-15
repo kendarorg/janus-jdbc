@@ -6,16 +6,17 @@ import org.kendar.janus.server.JdbcContext;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
-public class PreparedStatementExecuteBatch implements JdbcCommand {
+public class PerparedStatementExecuteLargeBatch implements JdbcCommand {
     private List<List<PreparedStatementParameter>> batches;
 
-    public PreparedStatementExecuteBatch(){
+    public PerparedStatementExecuteLargeBatch(){
 
     }
 
-    public PreparedStatementExecuteBatch(List<List<PreparedStatementParameter>> batches) {
+    public PerparedStatementExecuteLargeBatch(List<List<PreparedStatementParameter>> batches) {
 
         this.batches = batches;
     }
@@ -33,7 +34,7 @@ public class PreparedStatementExecuteBatch implements JdbcCommand {
                 statement.addBatch();
             }
         }
-        return statement.executeBatch();
+        return statement.executeLargeBatch();
     }
 
     @Override
@@ -49,7 +50,7 @@ public class PreparedStatementExecuteBatch implements JdbcCommand {
 
     @Override
     public String toString() {
-        return "PreparedStatementExecuteBatch{" +
+        return "StatementExecuteBatch{" +
                 "batches=" + batches +
                 '}';
     }

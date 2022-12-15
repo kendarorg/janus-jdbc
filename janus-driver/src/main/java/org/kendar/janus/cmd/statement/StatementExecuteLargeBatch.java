@@ -1,39 +1,32 @@
-package org.kendar.janus.cmd.preparedstatement;
+package org.kendar.janus.cmd.statement;
 
 import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
-public class PreparedStatementExecuteBatch implements JdbcCommand {
-    private List<List<PreparedStatementParameter>> batches;
+public class StatementExecuteLargeBatch implements JdbcCommand {
+    private List<String> batches;
 
-    public PreparedStatementExecuteBatch(){
+    public StatementExecuteLargeBatch(){
 
     }
 
-    public PreparedStatementExecuteBatch(List<List<PreparedStatementParameter>> batches) {
+    public StatementExecuteLargeBatch(List<String> batches) {
 
         this.batches = batches;
     }
 
     @Override
     public Object execute(JdbcContext context, Long uid) throws SQLException {
-        var statement = (PreparedStatement)context.get(uid);
+        var statement = (Statement)context.get(uid);
         for(var batch:batches){
-            if(batch.isEmpty()){
-                statement.addBatch();
-            }else{
-                for(var par:batch){
-                    par.load(statement);
-                }
-                statement.addBatch();
-            }
+            statement.addBatch(batch);
         }
-        return statement.executeBatch();
+        return statement.executeLargeBatch();
     }
 
     @Override
@@ -49,7 +42,7 @@ public class PreparedStatementExecuteBatch implements JdbcCommand {
 
     @Override
     public String toString() {
-        return "PreparedStatementExecuteBatch{" +
+        return "StatementExecuteBatch{" +
                 "batches=" + batches +
                 '}';
     }

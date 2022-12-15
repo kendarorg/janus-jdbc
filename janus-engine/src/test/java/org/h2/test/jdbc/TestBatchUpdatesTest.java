@@ -206,7 +206,7 @@ public class TestBatchUpdatesTest extends TestDb {
         String s = COFFEE_UPDATE;
         trace("Prepared Statement String:" + s);
         prep = conn.prepareStatement(s);
-        prep.addBatch();
+        //prep.addBatch();
         prep.setInt(1, 2);
         prep.addBatch();
         prep.setInt(1, 3);
@@ -216,14 +216,14 @@ public class TestBatchUpdatesTest extends TestDb {
         int[] updateCount = prep.executeBatch();
         int updateCountLen = updateCount.length;
 
-        // PreparedStatement p;
-        // p = conn.prepareStatement(COFFEE_UPDATE);
-        // p.setInt(1,2);
-        // System.out.println("upc="+p.executeUpdate());
-        // p.setInt(1,3);
-        // System.out.println("upc="+p.executeUpdate());
-        // p.setInt(1,4);
-        // System.out.println("upc="+p.executeUpdate());
+         PreparedStatement p;
+         p = conn.prepareStatement(COFFEE_UPDATE);
+         p.setInt(1,2);
+         System.out.println("upc="+p.executeUpdate());
+         p.setInt(1,3);
+         System.out.println("upc="+p.executeUpdate());
+         p.setInt(1,4);
+         System.out.println("upc="+p.executeUpdate());
 
         trace("updateCount length:" + updateCountLen);
         assertEquals(3, updateCountLen);
