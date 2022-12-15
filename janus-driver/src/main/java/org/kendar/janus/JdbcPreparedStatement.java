@@ -2,6 +2,7 @@ package org.kendar.janus;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
+import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.preparedstatement.*;
 import org.kendar.janus.cmd.preparedstatement.parameters.*;
 import org.kendar.janus.engine.Engine;
@@ -29,8 +30,8 @@ import java.util.Calendar;
 import java.util.List;
 
 public class JdbcPreparedStatement extends JdbcStatement implements PreparedStatement {
-    private String sql;
-    private ResultSetMetaData metadata;
+    protected String sql;
+    protected ResultSetMetaData metadata;
 
     public JdbcPreparedStatement(JdbcConnection connection, Engine engine, long traceId, int maxRows, int queryTimeout,
                                  ResultSetType resultSetType, ResultSetConcurrency concurrency, ResultSetHoldability holdability) {
@@ -314,10 +315,10 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     private List<List<PreparedStatementParameter>> batches = new ArrayList<>();
     @Override
     public void addBatch() throws SQLException {
-        if(parameters.isEmpty()){
-            throw new SQLException("Empty batch");
+
+        if(parameters!=null && !parameters.isEmpty()) {
+            batches.add(parameters);
         }
-        batches.add(parameters);
         parameters = new ArrayList<>();
     }
 
@@ -450,5 +451,12 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     @Override
     public ParameterMetaData getParameterMetaData() throws SQLException {
         throw new UnsupportedOperationException("?getParameterMetaData");
+    }
+
+    @Override
+    public long executeLargeUpdate() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "executeLargeUpdate")
+                ,connection.getTraceId(),getTraceId())).getResult();
     }
 }

@@ -2,16 +2,22 @@ package org.kendar.janus;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
+import org.kendar.janus.cmd.call.CallableStatementExecute;
+import org.kendar.janus.cmd.call.CallableStatementExecuteQuery;
+import org.kendar.janus.cmd.preparedstatement.PreparedStatementExecute;
+import org.kendar.janus.cmd.preparedstatement.PreparedStatementExecuteQuery;
 import org.kendar.janus.cmd.preparedstatement.PreparedStatementParameter;
 import org.kendar.janus.cmd.preparedstatement.parameters.*;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
+import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.types.JdbcBlob;
 import org.kendar.janus.types.JdbcClob;
 import org.kendar.janus.types.JdbcNClob;
 import org.kendar.janus.types.JdbcSQLXML;
+import org.kendar.janus.utils.ExceptionsWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -317,6 +323,48 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
         return resultSet.getShort(parameterIndex);
     }
 
+    @Override
+    public ResultSet executeQuery() throws SQLException {
+        try {
+            var command = new CallableStatementExecuteQuery(
+                    sql,
+                    parameters,
+                    outParameters
+            );
+            var result = (JdbcResultSet)this.engine.execute(command,connection.getTraceId(),getTraceId());
+            result.setEngine(engine);
+            result.setConnection(connection);
+            result.setStatement(this);
+            this.resultSet = result;
+            return result;
+        }
+        catch (SQLException e) {
+            throw e;
+        }
+        catch (Exception e2) {
+            throw ExceptionsWrapper.toSQLException(e2);
+        }
+    }
+
+    @Override
+    public boolean execute() throws SQLException {
+        resultSet=null;
+        try {
+            var command = new CallableStatementExecute(
+                    sql,
+                    parameters,
+                    outParameters
+            );
+            var result = (ObjectResult)this.engine.execute(command,connection.getTraceId(),getTraceId());
+            return result.getResult();
+        }
+        catch (SQLException e) {
+            throw e;
+        }
+        catch (Exception e2) {
+            throw ExceptionsWrapper.toSQLException(e2);
+        }
+    }
     @Override
     public int getInt(int parameterIndex) throws SQLException {
         setupResultSet();

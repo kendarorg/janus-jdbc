@@ -83,7 +83,7 @@ public class Exec implements JdbcCommand {
             var method = target.getClass().getMethod(getName(),
                     paramType);
             Object result =null;
-            if(parameters==null) {
+            if(parameters==null||parameters.length==0) {
                 result = method.invoke(target);
             }else{
                 result = method.invoke(target,parameters);

@@ -3,10 +3,7 @@ package org.kendar.janus.cmd.preparedstatement.parameters;
 import org.apache.commons.lang3.ClassUtils;
 import org.kendar.janus.types.JdbcRowId;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.RowId;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class RowIdParameter extends SimpleParameter<RowId>{
     public RowIdParameter() {

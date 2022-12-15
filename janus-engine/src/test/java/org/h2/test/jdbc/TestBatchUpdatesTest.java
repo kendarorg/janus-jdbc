@@ -206,7 +206,7 @@ public class TestBatchUpdatesTest extends TestDb {
         String s = COFFEE_UPDATE;
         trace("Prepared Statement String:" + s);
         prep = conn.prepareStatement(s);
-        assertThrows(Exception.class,()-> prep.addBatch());
+        prep.addBatch();
         prep.setInt(1, 2);
         prep.addBatch();
         prep.setInt(1, 3);

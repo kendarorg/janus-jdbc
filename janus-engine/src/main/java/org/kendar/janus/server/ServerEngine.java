@@ -1,5 +1,6 @@
 package org.kendar.janus.server;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.cmd.connection.ConnectionConnect;
@@ -72,37 +73,56 @@ public class ServerEngine implements Engine {
 
     @Override
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid) throws SQLException {
-        if(isReplaying){
-            var recording = recordings.get(currentRecording);
-            var result = recording.get((int)replayIndex);
-            replayIndex++;
-            return (JdbcResult) result.getResponse();
+        try {
+            if (isReplaying) {
+                var recording = recordings.get(currentRecording);
+                var result = recording.get((int) replayIndex);
+                replayIndex++;
+                return (JdbcResult) result.getResponse();
+            }
+            JdbcResult result = null;
+            Object resultObject = null;
+            Long traceId = null;
+            if (command instanceof ConnectionConnect) {
+                resultObject = handleConnect((ConnectionConnect) command);
+            } else if (command instanceof Close) {
+                resultObject = handleClose((Close) command, connectionId, uid);
+            } else {
+                resultObject = handle(command, connectionId, uid);
+                traceId = getTraceId();
+                contexts.get(connectionId).put(traceId, resultObject);
+            }
+            var toret = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
+            if (isRecording) {
+                var recording = recordings.get(currentRecording);
+                var rr = new ResponseRequest();
+                var jdbcRequest = new JdbcRequest();
+                jdbcRequest.setCommand(command);
+                jdbcRequest.setConnectionId(connectionId);
+                jdbcRequest.setConnectionId(uid);
+                rr.setRequest(jdbcRequest);
+                rr.setResponse(toret);
+                recording.add(rr);
+            }
+            return toret;
+        }catch(SQLException ex){
+            int maxDepth = 10;
+
+            SQLException founded = ex;
+            Throwable current = ex;
+            while(maxDepth>0){
+                if(current.getCause()==null){
+                    break;
+                }
+                if(ClassUtils.isAssignable(current.getCause().getClass(),SQLException.class)){
+                    founded=(SQLException)current.getCause();
+                    break;
+                }
+                current = current.getCause();
+                maxDepth--;
+            }
+            throw founded;
         }
-        JdbcResult result = null;
-        Object resultObject = null;
-        Long traceId = null;
-        if(command instanceof ConnectionConnect){
-            resultObject = handleConnect((ConnectionConnect)command);
-        }else if(command instanceof Close){
-            resultObject = handleClose((Close)command,connectionId,uid);
-        }else{
-            resultObject = handle(command,connectionId,uid);
-            traceId = getTraceId();
-            contexts.get(connectionId).put(traceId,resultObject);
-        }
-        var toret = JdbcTypesConverter.convertResult(this,resultObject,connectionId,traceId);
-        if(isRecording){
-            var recording = recordings.get(currentRecording);
-            var rr = new ResponseRequest();
-            var jdbcRequest = new JdbcRequest();
-            jdbcRequest.setCommand(command);
-            jdbcRequest.setConnectionId(connectionId);
-            jdbcRequest.setConnectionId(uid);
-            rr.setRequest(jdbcRequest);
-            rr.setResponse(toret);
-            recording.add(rr);
-        }
-        return toret;
     }
 
     @Override

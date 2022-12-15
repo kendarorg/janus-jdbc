@@ -167,7 +167,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         for (int i = 1; i <= columnCount; ++i) {
 
             columnDescriptors.add(new ColumnDescriptor(
-                    md.getColumnType(i),
+                    getColumnType(md,i),
                     md.getColumnName(i),
                     md.getColumnLabel(i)));
             var cd = columnDescriptors.get(i-1);
@@ -198,6 +198,14 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         }
         if(rowsCount==0){
             lastRow = true;
+        }
+    }
+
+    private int getColumnType(ResultSetMetaData md,int i) throws SQLException {
+        try {
+            return md.getColumnType(i);
+        }catch (Exception ex){
+            return Types.OTHER;
         }
     }
 

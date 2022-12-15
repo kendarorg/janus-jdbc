@@ -82,7 +82,7 @@ public class CStatementTest extends TestBase {
         st.execute("CREATE ALIAS testSimpleSp FOR \"org.kendar.janus.CStatementTest.getClob\"");
         ResultSet rs;
         var ps = conn.prepareCall("{ ? = CALL testSimpleSp(?)}");
-        ps.registerOutParameter("PUBLIC.TESTCLOBSP(?2)", Types.CLOB);
+        ps.registerOutParameter("PUBLIC.TESTSIMPLESP(?2)", Types.CLOB);
         ps.setClob(2,data);
         rs = ps.executeQuery();
         assertTrue(rs.next());

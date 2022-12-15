@@ -194,4 +194,24 @@ public class ObjectParameter implements PreparedStatementParameter {
                 ", \n\tscaleOrLength=" + scaleOrLength +
                 '}';
     }
+
+    public void loadOut(CallableStatement callableStatement) throws SQLException {
+        if(columnName!=null && !columnName.isEmpty()) {
+            if(scaleOrLength!=null){
+                callableStatement.registerOutParameter(columnName,targetSqlType,scaleOrLength);
+            }else if(typeName!=null){
+                callableStatement.registerOutParameter(columnName,targetSqlType,typeName);
+            }else{
+                callableStatement.registerOutParameter(columnName,targetSqlType);
+            }
+        }else{
+            if(scaleOrLength!=null){
+                callableStatement.registerOutParameter(columnIndex,targetSqlType,scaleOrLength);
+            }else if(typeName!=null){
+                callableStatement.registerOutParameter(columnIndex,targetSqlType,typeName);
+            }else{
+                callableStatement.registerOutParameter(columnIndex,targetSqlType);
+            }
+        }
+    }
 }
