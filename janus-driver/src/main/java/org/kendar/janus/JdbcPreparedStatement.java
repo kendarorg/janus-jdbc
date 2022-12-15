@@ -316,9 +316,10 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     @Override
     public void addBatch() throws SQLException {
 
-        if(parameters!=null && !parameters.isEmpty()) {
-            batches.add(parameters);
+        if(parameters==null) {
+            parameters= new ArrayList<>();
         }
+        batches.add(parameters);
         parameters = new ArrayList<>();
     }
 
