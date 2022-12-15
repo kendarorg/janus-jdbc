@@ -12,6 +12,10 @@ public abstract class SimpleParameter<T> implements PreparedStatementParameter {
     protected T value;
     protected int columnIndex;
 
+    public Object getValue(){
+        return value;
+    }
+
     @Override
     public String getColumnName() {
         return columnName;

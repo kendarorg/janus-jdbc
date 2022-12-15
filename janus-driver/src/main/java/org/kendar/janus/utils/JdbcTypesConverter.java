@@ -81,6 +81,9 @@ public class JdbcTypesConverter {
         if(ClassUtils.isAssignable(resultObject.getClass(), JdbcResult.class)){
             return (JdbcResult) resultObject;
         }
+        if(resultObject.getClass().isArray()){
+            return new ObjectResult(resultObject);
+        }
         return new ObjectResult(null);
     }
 

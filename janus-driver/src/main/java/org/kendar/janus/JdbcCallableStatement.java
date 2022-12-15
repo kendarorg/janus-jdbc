@@ -320,7 +320,12 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
     @Override
     public int getInt(int parameterIndex) throws SQLException {
         setupResultSet();
-        return resultSet.getInt(parameterIndex);
+        if(resultSet!=null) {
+            var possible = resultSet.getInt(parameterIndex);
+            return possible;
+        }
+        var par = getParameter(parameterIndex);
+        return (int)par.getValue();
     }
 
     @Override
@@ -398,7 +403,14 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
     @Override
     public Blob getBlob(int parameterIndex) throws SQLException {
         setupResultSet();
-        return resultSet.getBlob(parameterIndex);
+        if(resultSet!=null) {
+            var possible = resultSet.getBlob(parameterIndex);
+            if (possible != null) {
+                return possible;
+            }
+        }
+        var par = getParameter(parameterIndex);
+        return (Blob)par.getValue();
     }
 
     @Override
@@ -439,10 +451,30 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
         return resultSet.getURL(parameterIndex);
     }
 
+    private PreparedStatementParameter getParameter(String parameterName){
+        var col = this.parameters.stream().filter(p->parameterName.equalsIgnoreCase(p.getColumnName())).findFirst();
+        if(col.isPresent())return col.get();
+        return null;
+    }
+
+
+    private PreparedStatementParameter getParameter(int parameterIndex){
+        var col = this.parameters.stream().filter(p->parameterIndex==p.getColumnIndex()).findFirst();
+        if(col.isPresent())return col.get();
+        return null;
+    }
+
     @Override
     public String getString(String parameterName) throws SQLException {
         setupResultSet();
-        return resultSet.getString(parameterName);
+        if(resultSet!=null) {
+            var possible = resultSet.getString(parameterName);
+            if (possible != null) {
+                return possible;
+            }
+        }
+        var par = getParameter(parameterName);
+        return (String)par.getValue();
     }
 
     @Override

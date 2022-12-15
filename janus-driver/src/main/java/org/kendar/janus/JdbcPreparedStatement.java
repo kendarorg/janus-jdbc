@@ -72,6 +72,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public int executeUpdate() throws SQLException {
+        resultSet=null;
         var result = (ObjectResult)this.engine.execute(
                 new PreparedStatementExecuteUpdate(this.sql, this.parameters),
                 this.connection.getTraceId(),
@@ -199,6 +200,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public boolean execute() throws SQLException {
+        resultSet=null;
         try {
             var command = new PreparedStatementExecute(
                     sql,
@@ -312,6 +314,9 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     private List<List<PreparedStatementParameter>> batches = new ArrayList<>();
     @Override
     public void addBatch() throws SQLException {
+        if(parameters.isEmpty()){
+            throw new SQLException("Empty batch");
+        }
         batches.add(parameters);
         parameters = new ArrayList<>();
     }

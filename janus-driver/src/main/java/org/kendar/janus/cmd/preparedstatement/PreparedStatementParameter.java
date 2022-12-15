@@ -12,4 +12,6 @@ public interface PreparedStatementParameter extends TypedSerializable {
     void load(CallableStatement callableStatement) throws SQLException;
     int getColumnIndex();
     String getColumnName();
+
+    Object getValue();
 }

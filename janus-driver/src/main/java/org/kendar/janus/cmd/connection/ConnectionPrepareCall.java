@@ -16,17 +16,9 @@ public class ConnectionPrepareCall extends ConnectionPrepareStatement {
         if (type == null && concurrency == null) {
             return connection.prepareCall(sql);
         }
-        if(!connection.getMetaData().supportsResultSetType(type.getValue())){
-            throw new SQLException(type+" not supported");
-        }
-        if(!connection.getMetaData().supportsResultSetConcurrency(type.getValue(),concurrency.getValue())){
-            throw new SQLException(type+":"+concurrency+" not supported");
-        }
 
         if(holdability!= ResultSetHoldability.DEFAULT){
-            if(!connection.getMetaData().supportsResultSetHoldability(holdability.getValue())){
-                throw new SQLException(holdability+" not supported");
-            }
+
             return connection.prepareCall (sql,type.getValue(), concurrency.getValue(),holdability.getValue());
         }
 

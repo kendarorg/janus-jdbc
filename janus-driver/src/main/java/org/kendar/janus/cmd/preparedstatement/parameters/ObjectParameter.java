@@ -148,6 +148,11 @@ public class ObjectParameter implements PreparedStatementParameter {
         return columnName;
     }
 
+    @Override
+    public Object getValue() {
+        return value;
+    }
+
 
     public boolean isOut() {
         return out;

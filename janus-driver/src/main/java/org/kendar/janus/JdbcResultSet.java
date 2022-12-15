@@ -1,5 +1,10 @@
 package org.kendar.janus;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.base.Converter;
 import org.apache.commons.io.IOUtils;
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
@@ -15,18 +20,20 @@ import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.RemainingResultSetResult;
 import org.kendar.janus.serialization.TypedSerializer;
-import org.kendar.janus.types.JdbcBlob;
-import org.kendar.janus.types.JdbcClob;
-import org.kendar.janus.types.JdbcNClob;
-import org.kendar.janus.types.JdbcRowId;
+import org.kendar.janus.types.*;
 import org.kendar.janus.utils.JdbcTypesConverter;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class JdbcResultSet implements JdbcResult, ResultSet {
@@ -651,6 +658,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public Blob getBlob(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==byte[].class){
+            var res = new JdbcBlob();
+            res.setBytes(1,(byte[])result);
+            return res;
+        }
         return (Blob) result;
     }
 
@@ -658,6 +670,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public Clob getClob(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==String.class){
+            var res = new JdbcClob();
+            res.setString(1,(String)result);
+            return res;
+        }
         return (Clob) result;
     }
 
@@ -665,6 +682,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public NClob getNClob(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==String.class){
+            var res = new JdbcNClob();
+            res.setString(1,(String)result);
+            return res;
+        }
         return (NClob)result;
     }
 
@@ -672,6 +694,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public SQLXML getSQLXML(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==String.class){
+            var res = new JdbcSQLXML();
+            res.setString((String)result);
+            return res;
+        }
         return (SQLXML)result;
     }
 
@@ -1553,10 +1580,16 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return new ByteArrayInputStream(str.getBytes());
     }
 
+
+
     @Override
-    public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        var value = getFieldById(columnIndex);
-        return (T)value;
+    public <T> T getObject(int columnIndex, Class<T> var0) throws SQLException {
+        var var1 = getFieldById(columnIndex);
+        if(var1==null) return null;
+        return (T)var1;
+
+
+
     }
 
 
