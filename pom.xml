@@ -10,6 +10,7 @@
     <modules>
         <module>janus-driver</module>
         <module>janus-engine</module>
+        <module>typeconverter</module>
         <module>jacoco</module>
     </modules>
     <packaging>pom</packaging>

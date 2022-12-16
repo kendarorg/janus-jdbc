@@ -170,20 +170,20 @@ public class TestCallableStatementTest extends TestDb {
         call.registerOutParameter(1, Types.DATE);
         call.execute();
         Assertions.assertEquals("2000-01-01", call.getDate(1).toString());
-        //FIXME Assertions.assertEquals("2000-01-01", call.getObject(1, LocalDate.class).toString());
+        Assertions.assertEquals("2000-01-01", call.getObject(1, LocalDate.class).toString());
 
         call.setTime(2, java.sql.Time.valueOf("01:02:03"));
         call.registerOutParameter(1, Types.TIME);
         call.execute();
         Assertions.assertEquals("01:02:03", call.getTime(1).toString());
-        //FIXME Assertions.assertEquals("01:02:03", call.getObject(1, LocalTime.class).toString());
+        Assertions.assertEquals("01:02:03", call.getObject(1, LocalTime.class).toString());
 
         call.setTimestamp(2, java.sql.Timestamp.valueOf(
                 "2001-02-03 04:05:06.789"));
         call.registerOutParameter(1, Types.TIMESTAMP);
         call.execute();
         Assertions.assertEquals("2001-02-03 04:05:06.789", call.getTimestamp(1).toString());
-        //FIXME Assertions.assertEquals("2001-02-03T04:05:06.789", call.getObject(1, LocalDateTime.class).toString());
+        Assertions.assertEquals("2001-02-03T04:05:06.789", call.getObject(1, LocalDateTime.class).toString());
 
         call.setBoolean(2, true);
         call.registerOutParameter(1, Types.BIT);
@@ -198,7 +198,7 @@ public class TestCallableStatementTest extends TestDb {
         call.setBigDecimal(2, BigDecimal.TEN);
         call.registerOutParameter(1, Types.DECIMAL);
         call.execute();
-        Assertions.assertEquals("10.0", call.getBigDecimal(1).toString());
+        Assertions.assertEquals("10", call.getBigDecimal(1).toString());
     }
 
 
@@ -272,16 +272,16 @@ public class TestCallableStatementTest extends TestDb {
 
         Assertions.assertEquals("2001-02-03 10:20:30.0", call.getTimestamp(4).toString());
         Assertions.assertEquals("2001-02-03 10:20:30.0", call.getTimestamp("D").toString());
-        //TOFIX Assertions.assertEquals("2001-02-03T10:20:30", call.getObject(4, LocalDateTime.class).toString());
-        //TOFIX Assertions.assertEquals("2001-02-03T10:20:30", call.getObject("D", LocalDateTime.class).toString());
+        Assertions.assertEquals("2001-02-03T10:20:30", call.getObject(4, LocalDateTime.class).toString());
+        Assertions.assertEquals("2001-02-03T10:20:30", call.getObject("D", LocalDateTime.class).toString());
         Assertions.assertEquals("10:20:30", call.getTime(4).toString());
         Assertions.assertEquals("10:20:30", call.getTime("D").toString());
-        //TOFIX Assertions.assertEquals("10:20:30", call.getObject(4, LocalTime.class).toString());
-        //TOFIX Assertions.assertEquals("10:20:30", call.getObject("D", LocalTime.class).toString());
+        Assertions.assertEquals("10:20:30", call.getObject(4, LocalTime.class).toString());
+        Assertions.assertEquals("10:20:30", call.getObject("D", LocalTime.class).toString());
         Assertions.assertEquals("2001-02-03", call.getDate(4).toString());
         Assertions.assertEquals("2001-02-03", call.getDate("D").toString());
-        //TOFIX Assertions.assertEquals("2001-02-03", call.getObject(4, LocalDate.class).toString());
-        //TOFIX Assertions.assertEquals("2001-02-03", call.getObject("D", LocalDate.class).toString());
+        Assertions.assertEquals("2001-02-03", call.getObject(4, LocalDate.class).toString());
+        Assertions.assertEquals("2001-02-03", call.getObject("D", LocalDate.class).toString());
 
         Assertions.assertEquals(100, call.getInt(1));
         Assertions.assertEquals(100, call.getInt("A"));

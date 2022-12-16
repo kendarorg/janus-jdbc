@@ -75,7 +75,7 @@ public class TestPreparedStatement extends TestDb {
         testPreparedStatementMetaData(conn);
         //testBigDecimal(conn);
         testDate(conn);
-        //FIXME testDate8(conn);
+        //testDate8(conn);
         //FIXME testEnum()
         //FIXME testTime8(conn);
         //FIXME  testOffsetTime8(conn);

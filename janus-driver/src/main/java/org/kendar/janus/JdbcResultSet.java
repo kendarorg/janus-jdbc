@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.Converter;
+import com.toddfast.util.convert.TypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
@@ -274,35 +275,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             lastColumnValue = null;
             return false;
         }
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (boolean) value;
-            case("int"):
-            case("integer"):
-                return ((int) value)!=0;
-            case("byte"):
-                return ((byte) value)!=0;
-            case("short"):
-                return ((short) value)!=0;
-            case("long"):
-                return ((long) value)!=0L;
-            case("float"):
-                return ((float) value)!=0.0F;
-            case("double"):
-                return ((double) value)!=0.0;
-            case("bigdecimal"):
-                return ((BigDecimal) value).intValue()!=0;
-            case("string"):
-                try {
-                    return Boolean.parseBoolean((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to boolean");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
+        return TypeConverter.convert(Boolean.class,value);
+
     }
 
     @Override
@@ -312,35 +286,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             lastColumnValue = null;
             return (byte)0;
         }
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (byte)(((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).byteValue();
-            case("byte"):
-                return ((Byte)value).byteValue();
-            case("short"):
-                return ((Short)value).byteValue();
-            case("long"):
-                return ((Long)value).byteValue();
-            case("float"):
-                return ((Float)value).byteValue();
-            case("double"):
-                return ((Double)value).byteValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).byteValue();
-            case("string"):
-                try {
-                    return Byte.parseByte((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to byte");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
+        return TypeConverter.convert(byte.class,value);
     }
 
     @Override
@@ -350,35 +296,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             lastColumnValue =null;
             return (short)0;
         }
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (short)(((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).shortValue();
-            case("byte"):
-                return ((Byte)value).shortValue();
-            case("short"):
-                return ((Short)value).shortValue();
-            case("long"):
-                return ((Long)value).shortValue();
-            case("float"):
-                return ((Float)value).shortValue();
-            case("double"):
-                return ((Double)value).shortValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).shortValue();
-            case("string"):
-                try {
-                    return Short.parseShort((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to short");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
+        return TypeConverter.convert(Short.class,value);
+
     }
 
     @Override
@@ -388,35 +307,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             lastColumnValue = null;
             return 0;
         }
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).intValue();
-            case("byte"):
-                return ((Byte)value).intValue();
-            case("short"):
-                return ((Short)value).intValue();
-            case("long"):
-                return ((Long)value).intValue();
-            case("float"):
-                return ((Float)value).intValue();
-            case("double"):
-                return ((Double)value).intValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).intValue();
-            case("string"):
-                try {
-                    return Integer.parseInt((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to short");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
+        return TypeConverter.convert(Integer.class,value);
     }
 
     @Override
@@ -426,35 +317,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             lastColumnValue = null;
             return 0L;
         }
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).longValue();
-            case("byte"):
-                return ((Byte)value).longValue();
-            case("short"):
-                return ((Short)value).longValue();
-            case("long"):
-                return ((Long)value).longValue();
-            case("float"):
-                return ((Float)value).longValue();
-            case("double"):
-                return ((Double)value).longValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).longValue();
-            case("string"):
-                try {
-                    return Long.parseLong((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to long");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
+        return TypeConverter.convert(Long.class,value);
+
     }
 
     @Override
@@ -464,35 +328,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             lastColumnValue = null;
             return 0.0F;
         }
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1.0F : 0.0F);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).floatValue();
-            case("byte"):
-                return ((Byte)value).floatValue();
-            case("short"):
-                return ((Short)value).floatValue();
-            case("long"):
-                return ((Long)value).floatValue();
-            case("float"):
-                return ((Float)value).floatValue();
-            case("double"):
-                return ((Double)value).floatValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).floatValue();
-            case("string"):
-                try {
-                    return Float.parseFloat((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to float");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
+        return TypeConverter.convert(Float.class,value);
+
     }
 
     @Override
@@ -502,35 +339,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             lastColumnValue=null;
             return 0.0;
         }
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1.0 : 0.0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).doubleValue();
-            case("byte"):
-                return ((Byte)value).doubleValue();
-            case("short"):
-                return ((Short)value).doubleValue();
-            case("long"):
-                return ((Long)value).doubleValue();
-            case("float"):
-                return ((Float)value).doubleValue();
-            case("double"):
-                return ((Double)value).doubleValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).doubleValue();
-            case("string"):
-                try {
-                    return Double.parseDouble((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to double");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
+        return TypeConverter.convert(Double.class,value);
+
     }
 
     @Override
@@ -550,46 +360,8 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        BigDecimal result;
-        switch (name){
-            case("boolean"):
-                result = new BigDecimal(((boolean)value) ? 1.0 : 0.0);
-                break;
-            case("int"):
-            case("integer"):
-                result= new BigDecimal((int)value);
-                break;
-            case("byte"):
-                result= new BigDecimal((byte)value);
-                break;
-            case("short"):
-                result= new BigDecimal((short)value);
-                break;
-            case("long"):
-                result= new BigDecimal((long)value);
-                break;
-            case("float"):
-                result= new BigDecimal((float)value);
-                break;
-            case("double"):
-                result= new BigDecimal((double)value);
-                break;
-            case("bigdecimal"):
-                result = (BigDecimal) value;
-                break;
-            case("string"):
-                try {
-                    result = new BigDecimal(Double.parseDouble((String)value));
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to bigdecimal");
-                }
-                break;
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
-        return  result.setScale(0, RoundingMode.HALF_UP);
+        return TypeConverter.convert(BigDecimal.class,value);
+
     }
 
     @Override
@@ -605,90 +377,32 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return (byte[])result;
     }
 
-    private static Date getPureDate(long milliSeconds) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(milliSeconds);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return new Date(cal.getTimeInMillis());
-    }
+
 
     @Override
     public Date getDate(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
 
-        switch (name) {
-            case("date"): {
-                return (Date)value;
-            }
-            case("time"): {
-                return getPureDate(((Time)value).getTime());
-            }
-            case ("timestamp"): {
-                return getPureDate(((Timestamp)value).getTime());
-            }
-            default: {
-                throw new SQLException("Can't convert type to date: " + value.getClass());
-            }
-        }
+        return TypeConverter.convert(Date.class,value);
+
     }
 
-    private static Time getPureTime(long milliSeconds) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(milliSeconds);
-        cal.set(Calendar.YEAR, 1970);
-        cal.set(Calendar.MONTH, 0);
-        cal.set(Calendar.DATE, 1);
-        cal.set(Calendar.MILLISECOND, 0);
-        return new Time(cal.getTimeInMillis());
-    }
 
     @Override
     public Time getTime(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+        return TypeConverter.convert(Time.class,value);
 
-        switch (name) {
-            case("date"): {
-                return getPureTime(((Date)value).getTime());
-            }
-            case("time"): {
-                return (Time)value;
-            }
-            case ("timestamp"): {
-                return getPureTime(((Timestamp)value).getTime());
-            }
-            default: {
-                throw new SQLException("Can't convert type to time: " + value.getClass());
-            }
-        }
     }
 
     @Override
     public Timestamp getTimestamp(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+        return TypeConverter.convert(Timestamp.class,value);
 
-        switch (name) {
-            case("date"): {
-                return new Timestamp(((Date)value).getTime());
-            }
-            case("time"): {
-                return new Timestamp(((Time)value).getTime());
-            }
-            case ("timestamp"): {
-                return (Timestamp)value;
-            }
-            default: {
-                throw new SQLException("Can't convert type to timestamp: " + value.getClass());
-            }
-        }
     }
 
     @Override
@@ -1642,7 +1356,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public <T> T getObject(int columnIndex, Class<T> var0) throws SQLException {
         var var1 = getFieldById(columnIndex);
         if(var1==null) return null;
-        return (T)var1;
+        return (T)TypeConverter.convert(var0,var1);
 
 
 
@@ -1658,7 +1372,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public void updateNString(String columnLabel, String nString) throws SQLException {
         updateString(columnLabel,nString);
     }
-    //TODO Implements
+    
 
 
 

@@ -56,7 +56,7 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
         return this;
     }
 
-    //TODO Implements
+    
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(

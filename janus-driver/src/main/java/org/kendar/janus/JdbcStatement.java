@@ -385,7 +385,7 @@ public class JdbcStatement implements Statement {
                 ,connection.getTraceId(),getTraceId());
     }
 
-    //TODO Implements
+    
 
     @Override
     public SQLWarning getWarnings() throws SQLException {

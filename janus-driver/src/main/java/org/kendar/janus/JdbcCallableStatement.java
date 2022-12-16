@@ -696,7 +696,7 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
     public void setRowId(String parameterName, RowId x) throws SQLException {
         this.setParameter(new RowIdParameter().withValue(x).withColumnName(parameterName));
     }
-    //TODO Implements
+    
 
 
     @Override
