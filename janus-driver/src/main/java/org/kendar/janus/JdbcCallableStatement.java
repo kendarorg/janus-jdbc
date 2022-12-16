@@ -112,7 +112,7 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
 
     @Override
     public void setCharacterStream(String parameterName, Reader reader, int length) throws SQLException {
-        this.setParameter( new CharacterStreamParameter().fromReader(reader,length).withColumnName(parameterName));
+        this.setParameter( new CharacterStreamParameter().fromReader(reader,length).withColumnName(parameterName),Types.CLOB);
     }
 
     @Override

@@ -198,7 +198,7 @@ public class JdbcNClob extends BigFieldBase<char[],JdbcNClob, NClob, Reader> imp
         var result = connection.createNClob();
         try {
             if(data==null)return result;
-            result.setCharacterStream(0).write(data);
+            result.setCharacterStream(1).write(data);
         } catch (IOException e) {
             throw new SQLException(e);
         }

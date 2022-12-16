@@ -11,6 +11,10 @@ import java.sql.SQLException;
 public class CharacterStreamParameter extends SimpleParameter<char[]>{
     public CharacterStreamParameter fromReader(Reader reader, int length) throws SQLException {
         try{
+            if(reader==null){
+                value=null;
+                return this;
+            }
             var tmp= IOUtils.toCharArray(reader);
             var maxLen = (int)Math.min(length,tmp.length);
             if(maxLen<0){

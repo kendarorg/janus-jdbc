@@ -12,10 +12,7 @@ import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.results.ObjectResult;
-import org.kendar.janus.types.JdbcBlob;
-import org.kendar.janus.types.JdbcClob;
-import org.kendar.janus.types.JdbcNClob;
-import org.kendar.janus.types.JdbcSQLXML;
+import org.kendar.janus.types.*;
 import org.kendar.janus.utils.ExceptionsWrapper;
 
 import java.io.IOException;
@@ -70,6 +67,27 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     }
 
     protected void setParameter(PreparedStatementParameter parameter) {
+        parameters.add(parameter);
+    }
+
+    protected void setParameter(PreparedStatementParameter parameter,int sqlType) {
+        var parValue = parameter.getValue();
+        if(parValue==null){
+            parameters.add(new NullParameter()
+                    .withColumnIndex(parameter.getColumnIndex())
+                    .withColumnName(parameter.getColumnName())
+                    .withSqlType(sqlType));
+            return;
+        }else if(parValue instanceof BigFieldBase){
+            var bfb = (BigFieldBase)parValue;
+            if(bfb.getData()==null) {
+                parameters.add(new NullParameter()
+                        .withColumnIndex(parameter.getColumnIndex())
+                        .withColumnName(parameter.getColumnName())
+                        .withSqlType(sqlType));
+                return;
+            }
+        }
         parameters.add(parameter);
     }
 
@@ -227,53 +245,60 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     }
     @Override
     public void setNClob(int parameterIndex, NClob value) throws SQLException {
-        this.setParameter( new NClobParameter().withValue(value).withColumnIndex(parameterIndex));
+        this.setParameter( new NClobParameter().withValue(value).withColumnIndex(parameterIndex),Types.NCLOB);
     }
 
     @Override
     public void setBlob(int parameterIndex, Blob x) throws SQLException {
-        this.setParameter( new BlobParameter().withValue(x).withColumnIndex(parameterIndex));
+        this.setParameter( new BlobParameter().withValue(x).withColumnIndex(parameterIndex),Types.BLOB);
     }
 
     @Override
     public void setClob(int parameterIndex, Clob x) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(x).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(x).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader,length)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader,length)).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
-        this.setParameter( new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream,length)).withColumnIndex(parameterIndex));
+        this.setParameter(
+                new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream,length)).withColumnIndex(parameterIndex),
+                Types.BLOB);
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader,length)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader,length)).withColumnIndex(parameterIndex),
+                Types.NCLOB);
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader)).withColumnIndex(parameterIndex),
+                Types.CLOB);
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
-        this.setParameter( new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream)).withColumnIndex(parameterIndex));
+        this.setParameter( new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream)).withColumnIndex(parameterIndex),
+                Types.BLOB);
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader)).withColumnIndex(parameterIndex),
+                Types.NCLOB);
     }
 
 
     @Override
     public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
-        this.setParameter( new SQLXMLParameter().withValue(new JdbcSQLXML().fromSqlType(xmlObject)).withColumnIndex(parameterIndex));
+        this.setParameter( new SQLXMLParameter().withValue(new JdbcSQLXML().fromSqlType(xmlObject)).withColumnIndex(parameterIndex),
+                Types.SQLXML);
     }
 
 
@@ -355,7 +380,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
-        this.setParameter( new CharacterStreamParameter().fromReader(reader,length).withColumnIndex(parameterIndex));
+        this.setParameter( new CharacterStreamParameter().fromReader(reader,length).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
     @Override
@@ -365,7 +390,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-        this.setParameter( new CharacterStreamParameter().fromReader(reader,(int)length).withColumnIndex(parameterIndex));
+        this.setParameter( new CharacterStreamParameter().fromReader(reader,(int)length).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
 
@@ -424,6 +449,10 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
         try {
+            if(x==null){
+                setNull(parameterIndex,Types.CLOB);
+                return;
+            }
             var buffer = IOUtils.toByteArray(x);
             Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
             setClob(parameterIndex,targetReader,length);

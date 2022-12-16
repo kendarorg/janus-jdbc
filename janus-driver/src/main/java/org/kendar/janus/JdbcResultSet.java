@@ -1750,7 +1750,12 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public Reader getCharacterStream(int columnIndex) throws SQLException {
-        return getClob(columnIndex).getCharacterStream();
+        var rs = getClob(columnIndex);
+        if(rs==null){
+            lastColumnValue =null;
+            return null;
+        }
+        return rs.getCharacterStream();
     }
 
 
