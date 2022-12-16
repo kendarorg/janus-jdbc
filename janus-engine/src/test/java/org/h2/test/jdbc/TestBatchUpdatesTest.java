@@ -123,6 +123,7 @@ public class TestBatchUpdatesTest extends TestDb {
             total += t;
         }
         assertEquals(4, total);
+        stat.execute("DROP ALIAS updatePrices");
         conn.close();
     }
 

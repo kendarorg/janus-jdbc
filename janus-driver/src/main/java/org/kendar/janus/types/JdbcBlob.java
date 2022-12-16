@@ -1,6 +1,7 @@
 package org.kendar.janus.types;
 
 import org.apache.commons.io.IOUtils;
+import org.kendar.janus.utils.EmptyInputStream;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -41,11 +42,17 @@ public class JdbcBlob extends BigFieldBase<byte[],JdbcBlob,Blob,InputStream> imp
 
     @Override
     public InputStream getBinaryStream() throws SQLException {
+        if(data ==null){
+            return new EmptyInputStream();
+        }
         return getBinaryStream(0, Array.getLength(data));
     }
 
     @Override
     public InputStream getBinaryStream(long pos, long length) throws SQLException {
+        if(data ==null){
+            return new EmptyInputStream();
+        }
         return new ByteArrayInputStream(this.data, (int)pos, (int)length);
     }
 
@@ -148,7 +155,8 @@ public class JdbcBlob extends BigFieldBase<byte[],JdbcBlob,Blob,InputStream> imp
     public Object toNativeObject(Connection connection) throws SQLException {
         var result = connection.createBlob();
         try {
-            result.setBinaryStream(0).write(data);
+            if(data==null)return result;
+            result.setBinaryStream(1).write(data);
         } catch (IOException e) {
             throw new SQLException(e);
         }

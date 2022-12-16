@@ -291,7 +291,9 @@ public class JdbcStatement implements Statement {
         engine.execute(new Exec(
                         "cancel")
                 ,connection.getTraceId(),getTraceId());
-        resultSet.close();
+        if(resultSet!=null) {
+            resultSet.close();
+        }
     }
 
 

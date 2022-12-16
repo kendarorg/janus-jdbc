@@ -66,16 +66,16 @@ public abstract class SimpleParameter<T> implements PreparedStatementParameter {
         builder.write("value",value);
     }
 
-    protected boolean hasColumnName(){
-        return columnName!=null && !columnName.isEmpty();
-    }
-
     @Override
     public Object deserialize(TypedSerializer input) {
         this.columnIndex = input.read("columnIndex");
         this.columnName = input.read("columnName");
         this.value = input.read("value");
         return this;
+    }
+
+    protected boolean hasColumnName(){
+        return columnName!=null && !columnName.isEmpty();
     }
 
     @Override

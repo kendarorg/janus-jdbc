@@ -26,6 +26,7 @@ import org.kendar.janus.utils.JdbcTypesConverter;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
@@ -209,8 +210,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         }
     }
 
+    Object lastColumnValue;
     private Object getFieldById(int columnIndex){
-        return rows.get(cursor).get(columnIndex-1);
+        lastColumnValue = rows.get(cursor).get(columnIndex-1);
+        return lastColumnValue;
     }
 
     private int getFieldId(String columnLabel) throws SQLException {
@@ -241,7 +244,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public URL getURL(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
-        if(result==null) return null;
+        if(result==null) {
+            lastColumnValue= null;
+            return null;
+        }
         return (URL) result;
     }
 
@@ -254,14 +260,20 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public Array getArray(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
-        if(result==null) return null;
+        if(result==null) {
+            lastColumnValue = null;
+            return null;
+        }
         return (Array)result;
     }
 
     @Override
     public boolean getBoolean(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return false;
+        if(value==null) {
+            lastColumnValue = null;
+            return false;
+        }
         var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         switch (name){
             case("boolean"):
@@ -296,7 +308,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public byte getByte(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return (byte)0;
+        if(value==null) {
+            lastColumnValue = null;
+            return (byte)0;
+        }
         var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         switch (name){
             case("boolean"):
@@ -331,7 +346,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public short getShort(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return (short)0;
+        if(value==null) {
+            lastColumnValue =null;
+            return (short)0;
+        }
         var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         switch (name){
             case("boolean"):
@@ -366,7 +384,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public int getInt(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0;
+        if(value==null) {
+            lastColumnValue = null;
+            return 0;
+        }
         var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         switch (name){
             case("boolean"):
@@ -401,7 +422,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public long getLong(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0L;
+        if(value==null) {
+            lastColumnValue = null;
+            return 0L;
+        }
         var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         switch (name){
             case("boolean"):
@@ -436,7 +460,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public float getFloat(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0.0F;
+        if(value==null) {
+            lastColumnValue = null;
+            return 0.0F;
+        }
         var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         switch (name){
             case("boolean"):
@@ -471,7 +498,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public double getDouble(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0.0;
+        if(value==null) {
+            lastColumnValue=null;
+            return 0.0;
+        }
         var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         switch (name){
             case("boolean"):
@@ -505,7 +535,15 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        return getBigDecimal(columnIndex,-1);
+        var value = getFieldById(columnIndex);
+        if(value==null) {
+            lastColumnValue =null;
+            return null;
+        }
+        if(value instanceof BigDecimal){
+            return ((BigDecimal)value).setScale(0, RoundingMode.HALF_UP);
+        }
+        return getBigDecimal(columnIndex,0);
     }
 
     @Override
@@ -551,15 +589,16 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             default:
                 throw new SQLException("Can't convert type to boolean: " + value.getClass());
         }
-        if(scale>=0){
-            result = result.setScale(scale);
-        }
-        return result;
+        return  result.setScale(0, RoundingMode.HALF_UP);
     }
 
     @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
+        if(result==null){
+            lastColumnValue=null;
+            return null;
+        }
         if(result.getClass()==JdbcBlob.class){
             return ((JdbcBlob)result).getData();
         }
@@ -857,7 +896,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public boolean wasNull() throws SQLException {
-        return rows.get(cursor).get(lastColumn)==null;
+        return lastColumnValue==null;
     }
 
 

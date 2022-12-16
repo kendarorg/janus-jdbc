@@ -101,6 +101,9 @@ public class ObjectParameter implements PreparedStatementParameter {
                 throw new SQLException(ex);
             }
         }
+        if(value==null){
+            return null;
+        }
         var objClass = value.getClass();
         if(ClassUtils.isPrimitiveOrWrapper(objClass)) {
             return value;

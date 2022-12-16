@@ -32,10 +32,21 @@ public class TestBase {
         var conn = createFooTable();
         conn.createStatement().execute("INSERT INTO bar (foo) VALUES('" + value + "')");
     }
+    private boolean initialized=false;
+    private Object locker = new Object();
     protected void beforeEach() throws SQLException {
+
         serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
         jsonServer = new JsonServer(serverEngine);
         driver = (Driver)new JdbcDriver(jsonServer);
+        if(!initialized){
+            synchronized (locker) {
+                var conn = driver.connect(CONNECT_URL,null);;
+                conn.createStatement().execute("DROP ALL OBJECTS");
+                conn.close();
+                initialized=true;
+            }
+        }
     }
     protected InputStreamReader getInputStreamReader(int kb) throws IOException {
         var bytes = getBytes(kb);

@@ -290,6 +290,7 @@ public class TestConnection extends TestDb {
         deleteDb("schemaSetGet");
         Connection conn = getConnection("schemaSetGet");
         Statement s = conn.createStatement();
+        var prevSchema = conn.getSchema();
         s.executeUpdate("create schema my_test_schema");
         s.executeUpdate("create table my_test_schema.my_test_table(id int, nave varchar) as values (1, 'a')");
         assertEquals("PUBLIC", conn.getSchema());
@@ -317,7 +318,11 @@ public class TestConnection extends TestDb {
         }
         s.execute("SET SCHEMA \"MY_TEST_SCHEMA\"");
         assertEquals("MY_TEST_SCHEMA", conn.getSchema());
+        s.execute("DROP SCHEMA \"MY_TEST_SCHEMA\" CASCADE");
+
+        s.execute("DROP schema \"otheR_schEma\" CASCADE");
         s.close();
+
         conn.close();
         deleteDb("schemaSetGet");
     }

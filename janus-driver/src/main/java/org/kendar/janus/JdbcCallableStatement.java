@@ -18,6 +18,7 @@ import org.kendar.janus.types.JdbcClob;
 import org.kendar.janus.types.JdbcNClob;
 import org.kendar.janus.types.JdbcSQLXML;
 import org.kendar.janus.utils.ExceptionsWrapper;
+import org.kendar.janus.utils.SqlExceptionFunction;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class JdbcCallableStatement extends JdbcPreparedStatement  implements CallableStatement {
     public JdbcCallableStatement(JdbcConnection connection, Engine engine, long traceId, int maxRows, int queryTimeout,
@@ -301,26 +304,22 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
 
     @Override
     public String getString(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getString(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getString(a));
     }
 
     @Override
     public boolean getBoolean(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getBoolean(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getBoolean(a));
     }
 
     @Override
     public byte getByte(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getByte(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getByte(a));
     }
 
     @Override
     public short getShort(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getShort(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getShort(a));
     }
 
     @Override
@@ -365,138 +364,126 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
             throw ExceptionsWrapper.toSQLException(e2);
         }
     }
-    @Override
-    public int getInt(int parameterIndex) throws SQLException {
+
+    private <T> T  getParamByIndex(int parameterIndex, SqlExceptionFunction<Integer,T> retrieve ) throws SQLException {
         setupResultSet();
         if(resultSet!=null) {
-            var possible = resultSet.getInt(parameterIndex);
+            var possible = retrieve.apply(parameterIndex);
             return possible;
         }
         var par = getParameter(parameterIndex);
-        return (int)par.getValue();
+        return (T)par.getValue();
+    }
+
+    private <T> T  getParamByName(String parameterName, SqlExceptionFunction<String,T> retrieve ) throws SQLException {
+        setupResultSet();
+        if(resultSet!=null) {
+            var possible = retrieve.apply(parameterName);
+            return possible;
+        }
+        var par = getParameter(parameterName);
+        return (T)par.getValue();
+    }
+    @Override
+    public int getInt(int parameterIndex) throws SQLException {
+        return getParamByIndex(parameterIndex,a->resultSet.getInt(a));
     }
 
     @Override
     public long getLong(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getLong(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getLong(a));
     }
 
     @Override
     public float getFloat(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getFloat(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getFloat(a));
     }
 
     @Override
     public double getDouble(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getDouble(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getDouble(a));
     }
 
     @Override
     public BigDecimal getBigDecimal(int parameterIndex, int scale) throws SQLException {
-        setupResultSet();
-        return resultSet.getBigDecimal(parameterIndex,scale);
+        return getParamByIndex(parameterIndex,a->resultSet.getBigDecimal(a,scale));
     }
 
     @Override
     public byte[] getBytes(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getBytes(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getBytes(a));
     }
 
     @Override
     public Date getDate(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getDate(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getDate(a));
     }
 
     @Override
     public Time getTime(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getTime(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getTime(a));
     }
 
     @Override
     public Timestamp getTimestamp(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getTimestamp(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getTimestamp(a));
     }
 
     @Override
     public Object getObject(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getObject(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getObject(a));
     }
 
     @Override
     public BigDecimal getBigDecimal(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getBigDecimal(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getBigDecimal(a));
     }
 
     @Override
     public Object getObject(int parameterIndex, Map<String, Class<?>> map) throws SQLException {
-        setupResultSet();
-        return resultSet.getObject(parameterIndex,map);
+        return getParamByIndex(parameterIndex, a -> resultSet.getObject(a,map));
     }
 
     @Override
     public Ref getRef(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getRef(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getRef(a));
     }
 
     @Override
     public Blob getBlob(int parameterIndex) throws SQLException {
-        setupResultSet();
-        if(resultSet!=null) {
-            var possible = resultSet.getBlob(parameterIndex);
-            if (possible != null) {
-                return possible;
-            }
-        }
-        var par = getParameter(parameterIndex);
-        return (Blob)par.getValue();
+        return getParamByIndex(parameterIndex, a -> resultSet.getBlob(a));
     }
 
     @Override
     public Clob getClob(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getClob(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getClob(a));
     }
 
     @Override
     public Array getArray(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getArray(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getArray(a));
     }
 
     @Override
     public Date getDate(int parameterIndex, Calendar cal) throws SQLException {
-        setupResultSet();
-        return resultSet.getDate(parameterIndex,cal);
+        return getParamByIndex(parameterIndex, a -> resultSet.getDate(a,cal));
     }
 
     @Override
     public Time getTime(int parameterIndex, Calendar cal) throws SQLException {
-        setupResultSet();
-        return resultSet.getTime(parameterIndex,cal);
+        return getParamByIndex(parameterIndex, a -> resultSet.getTime(a,cal));
     }
 
     @Override
     public Timestamp getTimestamp(int parameterIndex, Calendar cal) throws SQLException {
-        setupResultSet();
-        return resultSet.getTimestamp(parameterIndex,cal);
+        return getParamByIndex(parameterIndex, a -> resultSet.getTimestamp(a,cal));
     }
 
 
 
     @Override
     public URL getURL(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getURL(parameterIndex);
+        return getParamByIndex(parameterIndex, a -> resultSet.getURL(a));
     }
 
     private PreparedStatementParameter getParameter(String parameterName){
@@ -514,232 +501,188 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
 
     @Override
     public String getString(String parameterName) throws SQLException {
-        setupResultSet();
-        if(resultSet!=null) {
-            var possible = resultSet.getString(parameterName);
-            if (possible != null) {
-                return possible;
-            }
-        }
-        var par = getParameter(parameterName);
-        return (String)par.getValue();
+        return getParamByName(parameterName,a->resultSet.getString(a));
     }
 
     @Override
     public boolean getBoolean(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getBoolean(parameterName);
+        return getParamByName(parameterName,a->resultSet.getBoolean(a));
     }
 
     @Override
     public byte getByte(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getByte(parameterName);
+        return getParamByName(parameterName,a->resultSet.getByte(a));
     }
 
     @Override
     public short getShort(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getShort(parameterName);
+        return getParamByName(parameterName,a->resultSet.getShort(a));
     }
 
     @Override
     public int getInt(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getInt(parameterName);
+        return getParamByName(parameterName,a->resultSet.getInt(a));
     }
 
     @Override
     public long getLong(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getLong(parameterName);
+        return getParamByName(parameterName,a->resultSet.getLong(a));
     }
 
     @Override
     public float getFloat(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getFloat(parameterName);
+        return getParamByName(parameterName,a->resultSet.getFloat(a));
     }
 
     @Override
     public double getDouble(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getDouble(parameterName);
+        return getParamByName(parameterName,a->resultSet.getDouble(a));
     }
 
     @Override
     public byte[] getBytes(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getBytes(parameterName);
+        return getParamByName(parameterName,a->resultSet.getBytes(a));
     }
 
     @Override
     public Date getDate(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getDate(parameterName);
+        return getParamByName(parameterName,a->resultSet.getDate(a));
     }
 
     @Override
     public Time getTime(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getTime(parameterName);
+        return getParamByName(parameterName,a->resultSet.getTime(a));
     }
 
     @Override
     public Timestamp getTimestamp(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getTimestamp(parameterName);
+        return getParamByName(parameterName,a->resultSet.getTimestamp(a));
     }
 
     @Override
     public Object getObject(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getObject(parameterName);
+        return getParamByName(parameterName,a->resultSet.getObject(a));
     }
 
     @Override
     public BigDecimal getBigDecimal(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getBigDecimal(parameterName);
+        return getParamByName(parameterName,a->resultSet.getBigDecimal(a));
     }
 
     @Override
     public Object getObject(String parameterName, Map<String, Class<?>> map) throws SQLException {
-        setupResultSet();
-        return resultSet.getObject(parameterName,map);
+        return getParamByName(parameterName,a->resultSet.getObject(a,map));
     }
 
     @Override
     public Ref getRef(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getRef(parameterName);
+        return getParamByName(parameterName,a->resultSet.getRef(a));
     }
 
     @Override
     public Blob getBlob(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getBlob(parameterName);
+        return getParamByName(parameterName,a->resultSet.getBlob(a));
     }
 
     @Override
     public Clob getClob(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getClob(parameterName);
+        return getParamByName(parameterName,a->resultSet.getClob(a));
     }
 
     @Override
     public Array getArray(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getArray(parameterName);
+        return getParamByName(parameterName,a->resultSet.getArray(a));
     }
 
     @Override
     public Date getDate(String parameterName, Calendar cal) throws SQLException {
-        setupResultSet();
-        return resultSet.getDate(parameterName,cal);
+        return getParamByName(parameterName,a->resultSet.getDate(a,cal));
     }
 
     @Override
     public Time getTime(String parameterName, Calendar cal) throws SQLException {
-        setupResultSet();
-        return resultSet.getTime(parameterName,cal);
+        return getParamByName(parameterName,a->resultSet.getTime(a,cal));
     }
 
     @Override
     public Timestamp getTimestamp(String parameterName, Calendar cal) throws SQLException {
-        setupResultSet();
-        return resultSet.getTimestamp(parameterName,cal);
+        return getParamByName(parameterName,a->resultSet.getTimestamp(a,cal));
     }
 
     @Override
     public URL getURL(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getURL(parameterName);
+        return getParamByName(parameterName,a->resultSet.getURL(a));
     }
 
     @Override
     public RowId getRowId(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getRowId(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getRowId(a));
     }
 
     @Override
     public RowId getRowId(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getRowId(parameterName);
+        return getParamByName(parameterName,a->resultSet.getRowId(a));
     }
 
     @Override
     public NClob getNClob(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getNClob(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getNClob(a));
     }
 
     @Override
     public NClob getNClob(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getNClob(parameterName);
+        return getParamByName(parameterName, a -> resultSet.getNClob(a));
     }
 
     @Override
     public SQLXML getSQLXML(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getSQLXML(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getSQLXML(a));
     }
 
     @Override
     public SQLXML getSQLXML(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getSQLXML(parameterName);
+        return getParamByName(parameterName, a -> resultSet.getSQLXML(a));
     }
 
     @Override
     public String getNString(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getNString(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getNString(a));
     }
 
     @Override
     public String getNString(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getNString(parameterName);
+        return getParamByName(parameterName, a -> resultSet.getNString(a));
     }
 
     @Override
     public Reader getNCharacterStream(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getNCharacterStream(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getNCharacterStream(a));
     }
 
     @Override
     public Reader getNCharacterStream(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getNCharacterStream(parameterName);
+        return getParamByName(parameterName, a -> resultSet.getNCharacterStream(a));
     }
 
     @Override
     public Reader getCharacterStream(int parameterIndex) throws SQLException {
-        setupResultSet();
-        return resultSet.getCharacterStream(parameterIndex);
+        return getParamByIndex(parameterIndex,a->resultSet.getCharacterStream(a));
     }
 
     @Override
     public Reader getCharacterStream(String parameterName) throws SQLException {
-        setupResultSet();
-        return resultSet.getCharacterStream(parameterName);
+        return getParamByName(parameterName, a -> resultSet.getCharacterStream(a));
     }
 
 
     @Override
     public <T> T getObject(int parameterIndex, Class<T> type) throws SQLException {
-        setupResultSet();
-        return resultSet.getObject(parameterIndex,type);
+        return getParamByIndex(parameterIndex,a->resultSet.getObject(a,type));
     }
 
     @Override
     public <T> T getObject(String parameterName, Class<T> type) throws SQLException {
-        setupResultSet();
-        return resultSet.getObject(parameterName,type);
+        return getParamByName(parameterName, a -> resultSet.getObject(a,type));
     }
 
 

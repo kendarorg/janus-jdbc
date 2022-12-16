@@ -123,7 +123,9 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
-        this.setParameter( new BigDecimalParameter().withValue(x).withColumnIndex(parameterIndex));
+        this.setParameter( new BigDecimalParameter().
+                withValue(x).
+                withColumnIndex(parameterIndex));
 
     }
 
@@ -339,6 +341,10 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
         ));
         clearBatch();
         return result.getResult();
+    }
+
+    public void addBatch(String sql) throws SQLException {
+        throw new SQLException();
     }
 
     @Override
