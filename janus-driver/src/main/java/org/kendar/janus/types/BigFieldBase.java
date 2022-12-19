@@ -39,9 +39,14 @@ public abstract class BigFieldBase<T,K,J,S> implements TypedSerializable {
 
         InputStream is = null;
         try {
-            this.data = sqlObjectToDataArray(blob,-1);
-            this.length = Array.getLength(data);
-            freeSqlObject(blob);
+            if(blob == null){
+                this.data=null;
+                this.length=0;
+            }else {
+                this.data = sqlObjectToDataArray(blob, -1);
+                this.length = Array.getLength(data);
+                freeSqlObject(blob);
+            }
         }
         catch (Exception e) {
             ExceptionsWrapper.toSQLException(e);
@@ -51,8 +56,13 @@ public abstract class BigFieldBase<T,K,J,S> implements TypedSerializable {
 
     public K fromSource(S input) throws SQLException {
         try {
-            this.data = sourceToDataArray(input,-1);
-            this.length = Array.getLength(data);
+            if(input == null){
+                this.data=null;
+                this.length=0;
+            }else {
+                this.data = sourceToDataArray(input, -1);
+                this.length = Array.getLength(data);
+            }
         }
         catch (Exception e) {
             ExceptionsWrapper.toSQLException(e);
@@ -62,8 +72,13 @@ public abstract class BigFieldBase<T,K,J,S> implements TypedSerializable {
 
     public K fromSource(S input,long length) throws SQLException {
         try {
-            this.data = sourceToDataArray(input,length);
-            this.length = Array.getLength(data);
+            if(input == null){
+                this.data=null;
+                this.length=0;
+            }else {
+                this.data = sourceToDataArray(input, length);
+                this.length = Array.getLength(data);
+            }
         }
         catch (Exception e) {
             ExceptionsWrapper.toSQLException(e);

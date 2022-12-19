@@ -120,6 +120,7 @@ public class JdbcArray implements Array,TypedSerializable,JdbcType {
 
     @Override
     public Object toNativeObject(Connection connection) throws SQLException {
+
         return connection.createArrayOf(baseTypeName,(Object[])array);
     }
 }

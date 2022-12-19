@@ -88,4 +88,4 @@ The things are
 
 * The Updatable ResultSets are fetched one by one
 * RowId is handled as RowId when present, converted to long/String/byte[] if founded matching
-
+* Conversions extending "[Java Type Conversion (Done Well)](https://github.com/toddfast/typeconverter)"

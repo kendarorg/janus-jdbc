@@ -20,6 +20,11 @@ public class JsonServer implements Engine {
     }
 
     @Override
+    public Engine create() {
+        return new JsonServer(engine);
+    }
+
+    @Override
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid) throws SQLException {
         JdbcCommand deserialized = getIjCommand(command);
 

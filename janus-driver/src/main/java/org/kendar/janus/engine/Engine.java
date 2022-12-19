@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public interface Engine {
+    Engine create();
+
     JdbcResult execute(JdbcCommand command, Long connectionId, Long uid) throws SQLException;
 
     int getMaxRows();

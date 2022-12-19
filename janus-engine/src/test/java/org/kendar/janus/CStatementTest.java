@@ -21,7 +21,7 @@ public class CStatementTest extends TestBase {
         var conn = driver.connect(CONNECT_URL,null);
         var st = conn.createStatement();
         try {
-            st.execute("DROP ALIAS testSimpleSp");
+            st.execute("DROP ALIAS TESTSIMPLESP");
         }catch (Exception ex){}
     }
     @AfterEach
@@ -41,7 +41,8 @@ public class CStatementTest extends TestBase {
         rs = st.executeQuery("CALL testSimpleSp()");
         assertTrue(rs.next());
         assertEquals("1",rs.getString(1));
-
+        var stx = conn.createStatement();
+            stx.execute("DROP ALIAS TESTSIMPLESP");
     }
 
     public static Clob getClob(Clob clob){
@@ -69,6 +70,9 @@ public class CStatementTest extends TestBase {
         rs = ps.executeQuery();
         assertTrue(rs.next());
         assertEquals(1000,rs.getClob(1).length());
+
+        var stx = conn.createStatement();
+        stx.execute("DROP ALIAS TESTSIMPLESP");
     }
 
 
@@ -82,11 +86,13 @@ public class CStatementTest extends TestBase {
         st.execute("CREATE ALIAS testSimpleSp FOR \"org.kendar.janus.CStatementTest.getClob\"");
         ResultSet rs;
         var ps = conn.prepareCall("{ ? = CALL testSimpleSp(?)}");
-        ps.registerOutParameter("PUBLIC.TESTCLOBSP(?2)", Types.CLOB);
+        ps.registerOutParameter("PUBLIC.TESTSIMPLESP(?2)", Types.CLOB);
         ps.setClob(2,data);
         rs = ps.executeQuery();
         assertTrue(rs.next());
         assertEquals(1000,rs.getClob(1).length());
+        var stx = conn.createStatement();
+        stx.execute("DROP ALIAS TESTSIMPLESP");
     }
 
 
@@ -105,5 +111,8 @@ public class CStatementTest extends TestBase {
         rs = ps.executeQuery();
         assertTrue(rs.next());
         assertEquals(1000,rs.getClob("result").length());
+
+        var stx = conn.createStatement();
+        stx.execute("DROP ALIAS TESTSIMPLESP");
     }
 }

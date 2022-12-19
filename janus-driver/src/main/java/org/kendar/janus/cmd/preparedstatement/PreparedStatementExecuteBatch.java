@@ -24,10 +24,14 @@ public class PreparedStatementExecuteBatch implements JdbcCommand {
     public Object execute(JdbcContext context, Long uid) throws SQLException {
         var statement = (PreparedStatement)context.get(uid);
         for(var batch:batches){
-            for(var par:batch){
-                par.load(statement);
+            if(batch.isEmpty()){
+                statement.addBatch();
+            }else{
+                for(var par:batch){
+                    par.load(statement);
+                }
+                statement.addBatch();
             }
-            statement.addBatch();
         }
         return statement.executeBatch();
     }

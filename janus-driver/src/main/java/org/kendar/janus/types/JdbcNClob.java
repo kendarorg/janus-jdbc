@@ -197,10 +197,17 @@ public class JdbcNClob extends BigFieldBase<char[],JdbcNClob, NClob, Reader> imp
     public Object toNativeObject(Connection connection) throws SQLException {
         var result = connection.createNClob();
         try {
-            result.setCharacterStream(0).write(data);
+            if(data==null)return result;
+            result.setCharacterStream(1).write(data);
         } catch (IOException e) {
             throw new SQLException(e);
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        if(this.data==null)return "<closed>";
+        return "'"+new String(this.data)+"'";
     }
 }

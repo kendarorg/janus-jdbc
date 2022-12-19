@@ -1,18 +1,19 @@
 package org.kendar.janus;
 
+import com.toddfast.util.convert.TypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
+import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.preparedstatement.*;
 import org.kendar.janus.cmd.preparedstatement.parameters.*;
+import org.kendar.janus.cmd.statement.StatementExecuteLargeBatch;
+import org.kendar.janus.cmd.statement.StatementExecuteLargeUpdate;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.results.ObjectResult;
-import org.kendar.janus.types.JdbcBlob;
-import org.kendar.janus.types.JdbcClob;
-import org.kendar.janus.types.JdbcNClob;
-import org.kendar.janus.types.JdbcSQLXML;
+import org.kendar.janus.types.*;
 import org.kendar.janus.utils.ExceptionsWrapper;
 
 import java.io.IOException;
@@ -24,13 +25,14 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.time.OffsetTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class JdbcPreparedStatement extends JdbcStatement implements PreparedStatement {
-    private String sql;
-    private ResultSetMetaData metadata;
+    protected String sql;
+    protected ResultSetMetaData metadata;
 
     public JdbcPreparedStatement(JdbcConnection connection, Engine engine, long traceId, int maxRows, int queryTimeout,
                                  ResultSetType resultSetType, ResultSetConcurrency concurrency, ResultSetHoldability holdability) {
@@ -70,8 +72,30 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
         parameters.add(parameter);
     }
 
+    protected void setParameter(PreparedStatementParameter parameter,int sqlType) {
+        var parValue = parameter.getValue();
+        if(parValue==null){
+            parameters.add(new NullParameter()
+                    .withColumnIndex(parameter.getColumnIndex())
+                    .withColumnName(parameter.getColumnName())
+                    .withSqlType(sqlType));
+            return;
+        }else if(parValue instanceof BigFieldBase){
+            var bfb = (BigFieldBase)parValue;
+            if(bfb.getData()==null) {
+                parameters.add(new NullParameter()
+                        .withColumnIndex(parameter.getColumnIndex())
+                        .withColumnName(parameter.getColumnName())
+                        .withSqlType(sqlType));
+                return;
+            }
+        }
+        parameters.add(parameter);
+    }
+
     @Override
     public int executeUpdate() throws SQLException {
+        resultSet=null;
         var result = (ObjectResult)this.engine.execute(
                 new PreparedStatementExecuteUpdate(this.sql, this.parameters),
                 this.connection.getTraceId(),
@@ -119,7 +143,9 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
-        this.setParameter( new BigDecimalParameter().withValue(x).withColumnIndex(parameterIndex));
+        this.setParameter( new BigDecimalParameter().
+                withValue(x).
+                withColumnIndex(parameterIndex));
 
     }
 
@@ -199,6 +225,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public boolean execute() throws SQLException {
+        resultSet=null;
         try {
             var command = new PreparedStatementExecute(
                     sql,
@@ -220,53 +247,60 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     }
     @Override
     public void setNClob(int parameterIndex, NClob value) throws SQLException {
-        this.setParameter( new NClobParameter().withValue(value).withColumnIndex(parameterIndex));
+        this.setParameter( new NClobParameter().withValue(value).withColumnIndex(parameterIndex),Types.NCLOB);
     }
 
     @Override
     public void setBlob(int parameterIndex, Blob x) throws SQLException {
-        this.setParameter( new BlobParameter().withValue(x).withColumnIndex(parameterIndex));
+        this.setParameter( new BlobParameter().withValue(x).withColumnIndex(parameterIndex),Types.BLOB);
     }
 
     @Override
     public void setClob(int parameterIndex, Clob x) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(x).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(x).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader,length)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader,length)).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
-        this.setParameter( new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream,length)).withColumnIndex(parameterIndex));
+        this.setParameter(
+                new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream,length)).withColumnIndex(parameterIndex),
+                Types.BLOB);
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader,length)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader,length)).withColumnIndex(parameterIndex),
+                Types.NCLOB);
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcClob().fromSource(reader)).withColumnIndex(parameterIndex),
+                Types.CLOB);
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
-        this.setParameter( new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream)).withColumnIndex(parameterIndex));
+        this.setParameter( new BlobParameter().withValue(new JdbcBlob().fromSource(inputStream)).withColumnIndex(parameterIndex),
+                Types.BLOB);
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader) throws SQLException {
-        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader)).withColumnIndex(parameterIndex));
+        this.setParameter( new ClobParameter().withValue(new JdbcNClob().fromSource(reader)).withColumnIndex(parameterIndex),
+                Types.NCLOB);
     }
 
 
     @Override
     public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
-        this.setParameter( new SQLXMLParameter().withValue(new JdbcSQLXML().fromSqlType(xmlObject)).withColumnIndex(parameterIndex));
+        this.setParameter( new SQLXMLParameter().withValue(new JdbcSQLXML().fromSqlType(xmlObject)).withColumnIndex(parameterIndex),
+                Types.SQLXML);
     }
 
 
@@ -295,6 +329,9 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setObject(int parameterIndex, Object x) throws SQLException {
+        /*if(x!=null && x instanceof OffsetTime){
+            x = TypeConverter.convert(Time.class,x);
+        }*/
         this.setParameter( new ObjectParameter().withValue(x)
                 .withColumnIndex(parameterIndex));
     }
@@ -312,6 +349,10 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     private List<List<PreparedStatementParameter>> batches = new ArrayList<>();
     @Override
     public void addBatch() throws SQLException {
+
+        if(parameters==null) {
+            parameters= new ArrayList<>();
+        }
         batches.add(parameters);
         parameters = new ArrayList<>();
     }
@@ -332,6 +373,10 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
         return result.getResult();
     }
 
+    public void addBatch(String sql) throws SQLException {
+        throw new SQLException();
+    }
+
     @Override
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
         this.setParameter(new RowIdParameter().withValue(x).withColumnIndex(parameterIndex));
@@ -340,7 +385,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
-        this.setParameter( new CharacterStreamParameter().fromReader(reader,length).withColumnIndex(parameterIndex));
+        this.setParameter( new CharacterStreamParameter().fromReader(reader,length).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
     @Override
@@ -350,7 +395,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-        this.setParameter( new CharacterStreamParameter().fromReader(reader,(int)length).withColumnIndex(parameterIndex));
+        this.setParameter( new CharacterStreamParameter().fromReader(reader,(int)length).withColumnIndex(parameterIndex),Types.CLOB);
     }
 
 
@@ -409,6 +454,10 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
         try {
+            if(x==null){
+                setNull(parameterIndex,Types.CLOB);
+                return;
+            }
             var buffer = IOUtils.toByteArray(x);
             Reader targetReader =  new StringReader(new String(buffer, StandardCharsets.US_ASCII));
             setClob(parameterIndex,targetReader,length);
@@ -445,5 +494,64 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
     @Override
     public ParameterMetaData getParameterMetaData() throws SQLException {
         throw new UnsupportedOperationException("?getParameterMetaData");
+    }
+
+    @Override
+    public long executeLargeUpdate() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(
+                        "executeLargeUpdate")
+                ,connection.getTraceId(),getTraceId())).getResult();
+    }
+
+
+    @Override
+    public long executeLargeUpdate(String sql, int columnIndexes[]) throws SQLException {
+        var result= ((ObjectResult)engine.execute(
+                new PreparedStatementExecuteLargeUpdate(batches,sql,columnIndexes),
+                connection.getTraceId(),getTraceId()
+        ));
+        clearBatch();
+        return result.getResult();
+    }
+    @Override
+    public long executeLargeUpdate(String sql, String columnNames[])
+            throws SQLException {
+        var result= ((ObjectResult)engine.execute(
+                new PreparedStatementExecuteLargeUpdate(batches,sql,columnNames),
+                connection.getTraceId(),getTraceId()
+        ));
+        clearBatch();
+        return result.getResult();
+    }
+    @Override
+    public long executeLargeUpdate(String sql, int autoGeneratedKeys)
+            throws SQLException {
+        var result= ((ObjectResult)engine.execute(
+                new PreparedStatementExecuteLargeUpdate(batches,sql,autoGeneratedKeys),
+                connection.getTraceId(),getTraceId()
+        ));
+        clearBatch();
+        return result.getResult();
+    }
+
+    @Override
+    public long executeLargeUpdate(String sql) throws SQLException {
+        var result= ((ObjectResult)engine.execute(
+                new PreparedStatementExecuteLargeUpdate(batches,sql),
+                connection.getTraceId(),getTraceId()
+        ));
+        clearBatch();
+        return result.getResult();
+    }
+
+
+    @Override
+    public long[] executeLargeBatch() throws SQLException {
+        var result= ((ObjectResult)engine.execute(
+                new PerparedStatementExecuteLargeBatch(batches),
+                connection.getTraceId(),getTraceId()
+        ));
+        clearBatch();
+        return result.getResult();
     }
 }

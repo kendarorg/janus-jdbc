@@ -22,6 +22,9 @@ public class JdbcTypesConverter {
         if(resultObject==null){
             return new ObjectResult(null);
         }
+        if(resultObject.getClass()==String.class){
+            return new ObjectResult(resultObject);
+        }
         if(ClassUtils.isPrimitiveOrWrapper(resultObject.getClass())){
             return new ObjectResult(resultObject);
         }
@@ -80,6 +83,9 @@ public class JdbcTypesConverter {
         }
         if(ClassUtils.isAssignable(resultObject.getClass(), JdbcResult.class)){
             return (JdbcResult) resultObject;
+        }
+        if(resultObject.getClass().isArray()){
+            return new ObjectResult(resultObject);
         }
         return new ObjectResult(null);
     }

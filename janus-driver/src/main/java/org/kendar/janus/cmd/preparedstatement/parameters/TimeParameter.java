@@ -1,9 +1,6 @@
 package org.kendar.janus.cmd.preparedstatement.parameters;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Time;
+import java.sql.*;
 import java.util.Calendar;
 
 public class TimeParameter extends BaseTimeParameter<Time>{

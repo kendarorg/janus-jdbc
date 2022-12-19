@@ -1,5 +1,11 @@
 package org.kendar.janus;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.base.Converter;
+import com.toddfast.util.convert.TypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
@@ -15,18 +21,21 @@ import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.RemainingResultSetResult;
 import org.kendar.janus.serialization.TypedSerializer;
-import org.kendar.janus.types.JdbcBlob;
-import org.kendar.janus.types.JdbcClob;
-import org.kendar.janus.types.JdbcNClob;
-import org.kendar.janus.types.JdbcRowId;
+import org.kendar.janus.types.*;
 import org.kendar.janus.utils.JdbcTypesConverter;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class JdbcResultSet implements JdbcResult, ResultSet {
@@ -160,7 +169,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         for (int i = 1; i <= columnCount; ++i) {
 
             columnDescriptors.add(new ColumnDescriptor(
-                    md.getColumnType(i),
+                    getColumnType(md,i),
                     md.getColumnName(i),
                     md.getColumnLabel(i)));
             var cd = columnDescriptors.get(i-1);
@@ -194,8 +203,18 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         }
     }
 
+    private int getColumnType(ResultSetMetaData md,int i) throws SQLException {
+        try {
+            return md.getColumnType(i);
+        }catch (Exception ex){
+            return Types.OTHER;
+        }
+    }
+
+    Object lastColumnValue;
     private Object getFieldById(int columnIndex){
-        return rows.get(cursor).get(columnIndex-1);
+        lastColumnValue = rows.get(cursor).get(columnIndex-1);
+        return lastColumnValue;
     }
 
     private int getFieldId(String columnLabel) throws SQLException {
@@ -226,7 +245,10 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public URL getURL(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
-        if(result==null) return null;
+        if(result==null) {
+            lastColumnValue= null;
+            return null;
+        }
         return (URL) result;
     }
 
@@ -239,398 +261,148 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public Array getArray(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
-        if(result==null) return null;
+        if(result==null) {
+            lastColumnValue = null;
+            return null;
+        }
         return (Array)result;
     }
 
     @Override
     public boolean getBoolean(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return false;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (boolean) value;
-            case("int"):
-            case("integer"):
-                return ((int) value)!=0;
-            case("byte"):
-                return ((byte) value)!=0;
-            case("short"):
-                return ((short) value)!=0;
-            case("long"):
-                return ((long) value)!=0L;
-            case("float"):
-                return ((float) value)!=0.0F;
-            case("double"):
-                return ((double) value)!=0.0;
-            case("bigdecimal"):
-                return ((BigDecimal) value).intValue()!=0;
-            case("string"):
-                try {
-                    return Boolean.parseBoolean((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to boolean");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
+        if(value==null) {
+            lastColumnValue = null;
+            return false;
         }
+        return TypeConverter.convert(Boolean.class,value);
+
     }
 
     @Override
     public byte getByte(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return (byte)0;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (byte)(((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).byteValue();
-            case("byte"):
-                return ((Byte)value).byteValue();
-            case("short"):
-                return ((Short)value).byteValue();
-            case("long"):
-                return ((Long)value).byteValue();
-            case("float"):
-                return ((Float)value).byteValue();
-            case("double"):
-                return ((Double)value).byteValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).byteValue();
-            case("string"):
-                try {
-                    return Byte.parseByte((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to byte");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
+        if(value==null) {
+            lastColumnValue = null;
+            return (byte)0;
         }
+        return TypeConverter.convert(byte.class,value);
     }
 
     @Override
     public short getShort(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return (short)0;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (short)(((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).shortValue();
-            case("byte"):
-                return ((Byte)value).shortValue();
-            case("short"):
-                return ((Short)value).shortValue();
-            case("long"):
-                return ((Long)value).shortValue();
-            case("float"):
-                return ((Float)value).shortValue();
-            case("double"):
-                return ((Double)value).shortValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).shortValue();
-            case("string"):
-                try {
-                    return Short.parseShort((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to short");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
+        if(value==null) {
+            lastColumnValue =null;
+            return (short)0;
         }
+        return TypeConverter.convert(Short.class,value);
+
     }
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).intValue();
-            case("byte"):
-                return ((Byte)value).intValue();
-            case("short"):
-                return ((Short)value).intValue();
-            case("long"):
-                return ((Long)value).intValue();
-            case("float"):
-                return ((Float)value).intValue();
-            case("double"):
-                return ((Double)value).intValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).intValue();
-            case("string"):
-                try {
-                    return Integer.parseInt((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to short");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
+        if(value==null) {
+            lastColumnValue = null;
+            return 0;
         }
+        return TypeConverter.convert(Integer.class,value);
     }
 
     @Override
     public long getLong(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0L;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1 : 0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).longValue();
-            case("byte"):
-                return ((Byte)value).longValue();
-            case("short"):
-                return ((Short)value).longValue();
-            case("long"):
-                return ((Long)value).longValue();
-            case("float"):
-                return ((Float)value).longValue();
-            case("double"):
-                return ((Double)value).longValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).longValue();
-            case("string"):
-                try {
-                    return Long.parseLong((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to long");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
+        if(value==null) {
+            lastColumnValue = null;
+            return 0L;
         }
+        return TypeConverter.convert(Long.class,value);
+
     }
 
     @Override
     public float getFloat(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0.0F;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1.0F : 0.0F);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).floatValue();
-            case("byte"):
-                return ((Byte)value).floatValue();
-            case("short"):
-                return ((Short)value).floatValue();
-            case("long"):
-                return ((Long)value).floatValue();
-            case("float"):
-                return ((Float)value).floatValue();
-            case("double"):
-                return ((Double)value).floatValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).floatValue();
-            case("string"):
-                try {
-                    return Float.parseFloat((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to float");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
+        if(value==null) {
+            lastColumnValue = null;
+            return 0.0F;
         }
+        return TypeConverter.convert(Float.class,value);
+
     }
 
     @Override
     public double getDouble(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
-        if(value==null) return 0.0;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        switch (name){
-            case("boolean"):
-                return (((boolean)value) ? 1.0 : 0.0);
-            case("int"):
-            case("integer"):
-                return ((Integer)value).doubleValue();
-            case("byte"):
-                return ((Byte)value).doubleValue();
-            case("short"):
-                return ((Short)value).doubleValue();
-            case("long"):
-                return ((Long)value).doubleValue();
-            case("float"):
-                return ((Float)value).doubleValue();
-            case("double"):
-                return ((Double)value).doubleValue();
-            case("bigdecimal"):
-                return ((BigDecimal) value).doubleValue();
-            case("string"):
-                try {
-                    return Double.parseDouble((String)value);
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to double");
-                }
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
+        if(value==null) {
+            lastColumnValue=null;
+            return 0.0;
         }
+        return TypeConverter.convert(Double.class,value);
+
     }
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        return getBigDecimal(columnIndex,-1);
+        var value = getFieldById(columnIndex);
+        if(value==null) {
+            lastColumnValue =null;
+            return null;
+        }
+        if(value instanceof BigDecimal){
+            return ((BigDecimal)value).setScale(0, RoundingMode.HALF_UP);
+        }
+        return getBigDecimal(columnIndex,0);
     }
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        BigDecimal result;
-        switch (name){
-            case("boolean"):
-                result = new BigDecimal(((boolean)value) ? 1.0 : 0.0);
-                break;
-            case("int"):
-            case("integer"):
-                result= new BigDecimal((int)value);
-                break;
-            case("byte"):
-                result= new BigDecimal((byte)value);
-                break;
-            case("short"):
-                result= new BigDecimal((short)value);
-                break;
-            case("long"):
-                result= new BigDecimal((long)value);
-                break;
-            case("float"):
-                result= new BigDecimal((float)value);
-                break;
-            case("double"):
-                result= new BigDecimal((double)value);
-                break;
-            case("bigdecimal"):
-                result = (BigDecimal) value;
-                break;
-            case("string"):
-                try {
-                    result = new BigDecimal(Double.parseDouble((String)value));
-                }
-                catch (NumberFormatException e) {
-                    throw new SQLException("Can't convert String value '" + value + "' to bigdecimal");
-                }
-                break;
-            default:
-                throw new SQLException("Can't convert type to boolean: " + value.getClass());
-        }
-        if(scale>=0){
-            result = result.setScale(scale);
-        }
-        return result;
+        return TypeConverter.convert(BigDecimal.class,value);
+
     }
 
     @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
-        return (byte[])getFieldById(columnIndex);
+        var result = getFieldById(columnIndex);
+        if(result==null){
+            lastColumnValue=null;
+            return null;
+        }
+        if(result.getClass()==JdbcBlob.class){
+            return ((JdbcBlob)result).getData();
+        }
+        return (byte[])result;
     }
 
-    private static Date getPureDate(long milliSeconds) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(milliSeconds);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return new Date(cal.getTimeInMillis());
-    }
+
 
     @Override
     public Date getDate(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
 
-        switch (name) {
-            case("date"): {
-                return (Date)value;
-            }
-            case("time"): {
-                return getPureDate(((Time)value).getTime());
-            }
-            case ("timestamp"): {
-                return getPureDate(((Timestamp)value).getTime());
-            }
-            default: {
-                throw new SQLException("Can't convert type to date: " + value.getClass());
-            }
-        }
+        return TypeConverter.convert(Date.class,value);
+
     }
 
-    private static Time getPureTime(long milliSeconds) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(milliSeconds);
-        cal.set(Calendar.YEAR, 1970);
-        cal.set(Calendar.MONTH, 0);
-        cal.set(Calendar.DATE, 1);
-        cal.set(Calendar.MILLISECOND, 0);
-        return new Time(cal.getTimeInMillis());
-    }
 
     @Override
     public Time getTime(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+        return TypeConverter.convert(Time.class,value);
 
-        switch (name) {
-            case("date"): {
-                return getPureTime(((Date)value).getTime());
-            }
-            case("time"): {
-                return (Time)value;
-            }
-            case ("timestamp"): {
-                return getPureTime(((Timestamp)value).getTime());
-            }
-            default: {
-                throw new SQLException("Can't convert type to time: " + value.getClass());
-            }
-        }
     }
 
     @Override
     public Timestamp getTimestamp(int columnIndex) throws SQLException {
         var value = getFieldById(columnIndex);
         if(value==null) return null;
-        var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+        return TypeConverter.convert(Timestamp.class,value);
 
-        switch (name) {
-            case("date"): {
-                return new Timestamp(((Date)value).getTime());
-            }
-            case("time"): {
-                return new Timestamp(((Time)value).getTime());
-            }
-            case ("timestamp"): {
-                return (Timestamp)value;
-            }
-            default: {
-                throw new SQLException("Can't convert type to timestamp: " + value.getClass());
-            }
-        }
     }
 
     @Override
@@ -644,6 +416,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public String getString(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==JdbcClob.class){
+            return new String(((JdbcClob)result).getData());
+        }else if(result.getClass()==JdbcNClob.class){
+            return new String(((JdbcNClob)result).getData());
+        }
         return result.toString();
     }
 
@@ -651,6 +428,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public Blob getBlob(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==byte[].class){
+            var res = new JdbcBlob();
+            res.setBytes(1,(byte[])result);
+            return res;
+        }
         return (Blob) result;
     }
 
@@ -658,6 +440,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public Clob getClob(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==String.class){
+            var res = new JdbcClob();
+            res.setString(1,(String)result);
+            return res;
+        }
         return (Clob) result;
     }
 
@@ -665,6 +452,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public NClob getNClob(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==String.class){
+            var res = new JdbcNClob();
+            res.setString(1,(String)result);
+            return res;
+        }
         return (NClob)result;
     }
 
@@ -672,6 +464,11 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public SQLXML getSQLXML(int columnIndex) throws SQLException {
         var result = getFieldById(columnIndex);
         if(result==null) return null;
+        if(result.getClass()==String.class){
+            var res = new JdbcSQLXML();
+            res.setString((String)result);
+            return res;
+        }
         return (SQLXML)result;
     }
 
@@ -813,7 +610,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public boolean wasNull() throws SQLException {
-        return rows.get(cursor).get(lastColumn)==null;
+        return lastColumnValue==null;
     }
 
 
@@ -1553,10 +1350,16 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
         return new ByteArrayInputStream(str.getBytes());
     }
 
+
+
     @Override
-    public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        var value = getFieldById(columnIndex);
-        return (T)value;
+    public <T> T getObject(int columnIndex, Class<T> var0) throws SQLException {
+        var var1 = getFieldById(columnIndex);
+        if(var1==null) return null;
+        return (T)TypeConverter.convert(var0,var1);
+
+
+
     }
 
 
@@ -1569,7 +1372,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     public void updateNString(String columnLabel, String nString) throws SQLException {
         updateString(columnLabel,nString);
     }
-    //TODO Implements
+    
 
 
 
@@ -1947,7 +1750,12 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public Reader getCharacterStream(int columnIndex) throws SQLException {
-        return getClob(columnIndex).getCharacterStream();
+        var rs = getClob(columnIndex);
+        if(rs==null){
+            lastColumnValue =null;
+            return null;
+        }
+        return rs.getCharacterStream();
     }
 
 

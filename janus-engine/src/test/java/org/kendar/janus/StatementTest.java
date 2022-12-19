@@ -147,7 +147,7 @@ public class StatementTest extends TestBase {
                         new String[]{"10","20"},
                         new Object[]{BigDecimal.valueOf(10),BigDecimal.valueOf(11),BigDecimal.valueOf(31),BigDecimal.valueOf(20)},
                         new Class<?>[]{BigDecimal.class},
-                        "BigDecimal",".0")
+                        "BigDecimal","")
 
         );
     }

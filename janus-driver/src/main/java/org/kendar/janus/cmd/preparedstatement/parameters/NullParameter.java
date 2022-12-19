@@ -15,6 +15,8 @@ public class NullParameter implements PreparedStatementParameter {
 
 
 
+
+
     public NullParameter withColumnIndex(int columnIndex){
         this.columnIndex = columnIndex;
         return this;
@@ -63,6 +65,11 @@ public class NullParameter implements PreparedStatementParameter {
     @Override
     public String getColumnName() {
         return columnName;
+    }
+
+    @Override
+    public Object getValue() {
+        return null;
     }
 
     @Override

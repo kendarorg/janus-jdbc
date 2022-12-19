@@ -1,5 +1,7 @@
 package org.kendar.janus.cmd.preparedstatement.parameters;
 
+import org.kendar.janus.types.JdbcBlob;
+
 import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

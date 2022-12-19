@@ -101,6 +101,9 @@ public class ObjectParameter implements PreparedStatementParameter {
                 throw new SQLException(ex);
             }
         }
+        if(value==null){
+            return null;
+        }
         var objClass = value.getClass();
         if(ClassUtils.isPrimitiveOrWrapper(objClass)) {
             return value;
@@ -148,6 +151,11 @@ public class ObjectParameter implements PreparedStatementParameter {
         return columnName;
     }
 
+    @Override
+    public Object getValue() {
+        return value;
+    }
+
 
     public boolean isOut() {
         return out;
@@ -188,5 +196,25 @@ public class ObjectParameter implements PreparedStatementParameter {
                 ", \n\ttargetSqlType=" + targetSqlType +
                 ", \n\tscaleOrLength=" + scaleOrLength +
                 '}';
+    }
+
+    public void loadOut(CallableStatement callableStatement) throws SQLException {
+        if(columnName!=null && !columnName.isEmpty()) {
+            if(scaleOrLength!=null){
+                callableStatement.registerOutParameter(columnName,targetSqlType,scaleOrLength);
+            }else if(typeName!=null){
+                callableStatement.registerOutParameter(columnName,targetSqlType,typeName);
+            }else{
+                callableStatement.registerOutParameter(columnName,targetSqlType);
+            }
+        }else{
+            if(scaleOrLength!=null){
+                callableStatement.registerOutParameter(columnIndex,targetSqlType,scaleOrLength);
+            }else if(typeName!=null){
+                callableStatement.registerOutParameter(columnIndex,targetSqlType,typeName);
+            }else{
+                callableStatement.registerOutParameter(columnIndex,targetSqlType);
+            }
+        }
     }
 }

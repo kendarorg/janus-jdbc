@@ -56,7 +56,7 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
         return this;
     }
 
-    //TODO Implements
+    
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
@@ -429,7 +429,7 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
     public boolean supportsCoreSQLGrammar() throws SQLException {
         return ((ObjectResult) engine.execute(new Exec(
                         "supportsCoreSQLGrammar")
-                , connection.getTraceId(), connection.getTraceId())).getResult();
+                , connection.getTraceId(), getTraceId())).getResult();
     }
 
     @Override
@@ -1062,7 +1062,7 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
     public ResultSet getCrossReference(String parentCatalog, String parentSchema, String parentTable,
                                        String foreignCatalog, String foreignSchema, String foreignTable) throws SQLException {
         var result = (JdbcResultSet)engine.execute(new Exec(
-                        "getExportedKeys")
+                        "getCrossReference")
                         .withTypes(String.class,String.class,String.class,
                                 String.class,String.class,String.class)
                         .withParameters(parentCatalog,parentSchema,parentTable,
