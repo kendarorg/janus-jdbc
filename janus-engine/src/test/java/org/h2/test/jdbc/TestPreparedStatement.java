@@ -76,15 +76,15 @@ public class TestPreparedStatement extends TestDb {
         testCancelReuse(conn);
         testCoalesce(conn);
         testPreparedStatementMetaData(conn);
-        //testBigDecimal(conn);
+
         testDate(conn);
         //testDate8(conn);
         //FIXME testEnum()
         testTime8(conn);
-        //FIXME  testOffsetTime8(conn);
+        testOffsetTime8(conn);
         testDateTime8(conn);
-        //FIXME testOffsetDateTime8(conn);
-        //FIXME testZonedDateTime8(conn);
+        //////testOffsetDateTime8(conn);
+        //////testZonedDateTime8(conn);
         //FIXME testInstant8(conn);
         //FIXME testInterval(conn);
         //FIXME testInterval8(conn);
@@ -784,14 +784,17 @@ public class TestPreparedStatement extends TestDb {
         rs.close();
     }
 
-    private void testOffsetDateTime8(Connection conn) throws SQLException {
+    @Test void testOffsetDateTime8() throws SQLException {
+        Connection conn = getConnection("preparedStatement");
         PreparedStatement prep = conn.prepareStatement("SELECT ?");
         OffsetDateTime offsetDateTime = OffsetDateTime.parse("2001-02-03T04:05:06+02:30");
+
+        OffsetDateTime offsetDateTimeExpected = OffsetDateTime.parse("2001-02-03T01:35:06Z");
         prep.setObject(1, offsetDateTime);
         ResultSet rs = prep.executeQuery();
         rs.next();
         OffsetDateTime offsetDateTime2 = rs.getObject(1, OffsetDateTime.class);
-        assertEquals(offsetDateTime, offsetDateTime2);
+        assertEquals(offsetDateTimeExpected, offsetDateTime2);
         assertFalse(rs.next());
         rs.close();
 
@@ -799,14 +802,15 @@ public class TestPreparedStatement extends TestDb {
         rs = prep.executeQuery();
         rs.next();
         offsetDateTime2 = rs.getObject(1, OffsetDateTime.class);
-        assertEquals(offsetDateTime, offsetDateTime2);
+        assertEquals(offsetDateTimeExpected, offsetDateTime2);
         // Check default mapping
         rs.getObject(1);
         assertFalse(rs.next());
         rs.close();
     }
 
-    private void testZonedDateTime8(Connection conn) throws SQLException {
+    @Test void testZonedDateTime8() throws SQLException {
+        Connection conn = getConnection("preparedStatement");
         PreparedStatement prep = conn.prepareStatement("SELECT ?");
         ZonedDateTime zonedDateTime = ZonedDateTime.parse("2001-02-03T04:05:06+02:30");
         prep.setObject(1, zonedDateTime);
@@ -1582,6 +1586,7 @@ public class TestPreparedStatement extends TestDb {
     }
 
     private void testPreparedStatementWithIndexedParameterAndLiteralsNone() throws SQLException {
+
         // make sure that when the analyze table kicks in,
         // it works with ALLOW_LITERALS=NONE
         deleteDb("preparedStatement");

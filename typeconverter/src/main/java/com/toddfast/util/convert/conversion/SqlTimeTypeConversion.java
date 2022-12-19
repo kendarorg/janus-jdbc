@@ -6,10 +6,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Locale;
 
 import static com.toddfast.util.convert.Utils.getPureTime;
@@ -54,6 +51,9 @@ public class SqlTimeTypeConversion implements TypeConverter.Conversion {
 			}
 			case ("timestamp"): {
 				return getPureTime(((Timestamp)value).getTime());
+			}
+			case ("offsettime"): {
+				return Time.valueOf(((OffsetTime)value).toLocalTime());
 			}
 			default: {
 				throw new RuntimeException("Can't convert type to time: " + value.getClass());

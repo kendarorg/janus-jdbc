@@ -38,7 +38,7 @@ public class TestBase {
 
         serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
         jsonServer = new JsonServer(serverEngine);
-        driver = (Driver)new JdbcDriver(jsonServer);
+        driver = (Driver) JdbcDriver.of(jsonServer);
         if(!initialized){
             synchronized (locker) {
                 var conn = driver.connect(CONNECT_URL,null);;

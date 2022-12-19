@@ -17,3 +17,4 @@ com.toddfast.util.convert.conversion.UnknownTypeConversion
 com.toddfast.util.convert.conversion.LocalDateTimeTypeConversion
 com.toddfast.util.convert.conversion.LocalTimeTypeConversion
 com.toddfast.util.convert.conversion.LocalDateTypeConversion
+com.toddfast.util.convert.conversion.OffsetTimeTypeConversion

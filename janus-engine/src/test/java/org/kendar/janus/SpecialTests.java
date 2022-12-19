@@ -96,7 +96,7 @@ public class SpecialTests extends TestBase {
         var se = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
         se.setPrefetchMetadata(true);
         var js = new JsonServer(se);
-        var drv = (Driver)new JdbcDriver(js);
+        var drv = (Driver)JdbcDriver.of(js);
 
         insertInSimpleTable("testGetQueryMeta");
         var conn = drv.connect(CONNECT_URL,null);

@@ -72,6 +72,11 @@ public class ServerEngine implements Engine {
     }
 
     @Override
+    public Engine create() {
+        return new ServerEngine(connectionString,login,password);
+    }
+
+    @Override
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid) throws SQLException {
         try {
             if (isReplaying) {

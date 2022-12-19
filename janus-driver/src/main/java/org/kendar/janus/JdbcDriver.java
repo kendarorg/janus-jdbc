@@ -40,20 +40,21 @@ public class JdbcDriver implements Driver {
         testEngine = testEngineP;
     }
 
-    public JdbcDriver(){
-        if(testEngine!=null){
-            engine =testEngine;
-        }else {
-            engine = new DriverEngine();
+    public JdbcDriver() {
+        if (testEngine != null) {
+            engine = testEngine;
         }
     }
 
-    public JdbcDriver(Engine engine){
-        this.engine = engine;
+    public static JdbcDriver of(Engine engine){
+        var result = new JdbcDriver();
+        result.engine = engine;
+        return result;
     }
 
     @Override
     public Connection connect(String url, Properties properties) throws SQLException {
+
 
         Connection result = null;
         if (this.acceptsURL(url)) {
@@ -68,13 +69,20 @@ public class JdbcDriver implements Driver {
                 if(properties!=null){
                     localProperties = properties.getProperty("janus.clientinfo.properties");
                 }
+                var engineToUse = engine;
+                if(engineToUse==null){
+
+                    log.info("Connecting");
+                    engineToUse = new DriverEngine(uri.toString());
+                }
                 var command = new ConnectionConnect(
                         url,
                         properties,
                         LocalProperties.build(localProperties));
-                var connResult = (ObjectResult) engine.execute(command,-1L,-1L);
-                result = new JdbcConnection((Long)connResult.getResult(), engine);
+                var connResult = (ObjectResult) engineToUse.execute(command,-1L,-1L);
+                result = new JdbcConnection((Long)connResult.getResult(), engineToUse);
 
+                log.info("Connected");
             }
             catch (Exception e)
             {

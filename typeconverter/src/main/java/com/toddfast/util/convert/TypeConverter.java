@@ -868,6 +868,7 @@ public class TypeConverter {
 
 	/** Logical type name "sqltime" */
 	public static final String TYPE_SQL_TIME="sqltime";
+	public static final String TYPE_OFFSET_TIME="offsettime";
 
 	/** Logical type name "sqltimestamp" */
 	public static final String TYPE_SQL_TIMESTAMP="sqltimestamp";

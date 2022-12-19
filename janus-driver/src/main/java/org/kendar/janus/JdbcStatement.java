@@ -257,7 +257,7 @@ public class JdbcStatement implements Statement {
     @Override
     public void setFetchSize(int rows) throws SQLException {
         ((ObjectResult)engine.execute(new Exec(
-                        "setEscapeProcessing")
+                        "setFetchSize")
                         .withTypes(int.class)
                         .withParameters(rows)
                 ,connection.getTraceId(),getTraceId())).getResult();

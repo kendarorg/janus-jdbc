@@ -1,5 +1,6 @@
 package org.kendar.janus;
 
+import com.toddfast.util.convert.TypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
 import org.kendar.janus.cmd.Exec;
@@ -24,6 +25,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.time.OffsetTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -327,6 +329,9 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public void setObject(int parameterIndex, Object x) throws SQLException {
+        /*if(x!=null && x instanceof OffsetTime){
+            x = TypeConverter.convert(Time.class,x);
+        }*/
         this.setParameter( new ObjectParameter().withValue(x)
                 .withColumnIndex(parameterIndex));
     }
