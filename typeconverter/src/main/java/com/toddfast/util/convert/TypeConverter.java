@@ -859,6 +859,8 @@ public class TypeConverter {
 
 	/** Logical type name "sqldate" */
 	public static final String TYPE_SQL_DATE="sqldate";
+
+	public static final String TYPE_ZONED_DATE_TIME = "typezoneddatetime";
 	public static final String TYPE_UTIL_DATE="utildate";
 
 	public static final Object TYPE_LOCAL_DATE_TIME = "localdatetime";

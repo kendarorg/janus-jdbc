@@ -5,10 +5,7 @@ import com.toddfast.util.convert.TypeConverter;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Locale;
 
 /**
@@ -52,6 +49,9 @@ public class LocalTimeTypeConversion implements TypeConverter.Conversion {
 			}
 			case ("timestamp"): {
 				return ((Timestamp)value).toLocalDateTime().toLocalTime();
+			}
+			case ("zoneddatetime"): {
+				return ((ZonedDateTime)value).toLocalDateTime().toLocalTime();
 			}
 			default: {
 				throw new RuntimeException("Can't convert type to timestamp: " + value.getClass());

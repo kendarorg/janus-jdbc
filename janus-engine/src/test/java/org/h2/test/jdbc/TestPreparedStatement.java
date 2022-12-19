@@ -813,11 +813,12 @@ public class TestPreparedStatement extends TestDb {
         Connection conn = getConnection("preparedStatement");
         PreparedStatement prep = conn.prepareStatement("SELECT ?");
         ZonedDateTime zonedDateTime = ZonedDateTime.parse("2001-02-03T04:05:06+02:30");
+        ZonedDateTime zonedDateTimeExpected = ZonedDateTime.parse("2001-02-03T01:35:06+01:00[Europe/Berlin]");
         prep.setObject(1, zonedDateTime);
         ResultSet rs = prep.executeQuery();
         rs.next();
         ZonedDateTime zonedDateTime2 = rs.getObject(1, ZonedDateTime.class);
-        assertEquals(zonedDateTime, zonedDateTime2);
+        assertEquals(zonedDateTimeExpected, zonedDateTime2);
         assertFalse(rs.next());
         rs.close();
 
@@ -825,7 +826,7 @@ public class TestPreparedStatement extends TestDb {
         rs = prep.executeQuery();
         rs.next();
         zonedDateTime2 = rs.getObject(1, ZonedDateTime.class);
-        assertEquals(zonedDateTime, zonedDateTime2);
+        assertEquals(zonedDateTimeExpected, zonedDateTime2);
         assertFalse(rs.next());
         rs.close();
     }
