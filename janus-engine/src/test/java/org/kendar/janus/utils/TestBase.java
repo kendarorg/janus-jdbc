@@ -39,14 +39,14 @@ public class TestBase {
         serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
         jsonServer = new JsonServer(serverEngine);
         driver = (Driver) JdbcDriver.of(jsonServer);
-        if(!initialized){
-            synchronized (locker) {
-                var conn = driver.connect(CONNECT_URL,null);;
+        //if(!initialized){
+            //synchronized (locker) {
+                var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
                 conn.createStatement().execute("DROP ALL OBJECTS");
                 conn.close();
                 initialized=true;
-            }
-        }
+            //}
+        //}
     }
     protected InputStreamReader getInputStreamReader(int kb) throws IOException {
         var bytes = getBytes(kb);
@@ -105,7 +105,7 @@ public class TestBase {
 
     protected void afterEach() throws SQLException {
         var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
-        DatabaseMetaData databaseMetaData = conn.getMetaData();
+        //DatabaseMetaData databaseMetaData = conn.getMetaData();
         /*var tablesCount =0;
         try(ResultSet resultSet = databaseMetaData.getTables(null, null, null, new String[]{"TABLE"})){
             while(resultSet.next()) {

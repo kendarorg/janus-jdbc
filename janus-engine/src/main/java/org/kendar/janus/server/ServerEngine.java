@@ -7,6 +7,7 @@ import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.cmd.connection.ConnectionConnect;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.JdbcResult;
+import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.utils.JdbcTypesConverter;
 import org.kendar.janus.utils.LoggerWrapper;
 
@@ -91,15 +92,20 @@ public class ServerEngine implements Engine {
             Long traceId = null;
             if (command instanceof ConnectionConnect) {
                 resultObject = handleConnect((ConnectionConnect) command);
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
             } else if (command instanceof Close) {
                 resultObject = handleClose((Close) command, connectionId, uid);
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
             } else {
                 resultObject = handle(command, connectionId, uid);
                 var context = contexts.get(connectionId);
                 traceId = context.getNext();
-                contexts.get(connectionId).put(traceId, resultObject);
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
+                if(resultObject!=null && !ClassUtils.isAssignable(result.getClass(), ObjectResult.class)) {
+                    contexts.get(connectionId).put(traceId, resultObject);
+                }
             }
-            var toret = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
+
             if (isRecording) {
                 var recording = recordings.get(currentRecording);
                 var rr = new ResponseRequest();
@@ -108,10 +114,10 @@ public class ServerEngine implements Engine {
                 jdbcRequest.setConnectionId(connectionId);
                 jdbcRequest.setConnectionId(uid);
                 rr.setRequest(jdbcRequest);
-                rr.setResponse(toret);
+                rr.setResponse(result);
                 recording.add(rr);
             }
-            return toret;
+            return result;
         }catch(SQLException ex){
             int maxDepth = 10;
 
