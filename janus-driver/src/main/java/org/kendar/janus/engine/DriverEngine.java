@@ -31,7 +31,7 @@ public class DriverEngine implements Engine {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .header("Content-type","application/json")
-                    .uri(URI.create(url+"/"+connectionId+"/"+uid))
+                    .uri(URI.create(url+"/"+connectionId+"/"+command.getClass().getSimpleName()+"/"+uid))
                     .POST(HttpRequest.BodyPublishers.ofString((String) ser.getSerialized()))
                     .build();
 

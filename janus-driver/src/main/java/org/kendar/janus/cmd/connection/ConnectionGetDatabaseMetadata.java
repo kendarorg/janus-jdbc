@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class ConnectionGetDatabaseMetadata implements JdbcCommand {
     @Override
     public Object execute(JdbcContext context, Long uid) throws SQLException {
-        var connection = (Connection)context.get(uid);
+        var connection = (Connection)context.getConnection();
         return connection.getMetaData();
     }
 

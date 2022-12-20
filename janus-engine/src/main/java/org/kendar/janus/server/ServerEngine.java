@@ -1,6 +1,7 @@
 package org.kendar.janus.server;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.kendar.janus.JdbcConnection;
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.cmd.connection.ConnectionConnect;
@@ -94,7 +95,8 @@ public class ServerEngine implements Engine {
                 resultObject = handleClose((Close) command, connectionId, uid);
             } else {
                 resultObject = handle(command, connectionId, uid);
-                traceId = getTraceId();
+                var context = contexts.get(connectionId);
+                traceId = context.getNext();
                 contexts.get(connectionId).put(traceId, resultObject);
             }
             var toret = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
@@ -214,7 +216,7 @@ public class ServerEngine implements Engine {
 
         var traceId = getTraceId();
         contexts.put(traceId,new JdbcContext());
-        contexts.get(traceId).put(traceId,conn);
+        contexts.get(traceId).setConnection(conn);
 
         return traceId;
     }

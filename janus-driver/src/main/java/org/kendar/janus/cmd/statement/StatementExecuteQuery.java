@@ -31,7 +31,7 @@ public class StatementExecuteQuery implements JdbcCommand {
 
     @Override
     public Object execute(JdbcContext context, Long uid) throws SQLException {
-        var statement = (Statement)context.get(uid);
+        var statement = (Statement) context.get(uid);
         return statement.executeQuery(sql);
     }
 

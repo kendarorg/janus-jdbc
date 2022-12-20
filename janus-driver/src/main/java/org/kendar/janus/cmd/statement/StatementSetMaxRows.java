@@ -26,7 +26,7 @@ public class StatementSetMaxRows implements JdbcCommand {
     public Object execute(JdbcContext context, Long uid) throws SQLException {
         var statement = (Statement)context.get(uid);
         statement.setMaxRows(maxRows);
-        return null;
+        return Void.TYPE;
     }
 
     @Override

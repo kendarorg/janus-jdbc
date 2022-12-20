@@ -49,7 +49,7 @@ public class UpdateSpecialObject  implements JdbcCommand {
     public Object execute(JdbcContext context, Long uid) throws SQLException {
 
         var resultSet = (ResultSet)context.get(uid);
-        var connection = (Connection)context.get(connectionId);
+        var connection = (Connection)context.getConnection();;
         if(value ==null){
             updateNull(resultSet,connection);
         }else if(scaleOrLength!=null){

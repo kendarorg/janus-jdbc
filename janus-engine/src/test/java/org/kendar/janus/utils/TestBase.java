@@ -106,7 +106,7 @@ public class TestBase {
     protected void afterEach() throws SQLException {
         var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
         DatabaseMetaData databaseMetaData = conn.getMetaData();
-        var tablesCount =0;
+        /*var tablesCount =0;
         try(ResultSet resultSet = databaseMetaData.getTables(null, null, null, new String[]{"TABLE"})){
             while(resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
@@ -115,7 +115,9 @@ public class TestBase {
                     conn.createStatement().execute("DROP TABLE "+tableName);
                 }
             }
-        }
+        }*/
+
+        conn.createStatement().execute("DROP ALL OBJECTS");
         conn.close();
     }
 

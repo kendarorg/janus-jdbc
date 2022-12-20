@@ -22,7 +22,7 @@ public class ConnectionRollbackSavepoint implements JdbcCommand {
     }
     @Override
     public Object execute(JdbcContext context, Long uid) throws SQLException {
-        var connection = (Connection)context.get(uid);
+        var connection = (Connection)context.getConnection();
         var savePoint = (Savepoint)context.get(traceId);
         connection.rollback(savePoint);
         return null;

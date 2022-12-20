@@ -14,6 +14,7 @@ public class Exec implements JdbcCommand {
     private String name;
     private Class<?>[] paramType;
     private Object[] parameters;
+    private boolean onConnection;
 
 
     public String getName() {
@@ -37,6 +38,11 @@ public class Exec implements JdbcCommand {
 
     public Exec withTypes(Class<?> ...types){
         this.paramType=types;
+        return this;
+    }
+
+    public Exec onConnection(){
+        this.onConnection=true;
         return this;
     }
 
@@ -66,27 +72,38 @@ public class Exec implements JdbcCommand {
         builder.write("name",name);
         builder.write("paramType",paramType);
         builder.write("parameters",parameters);
+        builder.write("onConnection",onConnection);
+
     }
 
     @Override
     public JdbcCommand deserialize(TypedSerializer input) {
-        return new Exec(
-                input.read("name"))
-                .withTypes(input.read("paramType"))
-                .withParameters(input.read("parameters"));
+        name =input.read("name");
+        paramType = input.read("paramType");
+        parameters = input.read("parameters");
+        onConnection = input.read("onConnection");
+        return this;
     }
 
     @Override
     public Object execute(JdbcContext context, Long uid) throws SQLException {
         try {
+
             var target = context.get(uid);
+            if(onConnection){
+                target=context.getConnection();
+            }
             var method = target.getClass().getMethod(getName(),
                     paramType);
+
             Object result =null;
             if(parameters==null||parameters.length==0) {
                 result = method.invoke(target);
             }else{
                 result = method.invoke(target,parameters);
+            }
+            if(method.getReturnType()==Void.TYPE){
+                return Void.TYPE;
             }
             return result;
         }catch (Exception ex){

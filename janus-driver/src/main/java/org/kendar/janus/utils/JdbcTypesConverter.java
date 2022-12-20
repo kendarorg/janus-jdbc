@@ -12,6 +12,7 @@ import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.StatementResult;
+import org.kendar.janus.results.VoidResult;
 import org.kendar.janus.types.*;
 
 import java.sql.*;
@@ -19,6 +20,9 @@ import java.sql.*;
 public class JdbcTypesConverter {
 
     public static JdbcResult convertResult(Engine engine, Object resultObject, Long connectionId, Long traceId) throws SQLException {
+        if(resultObject==Void.TYPE){
+            return new VoidResult();
+        }
         if(resultObject==null){
             return new ObjectResult(null);
         }

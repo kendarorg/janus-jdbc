@@ -1593,6 +1593,9 @@ public class TestPreparedStatement extends TestDb {
         deleteDb("preparedStatement");
         Connection conn = getConnection(
                 "preparedStatement;ANALYZE_AUTO=100");
+
+        conn.createStatement().execute(
+                "DROP ALL OBJECTS");
         conn.createStatement().execute(
                 "SET ALLOW_LITERALS NONE");
         conn.prepareStatement("CREATE TABLE test (id INT)").execute();

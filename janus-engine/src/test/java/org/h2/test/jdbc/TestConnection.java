@@ -346,6 +346,8 @@ public class TestConnection extends TestDb {
                 fail("LOCK_TIMEOUT wasn't set");
             }
         } finally {
+            Connection conn1 = getConnection("aaaa");
+            conn1.createStatement().execute("DROP ALL OBJECTS");
             deleteDb("lockTimeout");
         }
     }

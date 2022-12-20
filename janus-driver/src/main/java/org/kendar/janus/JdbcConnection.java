@@ -10,15 +10,18 @@ import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.results.StatementResult;
+import org.kendar.janus.server.JdbcContext;
 import org.kendar.janus.types.*;
 
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class JdbcConnection implements Connection {
     private long traceId;
+
     private Engine engine;
     private boolean closed = false;
 
@@ -191,6 +194,7 @@ public class JdbcConnection implements Connection {
                         "nativeSQL")
                         .withTypes(String.class)
                         .withParameters(sql)
+                        .onConnection()
                 ,getTraceId(),getTraceId())).getResult();
     }
 
@@ -200,6 +204,7 @@ public class JdbcConnection implements Connection {
                         "setAutoCommit")
                         .withTypes(boolean.class)
                         .withParameters(autoCommit)
+                        .onConnection()
                 ,getTraceId(),getTraceId());
     }
 
@@ -207,6 +212,7 @@ public class JdbcConnection implements Connection {
     public boolean getAutoCommit() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getAutoCommit")
+                        .onConnection()
                 ,this.getTraceId(),getTraceId())).getResult();
     }
 
@@ -214,6 +220,7 @@ public class JdbcConnection implements Connection {
     public void commit() throws SQLException {
         engine.execute(new Exec(
                         "commit")
+                        .onConnection()
                 ,this.getTraceId(),getTraceId());
     }
 
@@ -221,6 +228,7 @@ public class JdbcConnection implements Connection {
     public void rollback() throws SQLException {
         engine.execute(new Exec(
                         "rollback")
+                        .onConnection()
                 ,this.traceId,traceId);
     }
 
@@ -232,6 +240,7 @@ public class JdbcConnection implements Connection {
                         "setHoldability")
                         .withParameters(holdability)
                         .withTypes(int.class)
+                        .onConnection()
                 , this.traceId, traceId);
     }
 
@@ -260,6 +269,7 @@ public class JdbcConnection implements Connection {
                             "setClientInfo")
                             .withParameters(name,value)
                             .withTypes(String.class,String.class)
+                            .onConnection()
                     , this.traceId, traceId);
         } catch (SQLException e) {
             throw new SQLClientInfoException();
@@ -273,6 +283,7 @@ public class JdbcConnection implements Connection {
                             "setClientInfo")
                             .withParameters(properties)
                             .withTypes(Properties.class)
+                            .onConnection()
                     , this.traceId, traceId);
         } catch (SQLException e) {
             throw new SQLClientInfoException();
@@ -295,6 +306,7 @@ public class JdbcConnection implements Connection {
                         "setSchema")
                         .withParameters(schema)
                         .withTypes(String.class)
+                        .onConnection()
                 , this.traceId, traceId);
     }
 
@@ -322,6 +334,7 @@ public class JdbcConnection implements Connection {
                         "setReadOnly")
                         .withParameters(readOnly)
                         .withTypes(boolean.class)
+                        .onConnection()
                 ,this.traceId,traceId);
     }
 
@@ -331,6 +344,7 @@ public class JdbcConnection implements Connection {
                         "setCatalog")
                         .withParameters(catalog)
                         .withTypes(String.class)
+                        .onConnection()
                 , this.traceId, traceId);
     }
 
@@ -340,6 +354,7 @@ public class JdbcConnection implements Connection {
                         "setTransactionIsolation")
                         .withParameters(level)
                         .withTypes(int.class)
+                        .onConnection()
                 , this.traceId, traceId);
     }
     @Override
@@ -357,6 +372,7 @@ public class JdbcConnection implements Connection {
     public Savepoint setSavepoint() throws SQLException {
         return (JdbcSavepoint)engine.execute(new Exec(
                         "setSavepoint")
+                        .onConnection()
                 , this.traceId, traceId);
     }
 
@@ -366,6 +382,7 @@ public class JdbcConnection implements Connection {
                         "setSavepoint")
                         .withTypes(String.class)
                         .withParameters(name)
+                        .onConnection()
                 , this.traceId, traceId);
     }
 
@@ -388,6 +405,7 @@ public class JdbcConnection implements Connection {
     public boolean isReadOnly() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "isReadOnly")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -395,6 +413,7 @@ public class JdbcConnection implements Connection {
     public String getCatalog() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getCatalog")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -402,6 +421,7 @@ public class JdbcConnection implements Connection {
     public int getTransactionIsolation() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getTransactionIsolation")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -412,6 +432,7 @@ public class JdbcConnection implements Connection {
     public Map<String, Class<?>> getTypeMap() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getTypeMap")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -421,6 +442,7 @@ public class JdbcConnection implements Connection {
                         "setTypeMap")
                         .withParameters(map)
                         .withTypes(Map.class)
+                        .onConnection()
                 , this.traceId, traceId);
     }
 
@@ -428,6 +450,7 @@ public class JdbcConnection implements Connection {
     public int getHoldability() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getHoldability")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -437,6 +460,7 @@ public class JdbcConnection implements Connection {
                         "isValid")
                         .withParameters(timeout)
                         .withTypes(int.class)
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -446,6 +470,7 @@ public class JdbcConnection implements Connection {
                         "getClientInfo")
                         .withParameters(name)
                         .withTypes(String.class)
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -453,6 +478,7 @@ public class JdbcConnection implements Connection {
     public Properties getClientInfo() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getClientInfo")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -460,6 +486,7 @@ public class JdbcConnection implements Connection {
     public String getSchema() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getSchema")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 
@@ -467,6 +494,7 @@ public class JdbcConnection implements Connection {
     public int getNetworkTimeout() throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(
                         "getNetworkTimeout")
+                        .onConnection()
                 , this.traceId, traceId)).getResult();
     }
 

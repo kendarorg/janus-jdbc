@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>janus</artifactId>
 		<groupId>org.kendar</groupId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.kendar</groupId>
 	<artifactId>typeconverter</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>toddfast-typeconverter</name>

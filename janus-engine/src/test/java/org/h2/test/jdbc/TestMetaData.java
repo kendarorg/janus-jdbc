@@ -54,7 +54,7 @@ public class TestMetaData extends TestDb {
         testGeneral();
         testAllowLiteralsNone();
         testClientInfo();
-        testQueryStatistics();
+        //////testQueryStatistics();
         testQueryStatisticsLimit();
     }
 
@@ -1328,7 +1328,7 @@ public class TestMetaData extends TestDb {
         deleteDb("metaData");
     }
 
-    private void testQueryStatistics() throws SQLException {
+    @Test void testQueryStatistics() throws SQLException {
         Connection conn = getConnection("metaData");
         Statement stat = conn.createStatement();
         stat.executeQuery("select x, space(1000) from system_range(1, 2000)");
