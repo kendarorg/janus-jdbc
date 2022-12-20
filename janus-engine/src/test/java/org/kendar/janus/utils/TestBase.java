@@ -11,16 +11,42 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.util.UUID;
 
 public class TestBase {
+    
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(getRealConnection(), "sa", "sa");
+    }
+
+    public String getRealConnection(){
+        return "jdbc:h2:mem:test;";
+    }
+
+    protected void beforeEach() throws SQLException {
+
+        serverEngine = new ServerEngine(getRealConnection(), "sa", "sa");
+        jsonServer = new JsonServer(serverEngine);
+        driver = (Driver) JdbcDriver.of(jsonServer);
+        //if(!initialized){
+        //synchronized (locker) {
+        var conn = getConnection();
+        conn.createStatement().execute("DROP ALL OBJECTS");
+        conn.close();
+        initialized=true;
+        //}
+        //}
+    }
+
     protected final String CONNECT_URL = "jdbc:janus:http://localhost/db?fetchSize=3&charset=UTF-8";
     protected Driver driver;
+    private static String dbId= UUID.randomUUID().toString();
     protected ServerEngine serverEngine;
     protected JsonServer jsonServer;
     protected SessionFactory sessionFactory;
 
     protected Connection createFooTable() throws SQLException {
-        var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        var conn = getConnection();
         String createStatement = "create table if not exists bar  (foo varchar(50))";
 
         Statement stmt = conn.createStatement();
@@ -34,20 +60,7 @@ public class TestBase {
     }
     private boolean initialized=false;
     private Object locker = new Object();
-    protected void beforeEach() throws SQLException {
 
-        serverEngine = new ServerEngine("jdbc:h2:mem:test;", "sa", "sa");
-        jsonServer = new JsonServer(serverEngine);
-        driver = (Driver) JdbcDriver.of(jsonServer);
-        //if(!initialized){
-            //synchronized (locker) {
-                var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
-                conn.createStatement().execute("DROP ALL OBJECTS");
-                conn.close();
-                initialized=true;
-            //}
-        //}
-    }
     protected InputStreamReader getInputStreamReader(int kb) throws IOException {
         var bytes = getBytes(kb);
         var inputStream = new ByteArrayInputStream(bytes);
@@ -104,7 +117,7 @@ public class TestBase {
     }
 
     protected void afterEach() throws SQLException {
-        var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        var conn = getConnection();
         //DatabaseMetaData databaseMetaData = conn.getMetaData();
         /*var tablesCount =0;
         try(ResultSet resultSet = databaseMetaData.getTables(null, null, null, new String[]{"TABLE"})){
@@ -122,7 +135,7 @@ public class TestBase {
     }
 
     protected void createSimpleTable() throws SQLException {
-        var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        var conn = getConnection();
         conn.createStatement().execute("create table if not exists " +
                 "persons(" +
                 "id IDENTITY NOT NULL PRIMARY KEY, " +
@@ -132,12 +145,12 @@ public class TestBase {
 
 
     protected void insertInSimpleTable(String value) throws SQLException {
-        var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        var conn = getConnection();
         conn.createStatement().execute("INSERT INTO persons(NAME) VALUES ('"+value+"');");
     }
 
     protected void updateInSimpleTable(String oldValue,String newValue) throws SQLException {
-        var conn = DriverManager.getConnection("jdbc:h2:mem:test;", "sa", "sa");
+        var conn = getConnection();
         conn.createStatement().execute("UPDATE persons SET NAME='"+newValue+"' ;");
     }
 

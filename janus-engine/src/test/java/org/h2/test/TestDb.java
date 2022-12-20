@@ -1,14 +1,30 @@
 package org.h2.test;
 
+import com.toddfast.util.convert.TypeConverter;
 import org.junit.jupiter.api.Assertions;
 import org.kendar.janus.utils.TestBase;
 
 import java.lang.reflect.Method;
 import java.sql.*;
+import java.util.Locale;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestDb extends TestBase {
+    private String connectionString = UUID.randomUUID().toString().replaceAll("-","");
+
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(getRealConnection(), "sa", "sa");
+    }
+
+    public String getDbName(){
+        return connectionString;
+    }
+
+    public String getRealConnection(){
+        return "jdbc:h2:mem:"+connectionString+";";
+    }
 
     public void execute(PreparedStatement stat) throws SQLException {
         execute(stat, null);
@@ -28,7 +44,27 @@ public class TestDb extends TestBase {
     }
 
     protected void assertEquals(Object toString, Object test_x) {
-        Assertions.assertEquals(toString,test_x);
+        if((toString!=null && test_x==null)||(toString==null && test_x==null)||(toString==null && test_x!=null)){
+            Assertions.assertEquals(toString,test_x);
+        }else if(toString instanceof String){
+            Assertions.assertEquals(
+                    ((String)toString).toLowerCase(Locale.ROOT),
+                    ((String)test_x).toLowerCase(Locale.ROOT));
+        }else if(toString instanceof Long || toString.getClass()==long.class){
+            Assertions.assertEquals(
+                    TypeConverter.asLong(toString),
+                    TypeConverter.asLong(test_x));
+        }else if(test_x instanceof Long || test_x.getClass()==long.class){
+            Assertions.assertEquals(
+                    TypeConverter.asLong(toString),
+                    TypeConverter.asLong(test_x));
+        }else if(toString.getClass().isArray()){
+            Assertions.assertArrayEquals(
+                    (Object[])toString,
+                    (Object[])test_x);
+        }else{
+            Assertions.assertEquals(toString,test_x);
+        }
     }
 
     protected void assertEquals(String messsage,Object toString, Object test_x) {
