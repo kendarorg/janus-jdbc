@@ -1,19 +1,27 @@
 package org.kendar.janus;
 
+import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.connection.ConnectionConnect;
 import org.kendar.janus.engine.DriverEngine;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.ObjectResult;
+import org.kendar.janus.server.JdbcContext;
 import org.kendar.janus.utils.ExceptionsWrapper;
 import org.kendar.janus.utils.LocalProperties;
 import org.kendar.janus.utils.LoggerWrapper;
 
 import java.net.URI;
 import java.sql.*;
+import java.util.Calendar;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class JdbcDriver implements Driver {
+
     private static final String JDBC_IDENTIFIER = "jdbc:janus:";
     private static final String HTTP_PROTOCOL = "http";
     private static final String HTTPS_PROTOCOL = "https";
@@ -24,6 +32,7 @@ public class JdbcDriver implements Driver {
     static {
         load();
     }
+
 
     private static synchronized void load() {
         try {

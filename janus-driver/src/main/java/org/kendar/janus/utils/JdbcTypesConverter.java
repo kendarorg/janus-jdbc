@@ -16,10 +16,12 @@ import org.kendar.janus.results.VoidResult;
 import org.kendar.janus.types.*;
 
 import java.sql.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class JdbcTypesConverter {
 
-    public static JdbcResult convertResult(Engine engine, Object resultObject, Long connectionId, Long traceId) throws SQLException {
+    public static JdbcResult convertResult(Engine engine, Object resultObject, Long connectionId, Supplier<Long> traceId) throws SQLException {
         if(resultObject==Void.TYPE){
             return new VoidResult();
         }
@@ -34,7 +36,7 @@ public class JdbcTypesConverter {
         }
         if(ClassUtils.isAssignable(resultObject.getClass(), Savepoint.class)){
             var result = new JdbcSavepoint();
-            result.setTraceId(traceId);
+            result.setTraceId(traceId.get());
             var ori = (Savepoint)resultObject;
             try {
                 result.setSavePointId(ori.getSavepointId());
@@ -50,7 +52,7 @@ public class JdbcTypesConverter {
             if(maxRows==0){
                 maxRows = engine.getMaxRows();
             }
-            return new StatementResult(traceId,maxRows,stmt.getQueryTimeout());
+            return new StatementResult(traceId.get(),maxRows,stmt.getQueryTimeout());
         }
         if(ClassUtils.isAssignable(resultObject.getClass(), ResultSetMetaData.class)){
             var rstst = (ResultSetMetaData)resultObject;
@@ -60,7 +62,7 @@ public class JdbcTypesConverter {
         }if(ClassUtils.isAssignable(resultObject.getClass(), DatabaseMetaData.class)){
             var rstst = (DatabaseMetaData)resultObject;
             var result = new JdbcDatabaseMetaData();
-            result.setTraceId(traceId);
+            result.setTraceId(traceId.get());
             return result;
         }
         if(ClassUtils.isAssignable(resultObject.getClass(), ResultSet.class)){
@@ -75,7 +77,7 @@ public class JdbcTypesConverter {
                 maxRows = engine.getMaxRows();
             }
             var result = new JdbcResultSet(
-                    traceId,
+                    traceId.get(),
                     ResultSetType.valueOf((int)rstst.getType()),
                     maxRows,
                     engine.getPrefetchMetadata(),

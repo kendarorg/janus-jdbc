@@ -6,7 +6,7 @@
 
     <groupId>org.kendar</groupId>
     <artifactId>janus</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <modules>
         <module>janus-driver</module>
         <module>janus-engine</module>

@@ -14,16 +14,15 @@ import org.kendar.janus.utils.LoggerWrapper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class ServerEngine implements Engine {
     static ConcurrentHashMap<Long, JdbcContext> contexts = new ConcurrentHashMap<>();
     static LoggerWrapper log = LoggerWrapper.getLogger(ServerEngine.class);
+    private final Timer timer;
     private int maxRows;
 
     public void setMaxRows(int maxRows) {
@@ -64,6 +63,13 @@ public class ServerEngine implements Engine {
 
     public ServerEngine(String connectionString, String login, String password) {
 
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                expireConnections();
+            }
+        }, 0, 500);
         this.maxRows = 3;
         this.prefetchMetadata = false;
         this.charset = "UTF-8";
@@ -71,6 +77,21 @@ public class ServerEngine implements Engine {
         this.connectionString = connectionString;
         this.login = login;
         this.password = password;
+    }
+
+    protected void expireConnections(){
+        var all = contexts.entrySet().stream().collect(Collectors.toList());
+        for(var context: all) {
+            long time = Calendar.getInstance().getTimeInMillis();
+            try {
+                if (context.getValue().getConnection().isClosed() ||
+                        !context.getValue().getConnection().isValid(500)) {
+                    handle(new Close(), context.getKey(), context.getKey());
+                }
+            }catch(Exception ex){
+
+            }
+        }
     }
 
     @Override
@@ -89,21 +110,35 @@ public class ServerEngine implements Engine {
             }
             JdbcResult result = null;
             Object resultObject = null;
-            Long traceId = null;
+            var traceId = new FinalContainer<Long>();
             if (command instanceof ConnectionConnect) {
                 resultObject = handleConnect((ConnectionConnect) command);
-                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId,()-> traceId.data);
             } else if (command instanceof Close) {
+                var closeCommand = (Close)command;
                 resultObject = handleClose((Close) command, connectionId, uid);
-                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId,()-> traceId.data);
+                if(closeCommand.isOnConnection()) {
+                    contexts.remove(connectionId);
+                }
             } else {
                 resultObject = handle(command, connectionId, uid);
+                //System.out.println(resultObject.getClass().getSimpleName());
                 var context = contexts.get(connectionId);
-                traceId = context.getNext();
-                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
+                //traceId = context.getNext();
+
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId,()->{
+                    traceId.data = context.getNext();
+                    return traceId.data;
+                });
                 if(resultObject!=null && !ClassUtils.isAssignable(result.getClass(), ObjectResult.class)) {
-                    contexts.get(connectionId).put(traceId, resultObject);
+                    contexts.get(connectionId).put(traceId.data, resultObject);
                 }
+                var connection = contexts.get(connectionId).getConnection();
+
+                long time = Calendar.getInstance().getTimeInMillis();
+                time+=connection.getNetworkTimeout();
+                contexts.get(connectionId).updateExpiration(time);
             }
 
             if (isRecording) {

@@ -8,7 +8,6 @@ package org.h2.test.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -28,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Tests the client info
  */
-public class TestConnection extends TestDb {
+public class TestZConnection extends TestDb {
 
     @BeforeEach
     protected void beforeEach() throws SQLException {
