@@ -12,6 +12,18 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TypeConverterTest {
 
+	@Test public void bigDecimal(){
+
+		Object in;
+		Object out;
+
+		String big="1234567890123456789012345678901234567890123456789012345678";
+		in=big;
+		out=TypeConverter.convert(BigDecimal.class,in);
+		assertTrue(out instanceof BigDecimal);
+		assertEquals(new BigDecimal(big),out);
+	}
+
 	@Test
 	public void testGeneral() {
 

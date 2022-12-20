@@ -55,7 +55,7 @@ public class BigDecimalTypeConversion implements TypeConverter.Conversion {
 				break;
 			case("string"):
 				try {
-					result = new BigDecimal(Double.parseDouble((String)value));
+					result = new BigDecimal((String)value);
 				}
 				catch (NumberFormatException e) {
 					throw new RuntimeException("Can't convert String value '" + value + "' to bigdecimal");
