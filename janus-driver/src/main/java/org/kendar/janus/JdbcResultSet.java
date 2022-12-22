@@ -845,7 +845,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public void close() throws SQLException {
         if (!this.isClosed()) {
-            this.engine.execute(new Close(),this.connection.getTraceId(),this.getTraceId());
+            this.engine.execute(new Close(this),this.connection.getTraceId(),this.getTraceId());
             this.closed = true;
         }
         if (this.statement != null && this.statement.isCloseOnCompletion()) {
@@ -923,7 +923,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateBoolean(int columnIndex, boolean x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateBoolean")
                         .withTypes(int.class,boolean.class)
                         .withParameters(columnIndex,x)
@@ -932,7 +932,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateByte(int columnIndex, byte x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateByte")
                         .withTypes(int.class,byte.class)
                         .withParameters(columnIndex,x)
@@ -941,7 +941,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateShort(int columnIndex, short x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateShort")
                         .withTypes(int.class,short.class)
                         .withParameters(columnIndex,x)
@@ -950,7 +950,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateInt(int columnIndex, int x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateInt")
                         .withTypes(int.class,int.class)
                         .withParameters(columnIndex,x)
@@ -960,7 +960,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateLong(int columnIndex, long x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateLong")
                         .withTypes(int.class,long.class)
                         .withParameters(columnIndex,x)
@@ -969,7 +969,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateFloat(int columnIndex, float x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateFloat")
                         .withTypes(int.class,float.class)
                         .withParameters(columnIndex,x)
@@ -979,7 +979,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateDouble(int columnIndex, double x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateDouble")
                         .withTypes(int.class,double.class)
                         .withParameters(columnIndex,x)
@@ -988,7 +988,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateBigDecimal(int columnIndex, BigDecimal x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateBigDecimal")
                         .withTypes(int.class,BigDecimal.class)
                         .withParameters(columnIndex,x)
@@ -998,7 +998,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateBytes(int columnIndex, byte[] x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateBytes")
                         .withTypes(int.class,byte[].class)
                         .withParameters(columnIndex,x)
@@ -1008,7 +1008,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateDate(int columnIndex, Date x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateDate")
                         .withTypes(int.class,Date.class)
                         .withParameters(columnIndex,x)
@@ -1017,7 +1017,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateTime(int columnIndex, Time x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateTime")
                         .withTypes(int.class,Time.class)
                         .withParameters(columnIndex,x)
@@ -1027,7 +1027,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateTimestamp")
                         .withTypes(int.class,Timestamp.class)
                         .withParameters(columnIndex,x)
@@ -1159,7 +1159,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateString(int columnIndex, String x) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                 "updateString")
                         .withTypes(int.class,String.class)
                         .withParameters(columnIndex,x)
@@ -1168,7 +1168,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void beforeFirst() throws SQLException {
-        engine.execute(new Exec("beforeFirst"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"beforeFirst"),connection.getTraceId(),getTraceId());
         this.rows = new ArrayList<>();
         this.cursor = -1;
         lastRow = false;
@@ -1176,23 +1176,23 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateRow() throws SQLException {
-        engine.execute(new Exec("updateRow"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"updateRow"),connection.getTraceId(),getTraceId());
     }
 
     @Override
     public void moveToInsertRow() throws SQLException {
-        engine.execute(new Exec("moveToInsertRow"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"moveToInsertRow"),connection.getTraceId(),getTraceId());
     }
 
 
     @Override
     public void insertRow() throws SQLException {
-        engine.execute(new Exec("insertRow"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"insertRow"),connection.getTraceId(),getTraceId());
     }
 
     @Override
     public void deleteRow() throws SQLException {
-        engine.execute(new Exec("deleteRow"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"deleteRow"),connection.getTraceId(),getTraceId());
     }
 
     private void mustBeUpdatable() throws SQLException {
@@ -1204,20 +1204,20 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public void refreshRow() throws SQLException {
         mustBeUpdatable();
-        engine.execute(new Exec("refreshRow"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"refreshRow"),connection.getTraceId(),getTraceId());
 
     }
 
     @Override
     public void cancelRowUpdates() throws SQLException {
         mustBeUpdatable();
-        engine.execute(new Exec("cancelRowUpdates"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"cancelRowUpdates"),connection.getTraceId(),getTraceId());
 
     }
 
     @Override
     public void moveToCurrentRow() throws SQLException {
-        engine.execute(new Exec("moveToCurrentRow"),connection.getTraceId(),getTraceId());
+        engine.execute(new Exec(this,"moveToCurrentRow"),connection.getTraceId(),getTraceId());
 
     }
 
@@ -1225,7 +1225,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public boolean rowUpdated() throws SQLException {
         mustBeUpdatable();
-        var obResult = (ObjectResult)engine.execute(new Exec("rowUpdated")
+        var obResult = (ObjectResult)engine.execute(new Exec(this,"rowUpdated")
                 ,connection.getTraceId(),getTraceId());
         return (boolean) obResult.getResult();
     }
@@ -1233,14 +1233,14 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public boolean rowInserted() throws SQLException {
         mustBeUpdatable();
-        var obResult = (ObjectResult)engine.execute(new Exec("rowInserted"),connection.getTraceId(),getTraceId());
+        var obResult = (ObjectResult)engine.execute(new Exec(this,"rowInserted"),connection.getTraceId(),getTraceId());
         return (boolean) obResult.getResult();
     }
 
     @Override
     public boolean rowDeleted() throws SQLException {
         mustBeUpdatable();
-        var obResult = (ObjectResult)engine.execute(new Exec("rowDeleted"),connection.getTraceId(),getTraceId());
+        var obResult = (ObjectResult)engine.execute(new Exec(this,"rowDeleted"),connection.getTraceId(),getTraceId());
         return (boolean) obResult.getResult();
     }
 
@@ -1435,7 +1435,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public boolean previous() throws SQLException {
         mustNotBeForwardOnly();
-        boolean result = ((ObjectResult)engine.execute(new Exec(
+        boolean result = ((ObjectResult)engine.execute(new Exec(this,
                         "previous")
                 ,connection.getTraceId(),getTraceId())).getResult();
         if(result==false)return false;
@@ -1448,7 +1448,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void setFetchDirection(int direction) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setFetchDirection")
                         .withTypes(int.class)
                         .withParameters(direction)
@@ -1457,7 +1457,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public int getFetchDirection() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getFetchDirection")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
@@ -1465,7 +1465,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
     @Override
     public void setFetchSize(int rows) throws SQLException {
 
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setFetchSize")
                         .withTypes(int.class)
                         .withParameters(rows)
@@ -1486,7 +1486,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
 
     @Override
     public void updateNull(int columnIndex) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "updateNull")
                         .withTypes(int.class)
                         .withParameters(columnIndex)

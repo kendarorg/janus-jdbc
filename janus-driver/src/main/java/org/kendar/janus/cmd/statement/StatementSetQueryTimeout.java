@@ -47,4 +47,8 @@ public class StatementSetQueryTimeout implements JdbcCommand {
                 "queryTimeout=" + queryTimeout +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/Statement/setQueryTimeout";
+    }
 }

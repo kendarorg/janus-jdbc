@@ -38,4 +38,8 @@ public class ConnectionReleaseSavepoint implements JdbcCommand {
         traceId = builder.read("traceId");
         return this;
     }
+    @Override
+    public String getPath() {
+        return "/Connection/releaseSavepoint";
+    }
 }

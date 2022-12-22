@@ -28,4 +28,9 @@ public class ConnectionGetDatabaseMetadata implements JdbcCommand {
     public String toString() {
         return "ConnectionGetDatabaseMetadata{}";
     }
+
+    @Override
+    public String getPath() {
+        return "/Connection/getDatabaseMetadata";
+    }
 }

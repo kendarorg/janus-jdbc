@@ -53,4 +53,8 @@ public class PreparedStatementExecuteBatch implements JdbcCommand {
                 "batches=" + batches +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/PreparedStatement/executeBatch";
+    }
 }

@@ -24,4 +24,8 @@ public class ConnectionPrepareCall extends ConnectionPrepareStatement {
 
         return connection.prepareCall(sql, type.getValue(),concurrency.getValue());
     }
+    @Override
+    public String getPath() {
+        return "/Connection/prepareCall";
+    }
 }

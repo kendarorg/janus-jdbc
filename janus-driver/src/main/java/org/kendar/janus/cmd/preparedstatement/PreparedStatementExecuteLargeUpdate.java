@@ -99,4 +99,8 @@ public class PreparedStatementExecuteLargeUpdate implements JdbcCommand {
                 ",sql=" + sql +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/PreparedStatement/executeLargeUpdate";
+    }
 }

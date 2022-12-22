@@ -1,5 +1,6 @@
 package org.kendar.janus.engine;
 
+import org.kendar.janus.JdbcDriver;
 import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.serialization.JsonTypedSerializer;
@@ -8,30 +9,33 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public class DriverEngine implements Engine {
     private static final JsonTypedSerializer serializer = new JsonTypedSerializer();
     private String url;
+    private JdbcDriver jdbcDriver;
 
-    public DriverEngine(String url){
+    public DriverEngine(String url, JdbcDriver jdbcDriver){
         this.url = url;
+        this.jdbcDriver = jdbcDriver;
     }
 
     @Override
     public Engine create() {
-        return new DriverEngine(url);
+        return new DriverEngine(url, jdbcDriver);
     }
 
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid){
+        jdbcDriver.refreshConnection(connectionId);
         var ser = serializer.newInstance();
         try {
             ser.write("command", command);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .header("Content-type","application/json")
-                    .uri(URI.create(url+"/"+connectionId+"/"+command.getClass().getSimpleName()+"/"+uid))
+                    .header("X-Connection-Id",connectionId.toString())
+                    .uri(URI.create(url+"/"+command.getPath()+"/"+uid))
                     .POST(HttpRequest.BodyPublishers.ofString((String) ser.getSerialized()))
                     .build();
 

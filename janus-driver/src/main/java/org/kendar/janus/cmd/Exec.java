@@ -11,6 +11,7 @@ import java.util.Objects;
 public class Exec implements JdbcCommand {
     private static final Object[] EMPTY_PARAMS = new Object[]{};
     private static final Class<?>[] EMPTY_TYPES = new Class<?>[]{};
+    private String initiator;
     private String name;
     private Class<?>[] paramType;
     private Object[] parameters;
@@ -28,9 +29,11 @@ public class Exec implements JdbcCommand {
     public Exec(){
         this.paramType = EMPTY_TYPES;
         this.parameters = EMPTY_PARAMS;
+        initiator="";
     }
 
-    public Exec(String name) {
+    public Exec(Object initiator,String name) {
+        this.initiator = initiator.getClass().getSimpleName();
         this.name = name;
         this.paramType = EMPTY_TYPES;
         this.parameters = EMPTY_PARAMS;
@@ -73,6 +76,7 @@ public class Exec implements JdbcCommand {
         builder.write("paramType",paramType);
         builder.write("parameters",parameters);
         builder.write("onConnection",onConnection);
+        builder.write("initiator",initiator);
 
     }
 
@@ -82,6 +86,7 @@ public class Exec implements JdbcCommand {
         paramType = input.read("paramType");
         parameters = input.read("parameters");
         onConnection = input.read("onConnection");
+        initiator = input.read("initiator");
         return this;
     }
 
@@ -112,6 +117,11 @@ public class Exec implements JdbcCommand {
     }
 
     @Override
+    public String getPath() {
+        return "/"+initiator+"/"+name;
+    }
+
+    @Override
     public String toString() {
         var result = "Exec{" +
                 "\n\tname='" + name + '\'';
@@ -123,5 +133,9 @@ public class Exec implements JdbcCommand {
         }
         result+= '}';
         return result;
+    }
+
+    public String getInitiator() {
+        return initiator;
     }
 }

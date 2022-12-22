@@ -80,4 +80,10 @@ public class CallableStatementExecute extends PreparedStatementExecuteBase {
             return executeInternal(statement);
         }
     }
+
+
+    @Override
+    public String getPath() {
+        return "/CallableStatement/execute";
+    }
 }

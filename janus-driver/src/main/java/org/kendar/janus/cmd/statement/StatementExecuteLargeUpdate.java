@@ -89,4 +89,8 @@ public class StatementExecuteLargeUpdate implements JdbcCommand {
                 ",sql=" + sql +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/Statement/executeLargeUpdate";
+    }
 }

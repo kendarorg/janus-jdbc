@@ -7,4 +7,5 @@ import java.sql.SQLException;
 
 public interface JdbcCommand extends TypedSerializable<JdbcCommand> {
     Object execute(JdbcContext context, Long uid) throws SQLException;
+    String getPath();
 }

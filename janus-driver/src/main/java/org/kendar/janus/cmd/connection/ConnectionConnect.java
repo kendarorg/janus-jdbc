@@ -89,4 +89,10 @@ public class ConnectionConnect implements JdbcCommand {
                 ", \n\tclientInfo=" + clientInfo +
                 '}';
     }
+
+
+    @Override
+    public String getPath() {
+        return "/Connection/connect";
+    }
 }

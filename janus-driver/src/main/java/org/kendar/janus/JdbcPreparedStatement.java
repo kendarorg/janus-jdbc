@@ -498,7 +498,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public long executeLargeUpdate() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "executeLargeUpdate")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }

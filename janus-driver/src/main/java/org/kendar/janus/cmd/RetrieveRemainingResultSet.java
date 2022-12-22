@@ -89,4 +89,10 @@ public class RetrieveRemainingResultSet implements JdbcCommand {
                 ", \n\tcurrentRow=" + currentRow +
                 '}';
     }
+
+
+    @Override
+    public String getPath() {
+        return "/ResultSet/getRemainingResultSet";
+    }
 }

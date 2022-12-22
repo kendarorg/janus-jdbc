@@ -66,4 +66,8 @@ public class StatementExecute implements JdbcCommand {
                 ", \n\tcolumnNames=" + Arrays.toString(columnNames) +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/Statement/execute";
+    }
 }

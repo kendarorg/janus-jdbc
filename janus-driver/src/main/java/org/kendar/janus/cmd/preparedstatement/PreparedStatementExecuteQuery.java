@@ -18,4 +18,8 @@ public class PreparedStatementExecuteQuery extends PreparedStatementExecuteBase 
     protected Object executeInternal(PreparedStatement statement) throws SQLException {
         return statement.executeQuery();
     }
+    @Override
+    public String getPath() {
+        return "/PreparedStatement/executeQuery";
+    }
 }

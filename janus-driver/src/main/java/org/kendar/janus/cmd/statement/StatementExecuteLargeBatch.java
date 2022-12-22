@@ -46,4 +46,8 @@ public class StatementExecuteLargeBatch implements JdbcCommand {
                 "batches=" + batches +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/Statement/executeLargeBatch";
+    }
 }

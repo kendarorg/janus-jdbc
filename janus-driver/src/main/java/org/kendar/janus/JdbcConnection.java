@@ -78,7 +78,7 @@ public class JdbcConnection implements Connection {
     public void close() throws SQLException {
         if (!this.isClosed()) {
             //FIXME REMOVE METADATA
-            this.engine.execute(new Close(),this.getTraceId(),this.getTraceId());
+            this.engine.execute(new Close(this),this.getTraceId(),this.getTraceId());
             this.closed = true;
         }
     }
@@ -190,7 +190,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public String nativeSQL(String sql) throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "nativeSQL")
                         .withTypes(String.class)
                         .withParameters(sql)
@@ -200,7 +200,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setAutoCommit")
                         .withTypes(boolean.class)
                         .withParameters(autoCommit)
@@ -210,7 +210,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getAutoCommit")
                         .onConnection()
                 ,this.getTraceId(),getTraceId())).getResult();
@@ -218,7 +218,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void commit() throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "commit")
                         .onConnection()
                 ,this.getTraceId(),getTraceId());
@@ -226,7 +226,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void rollback() throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "rollback")
                         .onConnection()
                 ,this.traceId,traceId);
@@ -236,7 +236,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setHoldability(int holdability) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setHoldability")
                         .withParameters(holdability)
                         .withTypes(int.class)
@@ -265,7 +265,7 @@ public class JdbcConnection implements Connection {
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         try {
-            engine.execute(new Exec(
+            engine.execute(new Exec(this,
                             "setClientInfo")
                             .withParameters(name,value)
                             .withTypes(String.class,String.class)
@@ -279,7 +279,7 @@ public class JdbcConnection implements Connection {
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
         try {
-            engine.execute(new Exec(
+            engine.execute(new Exec(this,
                             "setClientInfo")
                             .withParameters(properties)
                             .withTypes(Properties.class)
@@ -302,7 +302,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setSchema(String schema) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setSchema")
                         .withParameters(schema)
                         .withTypes(String.class)
@@ -330,7 +330,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setReadOnly")
                         .withParameters(readOnly)
                         .withTypes(boolean.class)
@@ -340,7 +340,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setCatalog(String catalog) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setCatalog")
                         .withParameters(catalog)
                         .withTypes(String.class)
@@ -350,7 +350,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setTransactionIsolation(int level) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setTransactionIsolation")
                         .withParameters(level)
                         .withTypes(int.class)
@@ -370,7 +370,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        return (JdbcSavepoint)engine.execute(new Exec(
+        return (JdbcSavepoint)engine.execute(new Exec(this,
                         "setSavepoint")
                         .onConnection()
                 , this.traceId, traceId);
@@ -378,7 +378,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
-        return (JdbcSavepoint)engine.execute(new Exec(
+        return (JdbcSavepoint)engine.execute(new Exec(this,
                         "setSavepoint")
                         .withTypes(String.class)
                         .withParameters(name)
@@ -403,7 +403,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "isReadOnly")
                         .onConnection()
                 , this.traceId, traceId)).getResult();
@@ -411,7 +411,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public String getCatalog() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getCatalog")
                         .onConnection()
                 , this.traceId, traceId)).getResult();
@@ -419,7 +419,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getTransactionIsolation")
                         .onConnection()
                 , this.traceId, traceId)).getResult();
@@ -430,7 +430,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getTypeMap")
                         .onConnection()
                 , this.traceId, traceId)).getResult();
@@ -438,7 +438,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setTypeMap")
                         .withParameters(map)
                         .withTypes(Map.class)
@@ -448,7 +448,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public int getHoldability() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getHoldability")
                         .onConnection()
                 , this.traceId, traceId)).getResult();
@@ -456,7 +456,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public boolean isValid(int timeout) throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "isValid")
                         .withParameters(timeout)
                         .withTypes(int.class)
@@ -466,7 +466,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public String getClientInfo(String name) throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getClientInfo")
                         .withParameters(name)
                         .withTypes(String.class)
@@ -476,7 +476,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getClientInfo")
                         .onConnection()
                 , this.traceId, traceId)).getResult();
@@ -484,7 +484,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public String getSchema() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getSchema")
                         .onConnection()
                 , this.traceId, traceId)).getResult();
@@ -492,7 +492,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public int getNetworkTimeout() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getNetworkTimeout")
                         .onConnection()
                 , this.traceId, traceId)).getResult();

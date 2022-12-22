@@ -23,4 +23,8 @@ public class PreparedStatementGetMetaData implements JdbcCommand{
     public JdbcCommand deserialize(TypedSerializer builder) {
         return this;
     }
+    @Override
+    public String getPath() {
+        return "/PreparedStatement/getMetaData";
+    }
 }

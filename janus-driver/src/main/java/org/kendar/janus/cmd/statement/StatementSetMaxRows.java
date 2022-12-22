@@ -47,4 +47,8 @@ public class StatementSetMaxRows implements JdbcCommand {
                 "maxRows=" + maxRows +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/Statement/setMaxRows";
+    }
 }

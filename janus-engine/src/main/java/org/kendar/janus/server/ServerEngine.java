@@ -16,11 +16,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class ServerEngine implements Engine {
     static ConcurrentHashMap<Long, JdbcContext> contexts = new ConcurrentHashMap<>();
+    static ConcurrentLinkedQueue<Long> indexes = new ConcurrentLinkedQueue<>();
     static LoggerWrapper log = LoggerWrapper.getLogger(ServerEngine.class);
     private final Timer timer;
     private int maxRows;
@@ -86,7 +88,7 @@ public class ServerEngine implements Engine {
             try {
                 if (context.getValue().getConnection().isClosed() ||
                         !context.getValue().getConnection().isValid(500)) {
-                    handle(new Close(), context.getKey(), context.getKey());
+                    handle(new Close(context.getValue().getConnection()), context.getKey(), context.getKey());
                 }
             }catch(Exception ex){
 
@@ -97,6 +99,16 @@ public class ServerEngine implements Engine {
     @Override
     public Engine create() {
         return new ServerEngine(connectionString,login,password);
+    }
+
+    private JdbcResult handleClose(Close command, Long connectionId, Long uid) throws SQLException {
+        command.execute(contexts.get(connectionId),uid);
+        return null;
+    }
+
+    private void removeContext(long id) {
+        contexts.remove(id);
+        indexes.add(id);
     }
 
     @Override
@@ -119,7 +131,7 @@ public class ServerEngine implements Engine {
                 resultObject = handleClose((Close) command, connectionId, uid);
                 result = JdbcTypesConverter.convertResult(this, resultObject, connectionId,()-> traceId.data);
                 if(closeCommand.isOnConnection()) {
-                    contexts.remove(connectionId);
+                    removeContext(connectionId);
                 }
             } else {
                 resultObject = handle(command, connectionId, uid);
@@ -233,12 +245,7 @@ public class ServerEngine implements Engine {
         return result;
     }
 
-    private JdbcResult handleClose(Close command, Long connectionId, Long uid) throws SQLException {
-        command.execute(contexts.get(connectionId),uid);
-        //FIXME Close everything
-        contexts.remove(traceId);
-        return null;
-    }
+
 
     private Long handleConnect(ConnectionConnect command) throws SQLException {
         log.debug("Connected to "+command.getDatabase());
@@ -255,7 +262,13 @@ public class ServerEngine implements Engine {
         Connection conn = DriverManager.
                 getConnection(connectionString, login, password);
 
-        var traceId = getTraceId();
+        var lastConnectionId =indexes.poll();
+        long traceId = 0L;
+        if(lastConnectionId!=null){
+            traceId=lastConnectionId;
+        }else {
+            traceId=getTraceId();
+        }
         contexts.put(traceId,new JdbcContext());
         contexts.get(traceId).setConnection(conn);
 

@@ -65,4 +65,8 @@ public class StatementExecuteQuery implements JdbcCommand {
                 ", \n\tresultSetType=" + resultSetType +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/Statement/executeQuery";
+    }
 }

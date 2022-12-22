@@ -29,4 +29,8 @@ public class StatementGetGeneratedKeys implements JdbcCommand {
     public String toString() {
         return "StatementGetGeneratedKeys{}";
     }
+    @Override
+    public String getPath() {
+        return "/Statement/getGeneratedKeys";
+    }
 }

@@ -195,4 +195,8 @@ public class ConnectionPrepareStatement implements JdbcCommand {
                 ", \n\tsql='" + sql + '\'' +
                 '}';
     }
+    @Override
+    public String getPath() {
+        return "/Connection/prepareStatement";
+    }
 }

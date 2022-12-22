@@ -80,7 +80,7 @@ public class JdbcStatement implements Statement {
     public void close() throws SQLException {
         if (!this.isClosed()) {
             //FIXME CLOSE METADATA
-            this.engine.execute(new Close(),connection.getTraceId(),this.getTraceId());
+            this.engine.execute(new Close(this),connection.getTraceId(),this.getTraceId());
             this.closed = true;
         }
     }
@@ -207,14 +207,14 @@ public class JdbcStatement implements Statement {
 
     @Override
     public int getMaxFieldSize() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getMaxFieldSize")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
 
     @Override
     public void setMaxFieldSize(int max) throws SQLException {
-        ((ObjectResult)engine.execute(new Exec(
+        ((ObjectResult)engine.execute(new Exec(this,
                         "setMaxFieldSize")
                         .withTypes(int.class)
                         .withParameters(max)
@@ -223,7 +223,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public void setEscapeProcessing(boolean enable) throws SQLException {
-        ((ObjectResult)engine.execute(new Exec(
+        ((ObjectResult)engine.execute(new Exec(this,
                         "setEscapeProcessing")
                         .withTypes(boolean.class)
                         .withParameters(enable)
@@ -241,14 +241,14 @@ public class JdbcStatement implements Statement {
 
     @Override
     public int getUpdateCount() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getUpdateCount")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
 
     @Override
     public boolean getMoreResults() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getMoreResults")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
@@ -256,7 +256,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public void setFetchSize(int rows) throws SQLException {
-        ((ObjectResult)engine.execute(new Exec(
+        ((ObjectResult)engine.execute(new Exec(this,
                         "setFetchSize")
                         .withTypes(int.class)
                         .withParameters(rows)
@@ -265,7 +265,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public int getFetchSize() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getFetchSize")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
@@ -278,7 +278,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public boolean getMoreResults(int current) throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getMoreResults")
                         .withTypes(int.class)
                         .withParameters(current)
@@ -288,7 +288,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public void cancel() throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "cancel")
                 ,connection.getTraceId(),getTraceId());
         if(resultSet!=null) {
@@ -300,7 +300,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public void setFetchDirection(int direction) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setFetchDirection")
                         .withTypes(int.class)
                         .withParameters(direction)
@@ -309,7 +309,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public int getFetchDirection() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "getFetchDirection")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
@@ -346,7 +346,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public void closeOnCompletion() throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "closeOnCompletion")
                 ,connection.getTraceId(),getTraceId());
         closeOnCompletion = true;
@@ -360,7 +360,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public void setPoolable(boolean poolable) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setPoolable")
                         .withTypes(boolean.class)
                         .withParameters(poolable)
@@ -369,7 +369,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public boolean isPoolable() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(
+        return ((ObjectResult)engine.execute(new Exec(this,
                         "isPoolable")
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
@@ -378,7 +378,7 @@ public class JdbcStatement implements Statement {
 
     @Override
     public void setCursorName(String name) throws SQLException {
-        engine.execute(new Exec(
+        engine.execute(new Exec(this,
                         "setCursorName")
                         .withTypes(String.class)
                         .withParameters(name)

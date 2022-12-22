@@ -9,6 +9,7 @@ import org.kendar.janus.server.JdbcContext;
 import org.kendar.janus.utils.ExceptionsWrapper;
 import org.kendar.janus.utils.LocalProperties;
 import org.kendar.janus.utils.LoggerWrapper;
+import org.kendar.janus.utils.TimedOutConnection;
 
 import java.net.URI;
 import java.sql.*;
@@ -22,6 +23,9 @@ import java.util.stream.Collectors;
 
 public class JdbcDriver implements Driver {
 
+    static ConcurrentHashMap<Long, TimedOutConnection> connections = new ConcurrentHashMap<>();
+
+    private static Timer timer;
     private static final String JDBC_IDENTIFIER = "jdbc:janus:";
     private static final String HTTP_PROTOCOL = "http";
     private static final String HTTPS_PROTOCOL = "https";
@@ -31,6 +35,13 @@ public class JdbcDriver implements Driver {
 
     static {
         load();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                expireConnections();
+            }
+        }, 0, 500);
     }
 
 
@@ -82,7 +93,7 @@ public class JdbcDriver implements Driver {
                 if(engineToUse==null){
 
                     log.info("Connecting");
-                    engineToUse = new DriverEngine(uri.toString());
+                    engineToUse = new DriverEngine(uri.toString(),this);
                 }
                 var command = new ConnectionConnect(
                         url,
@@ -90,7 +101,11 @@ public class JdbcDriver implements Driver {
                         LocalProperties.build(localProperties));
                 var connResult = (ObjectResult) engineToUse.execute(command,-1L,-1L);
                 result = new JdbcConnection((Long)connResult.getResult(), engineToUse);
-
+                var toConnection = new TimedOutConnection();
+                toConnection.setConnection((JdbcConnection)result);
+                long time = Calendar.getInstance().getTimeInMillis();
+                toConnection.setExpiration(time+5000);
+                connections.put((Long)connResult.getResult(),toConnection);
                 log.info("Connected");
             }
             catch (Exception e)
@@ -101,6 +116,23 @@ public class JdbcDriver implements Driver {
         }
         return result;
 
+    }
+
+
+    protected static void expireConnections(){
+        var all = connections.entrySet().stream().collect(Collectors.toList());
+        for(var context: all) {
+            long time = Calendar.getInstance().getTimeInMillis();
+            try {
+                if (context.getValue().getConnection().isClosed() ||
+                        time>context.getValue().getExpiration()) {
+                    context.getValue().getConnection().close();
+                    connections.remove(context.getKey());
+                }
+            }catch(Exception ex){
+
+            }
+        }
     }
 
     private boolean isHttpOrHttps(URI uri) {
@@ -135,5 +167,9 @@ public class JdbcDriver implements Driver {
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         throw new SQLFeatureNotSupportedException("getParentLogger");
+    }
+
+    public void refreshConnection(Long connectionId) {
+
     }
 }

@@ -164,4 +164,26 @@ public class UpdateSpecialObject  implements JdbcCommand {
         this.scaleOrLength = scaleOrLength;
         return this;
     }
+
+    @Override
+    public String getPath(){
+        var result = "/ResultSet/";
+        if(value ==null){
+            result+="updateNull";
+        }else if(scaleOrLength!=null){
+            result+="updateObject";
+        }else if(ClassUtils.isAssignable(type, NClob.class)){
+            result+="updateNClob";
+        }else if(ClassUtils.isAssignable(type, Clob.class)){
+            result+="updateClob";
+        }else if(ClassUtils.isAssignable(type, Blob.class)){
+            result+="updateBlob";
+        }else if(ClassUtils.isAssignable(type, SQLXML.class)){
+            result+="updateSQLXML";
+        }else if(ClassUtils.isAssignable(type, Array.class)){
+            result+="updateArray";
+        }
+        return result;
+
+    }
 }

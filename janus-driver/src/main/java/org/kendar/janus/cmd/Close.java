@@ -7,6 +7,8 @@ import org.kendar.janus.utils.ExceptionsWrapper;
 import java.sql.SQLException;
 
 public class Close implements JdbcCommand {
+    private String initiator;
+
     public boolean isOnConnection() {
         return onConnection;
     }
@@ -14,7 +16,11 @@ public class Close implements JdbcCommand {
     private boolean onConnection;
 
     public Close(){
+        initiator=null;
+    }
 
+    public Close(Object initiator){
+        this.initiator = initiator.getClass().getSimpleName();
     }
 
 
@@ -56,6 +62,11 @@ public class Close implements JdbcCommand {
             ExceptionsWrapper.toSQLException(ex);
         }
         return null;
+    }
+
+    @Override
+    public String getPath() {
+        return "/"+initiator+"/close";
     }
 
     @Override

@@ -97,4 +97,8 @@ public class ConnectionCreateStatement implements JdbcCommand {
         holdability = builder.read("holdability");
         return this;
     }
+    @Override
+    public String getPath() {
+        return "/Connection/createStatement";
+    }
 }

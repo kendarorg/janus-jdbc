@@ -23,4 +23,8 @@ public class ResultSetGetMetaData implements JdbcCommand{
     public JdbcCommand deserialize(TypedSerializer builder) {
         return this;
     }
+    @Override
+    public String getPath() {
+        return "/ResultSet/getMetaData";
+    }
 }

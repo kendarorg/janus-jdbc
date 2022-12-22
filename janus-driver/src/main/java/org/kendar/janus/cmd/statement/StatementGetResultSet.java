@@ -29,4 +29,9 @@ public class StatementGetResultSet implements JdbcCommand {
     public String toString() {
         return "StatementGetResultSet{}";
     }
+
+    @Override
+    public String getPath() {
+        return "/Statement/getResultSet";
+    }
 }

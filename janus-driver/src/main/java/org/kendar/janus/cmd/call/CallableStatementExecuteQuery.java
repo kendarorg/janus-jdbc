@@ -78,4 +78,10 @@ public class CallableStatementExecuteQuery extends PreparedStatementExecuteBase 
         outParameters = input.read("outParameters");
         return this;
     }
+
+
+    @Override
+    public String getPath() {
+        return "/CallableStatement/executeQuery";
+    }
 }
