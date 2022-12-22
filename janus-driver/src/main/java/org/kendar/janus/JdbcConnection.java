@@ -64,8 +64,6 @@ public class JdbcConnection implements Connection {
         return getJdbcStatement(command);
     }
 
-
-
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
         var command = new ConnectionGetDatabaseMetadata();

@@ -1,7 +1,6 @@
 package org.kendar.janus;
 
 import org.kendar.janus.cmd.Exec;
-import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.results.ObjectResult;
@@ -24,6 +23,11 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
         this.traceId = traceId;
     }
 
+    @Override
+    public Connection getConnection() throws SQLException {
+        return connection;
+    }
+
     public JdbcDatabaseMetaData(){
 
     }
@@ -32,869 +36,973 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
         connection = jdbcConnection;
         this.engine = engine;
     }
+    private boolean isReadOnly;
+    private String getURL;
+    private boolean autoCommitFailureClosesAllResultSets;
+    private boolean supportsStoredFunctionsUsingCallSyntax;
+    private boolean supportsSchemasInPrivilegeDefinitions;
+    private boolean supportsIntegrityEnhancementFacility;
+    private boolean supportsDifferentTableCorrelationNames;
+    private boolean supportsOpenStatementsAcrossRollback;
+    private boolean supportsDataManipulationTransactionsOnly;
+    private boolean supportsCatalogsInPrivilegeDefinitions;
+    private boolean dataDefinitionCausesTransactionCommit;
+    private boolean dataDefinitionIgnoredInTransactions;
+    private boolean supportsDataDefinitionAndDataManipulationTransactions;
+    private boolean supportsANSI92EntryLevelSQL;
+    private boolean supportsSubqueriesInComparisons;
+    private boolean supportsMultipleResultSets;
+    private boolean supportsExtendedSQLGrammar;
+    private boolean supportsSchemasInTableDefinitions;
+    private boolean supportsOrderByUnrelated;
+    private boolean supportsNonNullableColumns;
+    private boolean supportsCoreSQLGrammar;
+    private boolean supportsCatalogsInProcedureCalls;
+    private boolean supportsSelectForUpdate;
+    private boolean supportsMultipleTransactions;
+    private boolean supportsOpenCursorsAcrossCommit;
+    private int getMaxColumnNameLength;
+    private int getMaxColumnsInIndex;
+    private int getMaxColumnsInSelect;
+    private int getMaxSchemaNameLength;
+    private int getMaxBinaryLiteralLength;
+    private int getMaxProcedureNameLength;
+    private int getMaxCatalogNameLength;
+    private boolean supportsSchemasInIndexDefinitions;
+    private String getCatalogSeparator;
+    private boolean supportsSubqueriesInQuantifieds;
+    private boolean supportsPositionedDelete;
+    private boolean supportsGroupByUnrelated;
+    private boolean doesMaxRowSizeIncludeBlobs;
+    private int getMaxStatementLength;
+    private int getMaxColumnsInGroupBy;
+    private int getMaxUserNameLength;
+    private boolean supportsSchemasInProcedureCalls;
+    private boolean supportsCatalogsInTableDefinitions;
+    private boolean supportsPositionedUpdate;
+    private int getDefaultTransactionIsolation;
+    private int getMaxColumnsInOrderBy;
+    private boolean supportsANSI92IntermediateSQL;
+    private int getMaxTableNameLength;
+    private boolean supportsCorrelatedSubqueries;
+    private boolean supportsANSI92FullSQL;
+    private boolean supportsCatalogsInDataManipulation;
+    private boolean supportsCatalogsInIndexDefinitions;
+    private boolean supportsFullOuterJoins;
+    private boolean supportsGroupByBeyondSelect;
+    private boolean supportsStoredProcedures;
+    private boolean supportsOpenCursorsAcrossRollback;
+    private boolean supportsOpenStatementsAcrossCommit;
+    private int getMaxColumnsInTable;
+    private boolean supportsLikeEscapeClause;
+    private boolean supportsMinimumSQLGrammar;
+    private boolean supportsSchemasInDataManipulation;
+    private boolean supportsSubqueriesInIns;
+    private int getMaxCursorNameLength;
+    private int getMaxTablesInSelect;
+    private boolean supportsTransactions;
+    private boolean supportsLimitedOuterJoins;
+    private int getMaxCharLiteralLength;
+    private boolean supportsSubqueriesInExists;
+    private boolean supportsMixedCaseQuotedIdentifiers;
+    private String getDatabaseProductName;
+    private int getDriverMinorVersion;
+    private boolean supportsAlterTableWithDropColumn;
+    private boolean nullsAreSortedAtStart;
+    private boolean nullPlusNonNullIsNull;
+    private String getSearchStringEscape;
+    private boolean supportsExpressionsInOrderBy;
+    private String getDatabaseProductVersion;
+    private String getNumericFunctions;
+    private boolean storesUpperCaseIdentifiers;
+    private boolean usesLocalFilePerTable;
+    private boolean nullsAreSortedAtEnd;
+    private boolean supportsMixedCaseIdentifiers;
+    private boolean storesLowerCaseIdentifiers;
+    private boolean storesMixedCaseQuotedIdentifiers;
+    private boolean allProceduresAreCallable;
+    private boolean storesMixedCaseIdentifiers;
+    private boolean allTablesAreSelectable;
+    private boolean storesLowerCaseQuotedIdentifiers;
+    private String getIdentifierQuoteString;
+    private String getTimeDateFunctions;
+    private boolean supportsAlterTableWithAddColumn;
+    private int getDriverMajorVersion;
+    private String getExtraNameCharacters;
+    private boolean supportsColumnAliasing;
+    private boolean supportsTableCorrelationNames;
+    private boolean storesUpperCaseQuotedIdentifiers;
+    private boolean generatedKeyAlwaysReturned;
+    private int getJDBCMajorVersion;
+    private int getResultSetHoldability;
+    private long getMaxLogicalLobSize;
+    private boolean supportsMultipleOpenResults;
+    private int getDatabaseMajorVersion;
+    private int getDatabaseMinorVersion;
+    private boolean supportsStatementPooling;
+    private boolean supportsBatchUpdates;
+    private boolean supportsGetGeneratedKeys;
+    private boolean supportsNamedParameters;
+    private int getJDBCMinorVersion;
+    private String getUserName;
+    private boolean nullsAreSortedLow;
+    private String getDriverName;
+    private boolean supportsConvert;
+    private int getMaxStatements;
+    private boolean supportsUnion;
+    private boolean supportsOuterJoins;
+    private String getSQLKeywords;
+    private boolean supportsUnionAll;
+    private String getDriverVersion;
+    private int getMaxConnections;
+    private boolean isCatalogAtStart;
+    private boolean nullsAreSortedHigh;
+    private String getCatalogTerm;
+    private int getSQLStateType;
+    private boolean locatorsUpdateCopy;
+    private boolean usesLocalFiles;
+    private boolean supportsGroupBy;
+    private int getMaxIndexLength;
+    private String getProcedureTerm;
+    private int getMaxRowSize;
+    private String getSchemaTerm;
+    private boolean supportsSavepoints;
+    private String getSystemFunctions;
+    private String getStringFunctions;
+    private boolean supportsSharding;
+    private boolean supportsRefCursors;
 
 
     @Override
-    public Connection getConnection() throws SQLException {
-        return connection;
-    }
+    public boolean isReadOnly(){ return isReadOnly;}
+
+    @Override
+    public String getURL(){ return getURL;}
 
 
-    public void initialize(JdbcConnection jdbcConnection, Engine engine) {
-        connection = jdbcConnection;
-        this.engine = engine;
+    @Override
+    public boolean autoCommitFailureClosesAllResultSets(){ return autoCommitFailureClosesAllResultSets;}
+
+    @Override
+    public boolean supportsStoredFunctionsUsingCallSyntax(){ return supportsStoredFunctionsUsingCallSyntax;}
+
+    @Override
+    public boolean supportsSchemasInPrivilegeDefinitions(){ return supportsSchemasInPrivilegeDefinitions;}
+
+    @Override
+    public boolean supportsIntegrityEnhancementFacility(){ return supportsIntegrityEnhancementFacility;}
+
+    @Override
+    public boolean supportsDifferentTableCorrelationNames(){ return supportsDifferentTableCorrelationNames;}
+
+    @Override
+    public boolean supportsOpenStatementsAcrossRollback(){ return supportsOpenStatementsAcrossRollback;}
+
+    @Override
+    public boolean supportsDataManipulationTransactionsOnly(){ return supportsDataManipulationTransactionsOnly;}
+
+    @Override
+    public boolean supportsCatalogsInPrivilegeDefinitions(){ return supportsCatalogsInPrivilegeDefinitions;}
+
+    @Override
+    public boolean dataDefinitionCausesTransactionCommit(){ return dataDefinitionCausesTransactionCommit;}
+
+    @Override
+    public boolean dataDefinitionIgnoredInTransactions(){ return dataDefinitionIgnoredInTransactions;}
+
+    @Override
+    public boolean supportsDataDefinitionAndDataManipulationTransactions(){ return supportsDataDefinitionAndDataManipulationTransactions;}
+
+    @Override
+    public boolean supportsANSI92EntryLevelSQL(){ return supportsANSI92EntryLevelSQL;}
+
+    @Override
+    public boolean supportsSubqueriesInComparisons(){ return supportsSubqueriesInComparisons;}
+
+    @Override
+    public boolean supportsMultipleResultSets(){ return supportsMultipleResultSets;}
+
+    @Override
+    public boolean supportsExtendedSQLGrammar(){ return supportsExtendedSQLGrammar;}
+
+    @Override
+    public boolean supportsSchemasInTableDefinitions(){ return supportsSchemasInTableDefinitions;}
+
+    @Override
+    public boolean supportsOrderByUnrelated(){ return supportsOrderByUnrelated;}
+
+    @Override
+    public boolean supportsNonNullableColumns(){ return supportsNonNullableColumns;}
+
+    @Override
+    public boolean supportsCoreSQLGrammar(){ return supportsCoreSQLGrammar;}
+
+    @Override
+    public boolean supportsCatalogsInProcedureCalls(){ return supportsCatalogsInProcedureCalls;}
+
+    @Override
+    public boolean supportsSelectForUpdate(){ return supportsSelectForUpdate;}
+
+    @Override
+    public boolean supportsMultipleTransactions(){ return supportsMultipleTransactions;}
+
+    @Override
+    public boolean supportsOpenCursorsAcrossCommit(){ return supportsOpenCursorsAcrossCommit;}
+
+    @Override
+    public int getMaxColumnNameLength(){ return getMaxColumnNameLength;}
+
+    @Override
+    public int getMaxColumnsInIndex(){ return getMaxColumnsInIndex;}
+
+    @Override
+    public int getMaxColumnsInSelect(){ return getMaxColumnsInSelect;}
+
+    @Override
+    public int getMaxSchemaNameLength(){ return getMaxSchemaNameLength;}
+
+    @Override
+    public int getMaxBinaryLiteralLength(){ return getMaxBinaryLiteralLength;}
+
+    @Override
+    public int getMaxProcedureNameLength(){ return getMaxProcedureNameLength;}
+
+    @Override
+    public int getMaxCatalogNameLength(){ return getMaxCatalogNameLength;}
+
+    @Override
+    public boolean supportsSchemasInIndexDefinitions(){ return supportsSchemasInIndexDefinitions;}
+
+    @Override
+    public String getCatalogSeparator(){ return getCatalogSeparator;}
+
+    @Override
+    public boolean supportsSubqueriesInQuantifieds(){ return supportsSubqueriesInQuantifieds;}
+
+    @Override
+    public boolean supportsPositionedDelete(){ return supportsPositionedDelete;}
+
+    @Override
+    public boolean supportsGroupByUnrelated(){ return supportsGroupByUnrelated;}
+
+    @Override
+    public boolean doesMaxRowSizeIncludeBlobs(){ return doesMaxRowSizeIncludeBlobs;}
+
+    @Override
+    public int getMaxStatementLength(){ return getMaxStatementLength;}
+
+    @Override
+    public int getMaxColumnsInGroupBy(){ return getMaxColumnsInGroupBy;}
+
+    @Override
+    public int getMaxUserNameLength(){ return getMaxUserNameLength;}
+
+    @Override
+    public boolean supportsSchemasInProcedureCalls(){ return supportsSchemasInProcedureCalls;}
+
+    @Override
+    public boolean supportsCatalogsInTableDefinitions(){ return supportsCatalogsInTableDefinitions;}
+
+    @Override
+    public boolean supportsPositionedUpdate(){ return supportsPositionedUpdate;}
+
+    @Override
+    public int getDefaultTransactionIsolation(){ return getDefaultTransactionIsolation;}
+
+    @Override
+    public int getMaxColumnsInOrderBy(){ return getMaxColumnsInOrderBy;}
+
+    @Override
+    public boolean supportsANSI92IntermediateSQL(){ return supportsANSI92IntermediateSQL;}
+
+    @Override
+    public int getMaxTableNameLength(){ return getMaxTableNameLength;}
+
+    @Override
+    public boolean supportsCorrelatedSubqueries(){ return supportsCorrelatedSubqueries;}
+
+    @Override
+    public boolean supportsANSI92FullSQL(){ return supportsANSI92FullSQL;}
+
+    @Override
+    public boolean supportsCatalogsInDataManipulation(){ return supportsCatalogsInDataManipulation;}
+
+    @Override
+    public boolean supportsCatalogsInIndexDefinitions(){ return supportsCatalogsInIndexDefinitions;}
+
+    @Override
+    public boolean supportsFullOuterJoins(){ return supportsFullOuterJoins;}
+
+    @Override
+    public boolean supportsGroupByBeyondSelect(){ return supportsGroupByBeyondSelect;}
+
+    @Override
+    public boolean supportsStoredProcedures(){ return supportsStoredProcedures;}
+
+    @Override
+    public boolean supportsOpenCursorsAcrossRollback(){ return supportsOpenCursorsAcrossRollback;}
+
+    @Override
+    public boolean supportsOpenStatementsAcrossCommit(){ return supportsOpenStatementsAcrossCommit;}
+
+    @Override
+    public int getMaxColumnsInTable(){ return getMaxColumnsInTable;}
+
+    @Override
+    public boolean supportsLikeEscapeClause(){ return supportsLikeEscapeClause;}
+
+    @Override
+    public boolean supportsMinimumSQLGrammar(){ return supportsMinimumSQLGrammar;}
+
+    @Override
+    public boolean supportsSchemasInDataManipulation(){ return supportsSchemasInDataManipulation;}
+
+    @Override
+    public boolean supportsSubqueriesInIns(){ return supportsSubqueriesInIns;}
+
+    @Override
+    public int getMaxCursorNameLength(){ return getMaxCursorNameLength;}
+
+    @Override
+    public int getMaxTablesInSelect(){ return getMaxTablesInSelect;}
+
+    @Override
+    public boolean supportsTransactions(){ return supportsTransactions;}
+
+    @Override
+    public boolean supportsLimitedOuterJoins(){ return supportsLimitedOuterJoins;}
+
+    @Override
+    public int getMaxCharLiteralLength(){ return getMaxCharLiteralLength;}
+
+    @Override
+    public boolean supportsSubqueriesInExists(){ return supportsSubqueriesInExists;}
+
+    @Override
+    public boolean supportsMixedCaseQuotedIdentifiers(){ return supportsMixedCaseQuotedIdentifiers;}
+
+    @Override
+    public String getDatabaseProductName(){ return getDatabaseProductName;}
+
+    @Override
+    public int getDriverMinorVersion(){ return getDriverMinorVersion;}
+
+    @Override
+    public boolean supportsAlterTableWithDropColumn(){ return supportsAlterTableWithDropColumn;}
+
+    @Override
+    public boolean nullsAreSortedAtStart(){ return nullsAreSortedAtStart;}
+
+    @Override
+    public boolean nullPlusNonNullIsNull(){ return nullPlusNonNullIsNull;}
+
+    @Override
+    public String getSearchStringEscape(){ return getSearchStringEscape;}
+
+    @Override
+    public boolean supportsExpressionsInOrderBy(){ return supportsExpressionsInOrderBy;}
+
+    @Override
+    public String getDatabaseProductVersion(){ return getDatabaseProductVersion;}
+
+    @Override
+    public String getNumericFunctions(){ return getNumericFunctions;}
+
+    @Override
+    public boolean storesUpperCaseIdentifiers(){ return storesUpperCaseIdentifiers;}
+
+    @Override
+    public boolean usesLocalFilePerTable(){ return usesLocalFilePerTable;}
+
+    @Override
+    public boolean nullsAreSortedAtEnd(){ return nullsAreSortedAtEnd;}
+
+    @Override
+    public boolean supportsMixedCaseIdentifiers(){ return supportsMixedCaseIdentifiers;}
+
+    @Override
+    public boolean storesLowerCaseIdentifiers(){ return storesLowerCaseIdentifiers;}
+
+    @Override
+    public boolean storesMixedCaseQuotedIdentifiers(){ return storesMixedCaseQuotedIdentifiers;}
+
+    @Override
+    public boolean allProceduresAreCallable(){ return allProceduresAreCallable;}
+
+    @Override
+    public boolean storesMixedCaseIdentifiers(){ return storesMixedCaseIdentifiers;}
+
+    @Override
+    public boolean allTablesAreSelectable(){ return allTablesAreSelectable;}
+
+    @Override
+    public boolean storesLowerCaseQuotedIdentifiers(){ return storesLowerCaseQuotedIdentifiers;}
+
+    @Override
+    public String getIdentifierQuoteString(){ return getIdentifierQuoteString;}
+
+    @Override
+    public String getTimeDateFunctions(){ return getTimeDateFunctions;}
+
+    @Override
+    public boolean supportsAlterTableWithAddColumn(){ return supportsAlterTableWithAddColumn;}
+
+    @Override
+    public int getDriverMajorVersion(){ return getDriverMajorVersion;}
+
+    @Override
+    public String getExtraNameCharacters(){ return getExtraNameCharacters;}
+
+    @Override
+    public boolean supportsColumnAliasing(){ return supportsColumnAliasing;}
+
+    @Override
+    public boolean supportsTableCorrelationNames(){ return supportsTableCorrelationNames;}
+
+    @Override
+    public boolean storesUpperCaseQuotedIdentifiers(){ return storesUpperCaseQuotedIdentifiers;}
+
+    @Override
+    public boolean generatedKeyAlwaysReturned(){ return generatedKeyAlwaysReturned;}
+
+
+    @Override
+    public int getJDBCMajorVersion(){ return getJDBCMajorVersion;}
+
+    @Override
+    public int getResultSetHoldability(){ return getResultSetHoldability;}
+
+    @Override
+    public long getMaxLogicalLobSize(){ return getMaxLogicalLobSize;}
+
+    @Override
+    public boolean supportsMultipleOpenResults(){ return supportsMultipleOpenResults;}
+
+    @Override
+    public int getDatabaseMajorVersion(){ return getDatabaseMajorVersion;}
+
+    @Override
+    public int getDatabaseMinorVersion(){ return getDatabaseMinorVersion;}
+
+    @Override
+    public boolean supportsStatementPooling(){ return supportsStatementPooling;}
+
+    @Override
+    public boolean supportsBatchUpdates(){ return supportsBatchUpdates;}
+
+    @Override
+    public boolean supportsGetGeneratedKeys(){ return supportsGetGeneratedKeys;}
+
+    @Override
+    public boolean supportsNamedParameters(){ return supportsNamedParameters;}
+
+    @Override
+    public int getJDBCMinorVersion(){ return getJDBCMinorVersion;}
+
+    @Override
+    public String getUserName(){ return getUserName;}
+
+    @Override
+    public boolean nullsAreSortedLow(){ return nullsAreSortedLow;}
+
+    @Override
+    public String getDriverName(){ return getDriverName;}
+
+    @Override
+    public boolean supportsConvert(){ return supportsConvert;}
+
+    @Override
+    public int getMaxStatements(){ return getMaxStatements;}
+
+    @Override
+    public boolean supportsUnion(){ return supportsUnion;}
+
+    @Override
+    public boolean supportsOuterJoins(){ return supportsOuterJoins;}
+
+    @Override
+    public String getSQLKeywords(){ return getSQLKeywords;}
+
+    @Override
+    public boolean supportsUnionAll(){ return supportsUnionAll;}
+
+    @Override
+    public String getDriverVersion(){ return getDriverVersion;}
+
+    @Override
+    public int getMaxConnections(){ return getMaxConnections;}
+
+    @Override
+    public boolean isCatalogAtStart(){ return isCatalogAtStart;}
+
+    @Override
+    public boolean nullsAreSortedHigh(){ return nullsAreSortedHigh;}
+
+    @Override
+    public String getCatalogTerm(){ return getCatalogTerm;}
+
+    @Override
+    public int getSQLStateType(){ return getSQLStateType;}
+
+    @Override
+    public boolean locatorsUpdateCopy(){ return locatorsUpdateCopy;}
+
+
+
+    @Override
+    public boolean usesLocalFiles(){ return usesLocalFiles;}
+
+    @Override
+    public boolean supportsGroupBy(){ return supportsGroupBy;}
+
+    @Override
+    public int getMaxIndexLength(){ return getMaxIndexLength;}
+
+    @Override
+    public String getProcedureTerm(){ return getProcedureTerm;}
+
+    @Override
+    public int getMaxRowSize(){ return getMaxRowSize;}
+
+    @Override
+    public String getSchemaTerm(){ return getSchemaTerm;}
+
+    @Override
+    public boolean supportsSavepoints(){ return supportsSavepoints;}
+
+    @Override
+    public String getSystemFunctions(){ return getSystemFunctions;}
+
+    @Override
+    public String getStringFunctions(){ return getStringFunctions;}
+
+    @Override
+    public boolean supportsSharding(){ return supportsSharding;}
+
+    @Override
+    public boolean supportsRefCursors(){ return supportsRefCursors;}
+
+    public void fill(DatabaseMetaData src) throws SQLException {
+        isReadOnly=src.isReadOnly();
+        getURL=src.getURL();
+        autoCommitFailureClosesAllResultSets=src.autoCommitFailureClosesAllResultSets();
+        supportsStoredFunctionsUsingCallSyntax=src.supportsStoredFunctionsUsingCallSyntax();
+        supportsSchemasInPrivilegeDefinitions=src.supportsSchemasInPrivilegeDefinitions();
+        supportsIntegrityEnhancementFacility=src.supportsIntegrityEnhancementFacility();
+        supportsDifferentTableCorrelationNames=src.supportsDifferentTableCorrelationNames();
+        supportsOpenStatementsAcrossRollback=src.supportsOpenStatementsAcrossRollback();
+        supportsDataManipulationTransactionsOnly=src.supportsDataManipulationTransactionsOnly();
+        supportsCatalogsInPrivilegeDefinitions=src.supportsCatalogsInPrivilegeDefinitions();
+        dataDefinitionCausesTransactionCommit=src.dataDefinitionCausesTransactionCommit();
+        dataDefinitionIgnoredInTransactions=src.dataDefinitionIgnoredInTransactions();
+        supportsDataDefinitionAndDataManipulationTransactions=src.supportsDataDefinitionAndDataManipulationTransactions();
+        supportsANSI92EntryLevelSQL=src.supportsANSI92EntryLevelSQL();
+        supportsSubqueriesInComparisons=src.supportsSubqueriesInComparisons();
+        supportsMultipleResultSets=src.supportsMultipleResultSets();
+        supportsExtendedSQLGrammar=src.supportsExtendedSQLGrammar();
+        supportsSchemasInTableDefinitions=src.supportsSchemasInTableDefinitions();
+        supportsOrderByUnrelated=src.supportsOrderByUnrelated();
+        supportsNonNullableColumns=src.supportsNonNullableColumns();
+        supportsCoreSQLGrammar=src.supportsCoreSQLGrammar();
+        supportsCatalogsInProcedureCalls=src.supportsCatalogsInProcedureCalls();
+        supportsSelectForUpdate=src.supportsSelectForUpdate();
+        supportsMultipleTransactions=src.supportsMultipleTransactions();
+        supportsOpenCursorsAcrossCommit=src.supportsOpenCursorsAcrossCommit();
+        getMaxColumnNameLength=src.getMaxColumnNameLength();
+        getMaxColumnsInIndex=src.getMaxColumnsInIndex();
+        getMaxColumnsInSelect=src.getMaxColumnsInSelect();
+        getMaxSchemaNameLength=src.getMaxSchemaNameLength();
+        getMaxBinaryLiteralLength=src.getMaxBinaryLiteralLength();
+        getMaxProcedureNameLength=src.getMaxProcedureNameLength();
+        getMaxCatalogNameLength=src.getMaxCatalogNameLength();
+        supportsSchemasInIndexDefinitions=src.supportsSchemasInIndexDefinitions();
+        getCatalogSeparator=src.getCatalogSeparator();
+        supportsSubqueriesInQuantifieds=src.supportsSubqueriesInQuantifieds();
+        supportsPositionedDelete=src.supportsPositionedDelete();
+        supportsGroupByUnrelated=src.supportsGroupByUnrelated();
+        doesMaxRowSizeIncludeBlobs=src.doesMaxRowSizeIncludeBlobs();
+        getMaxStatementLength=src.getMaxStatementLength();
+        getMaxColumnsInGroupBy=src.getMaxColumnsInGroupBy();
+        getMaxUserNameLength=src.getMaxUserNameLength();
+        supportsSchemasInProcedureCalls=src.supportsSchemasInProcedureCalls();
+        supportsCatalogsInTableDefinitions=src.supportsCatalogsInTableDefinitions();
+        supportsPositionedUpdate=src.supportsPositionedUpdate();
+        getDefaultTransactionIsolation=src.getDefaultTransactionIsolation();
+        getMaxColumnsInOrderBy=src.getMaxColumnsInOrderBy();
+        supportsANSI92IntermediateSQL=src.supportsANSI92IntermediateSQL();
+        getMaxTableNameLength=src.getMaxTableNameLength();
+        supportsCorrelatedSubqueries=src.supportsCorrelatedSubqueries();
+        supportsANSI92FullSQL=src.supportsANSI92FullSQL();
+        supportsCatalogsInDataManipulation=src.supportsCatalogsInDataManipulation();
+        supportsCatalogsInIndexDefinitions=src.supportsCatalogsInIndexDefinitions();
+        supportsFullOuterJoins=src.supportsFullOuterJoins();
+        supportsGroupByBeyondSelect=src.supportsGroupByBeyondSelect();
+        supportsStoredProcedures=src.supportsStoredProcedures();
+        supportsOpenCursorsAcrossRollback=src.supportsOpenCursorsAcrossRollback();
+        supportsOpenStatementsAcrossCommit=src.supportsOpenStatementsAcrossCommit();
+        getMaxColumnsInTable=src.getMaxColumnsInTable();
+        supportsLikeEscapeClause=src.supportsLikeEscapeClause();
+        supportsMinimumSQLGrammar=src.supportsMinimumSQLGrammar();
+        supportsSchemasInDataManipulation=src.supportsSchemasInDataManipulation();
+        supportsSubqueriesInIns=src.supportsSubqueriesInIns();
+        getMaxCursorNameLength=src.getMaxCursorNameLength();
+        getMaxTablesInSelect=src.getMaxTablesInSelect();
+        supportsTransactions=src.supportsTransactions();
+        supportsLimitedOuterJoins=src.supportsLimitedOuterJoins();
+        getMaxCharLiteralLength=src.getMaxCharLiteralLength();
+        supportsSubqueriesInExists=src.supportsSubqueriesInExists();
+        supportsMixedCaseQuotedIdentifiers=src.supportsMixedCaseQuotedIdentifiers();
+        getDatabaseProductName=src.getDatabaseProductName();
+        getDriverMinorVersion=src.getDriverMinorVersion();
+        supportsAlterTableWithDropColumn=src.supportsAlterTableWithDropColumn();
+        nullsAreSortedAtStart=src.nullsAreSortedAtStart();
+        nullPlusNonNullIsNull=src.nullPlusNonNullIsNull();
+        getSearchStringEscape=src.getSearchStringEscape();
+        supportsExpressionsInOrderBy=src.supportsExpressionsInOrderBy();
+        getDatabaseProductVersion=src.getDatabaseProductVersion();
+        getNumericFunctions=src.getNumericFunctions();
+        storesUpperCaseIdentifiers=src.storesUpperCaseIdentifiers();
+        usesLocalFilePerTable=src.usesLocalFilePerTable();
+        nullsAreSortedAtEnd=src.nullsAreSortedAtEnd();
+        supportsMixedCaseIdentifiers=src.supportsMixedCaseIdentifiers();
+        storesLowerCaseIdentifiers=src.storesLowerCaseIdentifiers();
+        storesMixedCaseQuotedIdentifiers=src.storesMixedCaseQuotedIdentifiers();
+        allProceduresAreCallable=src.allProceduresAreCallable();
+        storesMixedCaseIdentifiers=src.storesMixedCaseIdentifiers();
+        allTablesAreSelectable=src.allTablesAreSelectable();
+        storesLowerCaseQuotedIdentifiers=src.storesLowerCaseQuotedIdentifiers();
+        getIdentifierQuoteString=src.getIdentifierQuoteString();
+        getTimeDateFunctions=src.getTimeDateFunctions();
+        supportsAlterTableWithAddColumn=src.supportsAlterTableWithAddColumn();
+        getDriverMajorVersion=src.getDriverMajorVersion();
+        getExtraNameCharacters=src.getExtraNameCharacters();
+        supportsColumnAliasing=src.supportsColumnAliasing();
+        supportsTableCorrelationNames=src.supportsTableCorrelationNames();
+        storesUpperCaseQuotedIdentifiers=src.storesUpperCaseQuotedIdentifiers();
+        generatedKeyAlwaysReturned=src.generatedKeyAlwaysReturned();
+        getJDBCMajorVersion=src.getJDBCMajorVersion();
+        getResultSetHoldability=src.getResultSetHoldability();
+        getMaxLogicalLobSize=src.getMaxLogicalLobSize();
+        supportsMultipleOpenResults=src.supportsMultipleOpenResults();
+        getDatabaseMajorVersion=src.getDatabaseMajorVersion();
+        getDatabaseMinorVersion=src.getDatabaseMinorVersion();
+        supportsStatementPooling=src.supportsStatementPooling();
+        supportsBatchUpdates=src.supportsBatchUpdates();
+        supportsGetGeneratedKeys=src.supportsGetGeneratedKeys();
+        supportsNamedParameters=src.supportsNamedParameters();
+        getJDBCMinorVersion=src.getJDBCMinorVersion();
+        getUserName=src.getUserName();
+        nullsAreSortedLow=src.nullsAreSortedLow();
+        getDriverName=src.getDriverName();
+        supportsConvert=src.supportsConvert();
+        getMaxStatements=src.getMaxStatements();
+        supportsUnion=src.supportsUnion();
+        supportsOuterJoins=src.supportsOuterJoins();
+        getSQLKeywords=src.getSQLKeywords();
+        supportsUnionAll=src.supportsUnionAll();
+        getDriverVersion=src.getDriverVersion();
+        getMaxConnections=src.getMaxConnections();
+        isCatalogAtStart=src.isCatalogAtStart();
+        nullsAreSortedHigh=src.nullsAreSortedHigh();
+        getCatalogTerm=src.getCatalogTerm();
+        getSQLStateType=src.getSQLStateType();
+        locatorsUpdateCopy=src.locatorsUpdateCopy();
+        usesLocalFiles=src.usesLocalFiles();
+        supportsGroupBy=src.supportsGroupBy();
+        getMaxIndexLength=src.getMaxIndexLength();
+        getProcedureTerm=src.getProcedureTerm();
+        getMaxRowSize=src.getMaxRowSize();
+        getSchemaTerm=src.getSchemaTerm();
+        supportsSavepoints=src.supportsSavepoints();
+        getSystemFunctions=src.getSystemFunctions();
+        getStringFunctions=src.getStringFunctions();
+        supportsSharding=src.supportsSharding();
+        supportsRefCursors=src.supportsRefCursors();
     }
 
     @Override
     public void serialize(TypedSerializer builder) {
+        builder.write("isReadOnly",isReadOnly);
+        builder.write("getURL",getURL);
+        builder.write("autoCommitFailureClosesAllResultSets",autoCommitFailureClosesAllResultSets);
+        builder.write("supportsStoredFunctionsUsingCallSyntax",supportsStoredFunctionsUsingCallSyntax);
+        builder.write("supportsSchemasInPrivilegeDefinitions",supportsSchemasInPrivilegeDefinitions);
+        builder.write("supportsIntegrityEnhancementFacility",supportsIntegrityEnhancementFacility);
+        builder.write("supportsDifferentTableCorrelationNames",supportsDifferentTableCorrelationNames);
+        builder.write("supportsOpenStatementsAcrossRollback",supportsOpenStatementsAcrossRollback);
+        builder.write("supportsDataManipulationTransactionsOnly",supportsDataManipulationTransactionsOnly);
+        builder.write("supportsCatalogsInPrivilegeDefinitions",supportsCatalogsInPrivilegeDefinitions);
+        builder.write("dataDefinitionCausesTransactionCommit",dataDefinitionCausesTransactionCommit);
+        builder.write("dataDefinitionIgnoredInTransactions",dataDefinitionIgnoredInTransactions);
+        builder.write("supportsDataDefinitionAndDataManipulationTransactions",supportsDataDefinitionAndDataManipulationTransactions);
+        builder.write("supportsANSI92EntryLevelSQL",supportsANSI92EntryLevelSQL);
+        builder.write("supportsSubqueriesInComparisons",supportsSubqueriesInComparisons);
+        builder.write("supportsMultipleResultSets",supportsMultipleResultSets);
+        builder.write("supportsExtendedSQLGrammar",supportsExtendedSQLGrammar);
+        builder.write("supportsSchemasInTableDefinitions",supportsSchemasInTableDefinitions);
+        builder.write("supportsOrderByUnrelated",supportsOrderByUnrelated);
+        builder.write("supportsNonNullableColumns",supportsNonNullableColumns);
+        builder.write("supportsCoreSQLGrammar",supportsCoreSQLGrammar);
+        builder.write("supportsCatalogsInProcedureCalls",supportsCatalogsInProcedureCalls);
+        builder.write("supportsSelectForUpdate",supportsSelectForUpdate);
+        builder.write("supportsMultipleTransactions",supportsMultipleTransactions);
+        builder.write("supportsOpenCursorsAcrossCommit",supportsOpenCursorsAcrossCommit);
+        builder.write("getMaxColumnNameLength",getMaxColumnNameLength);
+        builder.write("getMaxColumnsInIndex",getMaxColumnsInIndex);
+        builder.write("getMaxColumnsInSelect",getMaxColumnsInSelect);
+        builder.write("getMaxSchemaNameLength",getMaxSchemaNameLength);
+        builder.write("getMaxBinaryLiteralLength",getMaxBinaryLiteralLength);
+        builder.write("getMaxProcedureNameLength",getMaxProcedureNameLength);
+        builder.write("getMaxCatalogNameLength",getMaxCatalogNameLength);
+        builder.write("supportsSchemasInIndexDefinitions",supportsSchemasInIndexDefinitions);
+        builder.write("getCatalogSeparator",getCatalogSeparator);
+        builder.write("supportsSubqueriesInQuantifieds",supportsSubqueriesInQuantifieds);
+        builder.write("supportsPositionedDelete",supportsPositionedDelete);
+        builder.write("supportsGroupByUnrelated",supportsGroupByUnrelated);
+        builder.write("doesMaxRowSizeIncludeBlobs",doesMaxRowSizeIncludeBlobs);
+        builder.write("getMaxStatementLength",getMaxStatementLength);
+        builder.write("getMaxColumnsInGroupBy",getMaxColumnsInGroupBy);
+        builder.write("getMaxUserNameLength",getMaxUserNameLength);
+        builder.write("supportsSchemasInProcedureCalls",supportsSchemasInProcedureCalls);
+        builder.write("supportsCatalogsInTableDefinitions",supportsCatalogsInTableDefinitions);
+        builder.write("supportsPositionedUpdate",supportsPositionedUpdate);
+        builder.write("getDefaultTransactionIsolation",getDefaultTransactionIsolation);
+        builder.write("getMaxColumnsInOrderBy",getMaxColumnsInOrderBy);
+        builder.write("supportsANSI92IntermediateSQL",supportsANSI92IntermediateSQL);
+        builder.write("getMaxTableNameLength",getMaxTableNameLength);
+        builder.write("supportsCorrelatedSubqueries",supportsCorrelatedSubqueries);
+        builder.write("supportsANSI92FullSQL",supportsANSI92FullSQL);
+        builder.write("supportsCatalogsInDataManipulation",supportsCatalogsInDataManipulation);
+        builder.write("supportsCatalogsInIndexDefinitions",supportsCatalogsInIndexDefinitions);
+        builder.write("supportsFullOuterJoins",supportsFullOuterJoins);
+        builder.write("supportsGroupByBeyondSelect",supportsGroupByBeyondSelect);
+        builder.write("supportsStoredProcedures",supportsStoredProcedures);
+        builder.write("supportsOpenCursorsAcrossRollback",supportsOpenCursorsAcrossRollback);
+        builder.write("supportsOpenStatementsAcrossCommit",supportsOpenStatementsAcrossCommit);
+        builder.write("getMaxColumnsInTable",getMaxColumnsInTable);
+        builder.write("supportsLikeEscapeClause",supportsLikeEscapeClause);
+        builder.write("supportsMinimumSQLGrammar",supportsMinimumSQLGrammar);
+        builder.write("supportsSchemasInDataManipulation",supportsSchemasInDataManipulation);
+        builder.write("supportsSubqueriesInIns",supportsSubqueriesInIns);
+        builder.write("getMaxCursorNameLength",getMaxCursorNameLength);
+        builder.write("getMaxTablesInSelect",getMaxTablesInSelect);
+        builder.write("supportsTransactions",supportsTransactions);
+        builder.write("supportsLimitedOuterJoins",supportsLimitedOuterJoins);
+        builder.write("getMaxCharLiteralLength",getMaxCharLiteralLength);
+        builder.write("supportsSubqueriesInExists",supportsSubqueriesInExists);
+        builder.write("supportsMixedCaseQuotedIdentifiers",supportsMixedCaseQuotedIdentifiers);
+        builder.write("getDatabaseProductName",getDatabaseProductName);
+        builder.write("getDriverMinorVersion",getDriverMinorVersion);
+        builder.write("supportsAlterTableWithDropColumn",supportsAlterTableWithDropColumn);
+        builder.write("nullsAreSortedAtStart",nullsAreSortedAtStart);
+        builder.write("nullPlusNonNullIsNull",nullPlusNonNullIsNull);
+        builder.write("getSearchStringEscape",getSearchStringEscape);
+        builder.write("supportsExpressionsInOrderBy",supportsExpressionsInOrderBy);
+        builder.write("getDatabaseProductVersion",getDatabaseProductVersion);
+        builder.write("getNumericFunctions",getNumericFunctions);
+        builder.write("storesUpperCaseIdentifiers",storesUpperCaseIdentifiers);
+        builder.write("usesLocalFilePerTable",usesLocalFilePerTable);
+        builder.write("nullsAreSortedAtEnd",nullsAreSortedAtEnd);
+        builder.write("supportsMixedCaseIdentifiers",supportsMixedCaseIdentifiers);
+        builder.write("storesLowerCaseIdentifiers",storesLowerCaseIdentifiers);
+        builder.write("storesMixedCaseQuotedIdentifiers",storesMixedCaseQuotedIdentifiers);
+        builder.write("allProceduresAreCallable",allProceduresAreCallable);
+        builder.write("storesMixedCaseIdentifiers",storesMixedCaseIdentifiers);
+        builder.write("allTablesAreSelectable",allTablesAreSelectable);
+        builder.write("storesLowerCaseQuotedIdentifiers",storesLowerCaseQuotedIdentifiers);
+        builder.write("getIdentifierQuoteString",getIdentifierQuoteString);
+        builder.write("getTimeDateFunctions",getTimeDateFunctions);
+        builder.write("supportsAlterTableWithAddColumn",supportsAlterTableWithAddColumn);
+        builder.write("getDriverMajorVersion",getDriverMajorVersion);
+        builder.write("getExtraNameCharacters",getExtraNameCharacters);
+        builder.write("supportsColumnAliasing",supportsColumnAliasing);
+        builder.write("supportsTableCorrelationNames",supportsTableCorrelationNames);
+        builder.write("storesUpperCaseQuotedIdentifiers",storesUpperCaseQuotedIdentifiers);
+        builder.write("generatedKeyAlwaysReturned",generatedKeyAlwaysReturned);
+        builder.write("getJDBCMajorVersion",getJDBCMajorVersion);
+        builder.write("getResultSetHoldability",getResultSetHoldability);
+        builder.write("getMaxLogicalLobSize",getMaxLogicalLobSize);
+        builder.write("supportsMultipleOpenResults",supportsMultipleOpenResults);
+        builder.write("getDatabaseMajorVersion",getDatabaseMajorVersion);
+        builder.write("getDatabaseMinorVersion",getDatabaseMinorVersion);
+        builder.write("supportsStatementPooling",supportsStatementPooling);
+        builder.write("supportsBatchUpdates",supportsBatchUpdates);
+        builder.write("supportsGetGeneratedKeys",supportsGetGeneratedKeys);
+        builder.write("supportsNamedParameters",supportsNamedParameters);
+        builder.write("getJDBCMinorVersion",getJDBCMinorVersion);
+        builder.write("getUserName",getUserName);
+        builder.write("nullsAreSortedLow",nullsAreSortedLow);
+        builder.write("getDriverName",getDriverName);
+        builder.write("supportsConvert",supportsConvert);
+        builder.write("getMaxStatements",getMaxStatements);
+        builder.write("supportsUnion",supportsUnion);
+        builder.write("supportsOuterJoins",supportsOuterJoins);
+        builder.write("getSQLKeywords",getSQLKeywords);
+        builder.write("supportsUnionAll",supportsUnionAll);
+        builder.write("getDriverVersion",getDriverVersion);
+        builder.write("getMaxConnections",getMaxConnections);
+        builder.write("isCatalogAtStart",isCatalogAtStart);
+        builder.write("nullsAreSortedHigh",nullsAreSortedHigh);
+        builder.write("getCatalogTerm",getCatalogTerm);
+        builder.write("getSQLStateType",getSQLStateType);
+        builder.write("locatorsUpdateCopy",locatorsUpdateCopy);
+        builder.write("usesLocalFiles",usesLocalFiles);
+        builder.write("supportsGroupBy",supportsGroupBy);
+        builder.write("getMaxIndexLength",getMaxIndexLength);
+        builder.write("getProcedureTerm",getProcedureTerm);
+        builder.write("getMaxRowSize",getMaxRowSize);
+        builder.write("getSchemaTerm",getSchemaTerm);
+        builder.write("supportsSavepoints",supportsSavepoints);
+        builder.write("getSystemFunctions",getSystemFunctions);
+        builder.write("getStringFunctions",getStringFunctions);
+        builder.write("supportsSharding",supportsSharding);
+        builder.write("supportsRefCursors",supportsRefCursors);
         builder.write("traceId",traceId);
     }
 
     @Override
     public JdbcResult deserialize(TypedSerializer builder) {
-        traceId = builder.read("traceId");
+
+        isReadOnly =builder.read("isReadOnly");
+        getURL =builder.read("getURL");
+        autoCommitFailureClosesAllResultSets =builder.read("autoCommitFailureClosesAllResultSets");
+        supportsStoredFunctionsUsingCallSyntax =builder.read("supportsStoredFunctionsUsingCallSyntax");
+        supportsSchemasInPrivilegeDefinitions =builder.read("supportsSchemasInPrivilegeDefinitions");
+        supportsIntegrityEnhancementFacility =builder.read("supportsIntegrityEnhancementFacility");
+        supportsDifferentTableCorrelationNames =builder.read("supportsDifferentTableCorrelationNames");
+        supportsOpenStatementsAcrossRollback =builder.read("supportsOpenStatementsAcrossRollback");
+        supportsDataManipulationTransactionsOnly =builder.read("supportsDataManipulationTransactionsOnly");
+        supportsCatalogsInPrivilegeDefinitions =builder.read("supportsCatalogsInPrivilegeDefinitions");
+        dataDefinitionCausesTransactionCommit =builder.read("dataDefinitionCausesTransactionCommit");
+        dataDefinitionIgnoredInTransactions =builder.read("dataDefinitionIgnoredInTransactions");
+        supportsDataDefinitionAndDataManipulationTransactions =builder.read("supportsDataDefinitionAndDataManipulationTransactions");
+        supportsANSI92EntryLevelSQL =builder.read("supportsANSI92EntryLevelSQL");
+        supportsSubqueriesInComparisons =builder.read("supportsSubqueriesInComparisons");
+        supportsMultipleResultSets =builder.read("supportsMultipleResultSets");
+        supportsExtendedSQLGrammar =builder.read("supportsExtendedSQLGrammar");
+        supportsSchemasInTableDefinitions =builder.read("supportsSchemasInTableDefinitions");
+        supportsOrderByUnrelated =builder.read("supportsOrderByUnrelated");
+        supportsNonNullableColumns =builder.read("supportsNonNullableColumns");
+        supportsCoreSQLGrammar =builder.read("supportsCoreSQLGrammar");
+        supportsCatalogsInProcedureCalls =builder.read("supportsCatalogsInProcedureCalls");
+        supportsSelectForUpdate =builder.read("supportsSelectForUpdate");
+        supportsMultipleTransactions =builder.read("supportsMultipleTransactions");
+        supportsOpenCursorsAcrossCommit =builder.read("supportsOpenCursorsAcrossCommit");
+        getMaxColumnNameLength =builder.read("getMaxColumnNameLength");
+        getMaxColumnsInIndex =builder.read("getMaxColumnsInIndex");
+        getMaxColumnsInSelect =builder.read("getMaxColumnsInSelect");
+        getMaxSchemaNameLength =builder.read("getMaxSchemaNameLength");
+        getMaxBinaryLiteralLength =builder.read("getMaxBinaryLiteralLength");
+        getMaxProcedureNameLength =builder.read("getMaxProcedureNameLength");
+        getMaxCatalogNameLength =builder.read("getMaxCatalogNameLength");
+        supportsSchemasInIndexDefinitions =builder.read("supportsSchemasInIndexDefinitions");
+        getCatalogSeparator =builder.read("getCatalogSeparator");
+        supportsSubqueriesInQuantifieds =builder.read("supportsSubqueriesInQuantifieds");
+        supportsPositionedDelete =builder.read("supportsPositionedDelete");
+        supportsGroupByUnrelated =builder.read("supportsGroupByUnrelated");
+        doesMaxRowSizeIncludeBlobs =builder.read("doesMaxRowSizeIncludeBlobs");
+        getMaxStatementLength =builder.read("getMaxStatementLength");
+        getMaxColumnsInGroupBy =builder.read("getMaxColumnsInGroupBy");
+        getMaxUserNameLength =builder.read("getMaxUserNameLength");
+        supportsSchemasInProcedureCalls =builder.read("supportsSchemasInProcedureCalls");
+        supportsCatalogsInTableDefinitions =builder.read("supportsCatalogsInTableDefinitions");
+        supportsPositionedUpdate =builder.read("supportsPositionedUpdate");
+        getDefaultTransactionIsolation =builder.read("getDefaultTransactionIsolation");
+        getMaxColumnsInOrderBy =builder.read("getMaxColumnsInOrderBy");
+        supportsANSI92IntermediateSQL =builder.read("supportsANSI92IntermediateSQL");
+        getMaxTableNameLength =builder.read("getMaxTableNameLength");
+        supportsCorrelatedSubqueries =builder.read("supportsCorrelatedSubqueries");
+        supportsANSI92FullSQL =builder.read("supportsANSI92FullSQL");
+        supportsCatalogsInDataManipulation =builder.read("supportsCatalogsInDataManipulation");
+        supportsCatalogsInIndexDefinitions =builder.read("supportsCatalogsInIndexDefinitions");
+        supportsFullOuterJoins =builder.read("supportsFullOuterJoins");
+        supportsGroupByBeyondSelect =builder.read("supportsGroupByBeyondSelect");
+        supportsStoredProcedures =builder.read("supportsStoredProcedures");
+        supportsOpenCursorsAcrossRollback =builder.read("supportsOpenCursorsAcrossRollback");
+        supportsOpenStatementsAcrossCommit =builder.read("supportsOpenStatementsAcrossCommit");
+        getMaxColumnsInTable =builder.read("getMaxColumnsInTable");
+        supportsLikeEscapeClause =builder.read("supportsLikeEscapeClause");
+        supportsMinimumSQLGrammar =builder.read("supportsMinimumSQLGrammar");
+        supportsSchemasInDataManipulation =builder.read("supportsSchemasInDataManipulation");
+        supportsSubqueriesInIns =builder.read("supportsSubqueriesInIns");
+        getMaxCursorNameLength =builder.read("getMaxCursorNameLength");
+        getMaxTablesInSelect =builder.read("getMaxTablesInSelect");
+        supportsTransactions =builder.read("supportsTransactions");
+        supportsLimitedOuterJoins =builder.read("supportsLimitedOuterJoins");
+        getMaxCharLiteralLength =builder.read("getMaxCharLiteralLength");
+        supportsSubqueriesInExists =builder.read("supportsSubqueriesInExists");
+        supportsMixedCaseQuotedIdentifiers =builder.read("supportsMixedCaseQuotedIdentifiers");
+        getDatabaseProductName =builder.read("getDatabaseProductName");
+        getDriverMinorVersion =builder.read("getDriverMinorVersion");
+        supportsAlterTableWithDropColumn =builder.read("supportsAlterTableWithDropColumn");
+        nullsAreSortedAtStart =builder.read("nullsAreSortedAtStart");
+        nullPlusNonNullIsNull =builder.read("nullPlusNonNullIsNull");
+        getSearchStringEscape =builder.read("getSearchStringEscape");
+        supportsExpressionsInOrderBy =builder.read("supportsExpressionsInOrderBy");
+        getDatabaseProductVersion =builder.read("getDatabaseProductVersion");
+        getNumericFunctions =builder.read("getNumericFunctions");
+        storesUpperCaseIdentifiers =builder.read("storesUpperCaseIdentifiers");
+        usesLocalFilePerTable =builder.read("usesLocalFilePerTable");
+        nullsAreSortedAtEnd =builder.read("nullsAreSortedAtEnd");
+        supportsMixedCaseIdentifiers =builder.read("supportsMixedCaseIdentifiers");
+        storesLowerCaseIdentifiers =builder.read("storesLowerCaseIdentifiers");
+        storesMixedCaseQuotedIdentifiers =builder.read("storesMixedCaseQuotedIdentifiers");
+        allProceduresAreCallable =builder.read("allProceduresAreCallable");
+        storesMixedCaseIdentifiers =builder.read("storesMixedCaseIdentifiers");
+        allTablesAreSelectable =builder.read("allTablesAreSelectable");
+        storesLowerCaseQuotedIdentifiers =builder.read("storesLowerCaseQuotedIdentifiers");
+        getIdentifierQuoteString =builder.read("getIdentifierQuoteString");
+        getTimeDateFunctions =builder.read("getTimeDateFunctions");
+        supportsAlterTableWithAddColumn =builder.read("supportsAlterTableWithAddColumn");
+        getDriverMajorVersion =builder.read("getDriverMajorVersion");
+        getExtraNameCharacters =builder.read("getExtraNameCharacters");
+        supportsColumnAliasing =builder.read("supportsColumnAliasing");
+        supportsTableCorrelationNames =builder.read("supportsTableCorrelationNames");
+        storesUpperCaseQuotedIdentifiers =builder.read("storesUpperCaseQuotedIdentifiers");
+        generatedKeyAlwaysReturned =builder.read("generatedKeyAlwaysReturned");
+        getJDBCMajorVersion =builder.read("getJDBCMajorVersion");
+        getResultSetHoldability =builder.read("getResultSetHoldability");
+        getMaxLogicalLobSize =builder.read("getMaxLogicalLobSize");
+        supportsMultipleOpenResults =builder.read("supportsMultipleOpenResults");
+        getDatabaseMajorVersion =builder.read("getDatabaseMajorVersion");
+        getDatabaseMinorVersion =builder.read("getDatabaseMinorVersion");
+        supportsStatementPooling =builder.read("supportsStatementPooling");
+        supportsBatchUpdates =builder.read("supportsBatchUpdates");
+        supportsGetGeneratedKeys =builder.read("supportsGetGeneratedKeys");
+        supportsNamedParameters =builder.read("supportsNamedParameters");
+        getJDBCMinorVersion =builder.read("getJDBCMinorVersion");
+        getUserName =builder.read("getUserName");
+        nullsAreSortedLow =builder.read("nullsAreSortedLow");
+        getDriverName =builder.read("getDriverName");
+        supportsConvert =builder.read("supportsConvert");
+        getMaxStatements =builder.read("getMaxStatements");
+        supportsUnion =builder.read("supportsUnion");
+        supportsOuterJoins =builder.read("supportsOuterJoins");
+        getSQLKeywords =builder.read("getSQLKeywords");
+        supportsUnionAll =builder.read("supportsUnionAll");
+        getDriverVersion =builder.read("getDriverVersion");
+        getMaxConnections =builder.read("getMaxConnections");
+        isCatalogAtStart =builder.read("isCatalogAtStart");
+        nullsAreSortedHigh =builder.read("nullsAreSortedHigh");
+        getCatalogTerm =builder.read("getCatalogTerm");
+        getSQLStateType =builder.read("getSQLStateType");
+        locatorsUpdateCopy =builder.read("locatorsUpdateCopy");
+        usesLocalFiles =builder.read("usesLocalFiles");
+        supportsGroupBy =builder.read("supportsGroupBy");
+        getMaxIndexLength =builder.read("getMaxIndexLength");
+        getProcedureTerm =builder.read("getProcedureTerm");
+        getMaxRowSize =builder.read("getMaxRowSize");
+        getSchemaTerm =builder.read("getSchemaTerm");
+        supportsSavepoints =builder.read("supportsSavepoints");
+        getSystemFunctions =builder.read("getSystemFunctions");
+        getStringFunctions =builder.read("getStringFunctions");
+        supportsSharding =builder.read("supportsSharding");
+        supportsRefCursors =builder.read("supportsRefCursors");
+        traceId =builder.read("traceId");
         return this;
     }
 
-    
-    @Override
-    public boolean allProceduresAreCallable() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "allProceduresAreCallable")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
 
-    @Override
-    public boolean allTablesAreSelectable() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "allTablesAreSelectable")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getURL() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getURL")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getUserName() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getUserName")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean isReadOnly() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "isReadOnly")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean nullsAreSortedHigh() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "nullsAreSortedHigh")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean nullsAreSortedLow() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "nullsAreSortedLow")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean nullsAreSortedAtStart() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "nullsAreSortedAtStart")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean nullsAreSortedAtEnd() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "nullsAreSortedAtEnd")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getDatabaseProductName() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getDatabaseProductName")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getDatabaseProductVersion() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getDatabaseProductVersion")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getDriverName() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getDriverName")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getDriverVersion() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getDriverVersion")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getDriverMajorVersion() {
-
-        try {
-            return ((ObjectResult)engine.execute(new Exec(this,
-                            "getDriverMajorVersion")
-                    ,connection.getTraceId(),getTraceId())).getResult();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public int getDriverMinorVersion() {
-        try {
-            return ((ObjectResult)engine.execute(new Exec(this,
-                            "getDriverMinorVersion")
-                    ,connection.getTraceId(),getTraceId())).getResult();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public boolean usesLocalFiles() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "usesLocalFiles")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean usesLocalFilePerTable() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "usesLocalFilePerTable")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsMixedCaseIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsMixedCaseIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean storesUpperCaseIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "storesUpperCaseIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean storesLowerCaseIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "storesLowerCaseIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean storesMixedCaseIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "storesMixedCaseIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsMixedCaseQuotedIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "storesUpperCaseQuotedIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "storesLowerCaseQuotedIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "storesMixedCaseQuotedIdentifiers")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getIdentifierQuoteString() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getIdentifierQuoteString")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getSQLKeywords() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getSQLKeywords")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getNumericFunctions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getNumericFunctions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getStringFunctions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getStringFunctions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getSystemFunctions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getSystemFunctions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getTimeDateFunctions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getTimeDateFunctions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getSearchStringEscape() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getSearchStringEscape")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getExtraNameCharacters() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getExtraNameCharacters")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsAlterTableWithAddColumn() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsAlterTableWithAddColumn")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsAlterTableWithDropColumn() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsAlterTableWithDropColumn")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsColumnAliasing() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsColumnAliasing")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean nullPlusNonNullIsNull() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "nullPlusNonNullIsNull")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsConvert() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsConvert")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsConvert(int fromType, int toType) throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsConvert")
-                        .withTypes(int.class,int.class)
-                        .withParameters(fromType,toType)
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsTableCorrelationNames() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsTableCorrelationNames")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsDifferentTableCorrelationNames")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsExpressionsInOrderBy() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsExpressionsInOrderBy")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsOrderByUnrelated() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsOrderByUnrelated")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsGroupBy() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsGroupBy")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsGroupByUnrelated() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsGroupByUnrelated")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsGroupByBeyondSelect() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsGroupByBeyondSelect")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsLikeEscapeClause() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsLikeEscapeClause")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsMultipleResultSets() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsMultipleResultSets")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsMultipleTransactions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsMultipleTransactions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsNonNullableColumns() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsNonNullableColumns")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsMinimumSQLGrammar() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsMinimumSQLGrammar")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsCoreSQLGrammar() throws SQLException {
-        return ((ObjectResult) engine.execute(new Exec(this,
-                        "supportsCoreSQLGrammar")
-                , connection.getTraceId(), getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsExtendedSQLGrammar() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsExtendedSQLGrammar")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsANSI92EntryLevelSQL")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsANSI92IntermediateSQL() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsANSI92IntermediateSQL")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsANSI92FullSQL() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsANSI92FullSQL")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsIntegrityEnhancementFacility")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsOuterJoins() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsOuterJoins")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsFullOuterJoins() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsFullOuterJoins")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsLimitedOuterJoins() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsLimitedOuterJoins")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getSchemaTerm() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getSchemaTerm")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getProcedureTerm() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getProcedureTerm")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getCatalogTerm() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getCatalogTerm")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean isCatalogAtStart() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "isCatalogAtStart")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public String getCatalogSeparator() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getCatalogSeparator")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSchemasInDataManipulation() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSchemasInDataManipulation")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSchemasInProcedureCalls() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSchemasInProcedureCalls")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSchemasInTableDefinitions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSchemasInTableDefinitions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSchemasInIndexDefinitions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSchemasInPrivilegeDefinitions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsCatalogsInDataManipulation() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsCatalogsInDataManipulation")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsCatalogsInProcedureCalls")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsCatalogsInTableDefinitions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsCatalogsInIndexDefinitions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsCatalogsInPrivilegeDefinitions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsPositionedDelete() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsPositionedDelete")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsPositionedUpdate() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsPositionedUpdate")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSelectForUpdate() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSelectForUpdate")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsStoredProcedures() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsStoredProcedures")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSubqueriesInComparisons() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSubqueriesInComparisons")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSubqueriesInExists() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSubqueriesInExists")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSubqueriesInIns() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSubqueriesInIns")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSubqueriesInQuantifieds")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsCorrelatedSubqueries() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsCorrelatedSubqueries")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsUnion() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsUnion")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsUnionAll() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsUnionAll")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsOpenCursorsAcrossCommit")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsOpenCursorsAcrossRollback")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsOpenStatementsAcrossCommit")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsOpenStatementsAcrossRollback")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxBinaryLiteralLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxBinaryLiteralLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxCharLiteralLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxCharLiteralLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxColumnNameLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxColumnNameLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxColumnsInGroupBy() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxColumnsInGroupBy")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxColumnsInIndex() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxColumnsInIndex")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxColumnsInOrderBy() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxColumnsInOrderBy")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxColumnsInSelect() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxColumnsInSelect")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxColumnsInTable() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxColumnsInTable")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxConnections() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxConnections")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxCursorNameLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxCursorNameLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxIndexLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxIndexLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxSchemaNameLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxSchemaNameLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxProcedureNameLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxProcedureNameLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxCatalogNameLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxCatalogNameLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxRowSize() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxRowSize")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "doesMaxRowSizeIncludeBlobs")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxStatementLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxStatementLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxStatements() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxStatements")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxTableNameLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxTableNameLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxTablesInSelect() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxTablesInSelect")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getMaxUserNameLength() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getMaxUserNameLength")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getDefaultTransactionIsolation() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getDefaultTransactionIsolation")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsTransactions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsTransactions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsTransactionIsolationLevel(int level) throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsTransactionIsolationLevel")
-                        .withTypes(int.class)
-                        .withParameters(level)
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsDataDefinitionAndDataManipulationTransactions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsDataDefinitionAndDataManipulationTransactions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsDataManipulationTransactionsOnly() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsDataManipulationTransactionsOnly")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "dataDefinitionCausesTransactionCommit")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "dataDefinitionIgnoredInTransactions")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
 
     @Override
     public ResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) throws SQLException {
@@ -1096,6 +1204,148 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
     }
 
     @Override
+    public ResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getUDTs")
+                        .withTypes(String.class,String.class,String.class,int[].class)
+                        .withParameters(catalog,schemaPattern,typeNamePattern,types)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public ResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getSuperTypes")
+                        .withTypes(String.class,String.class,String.class)
+                        .withParameters(catalog,schemaPattern,typeNamePattern)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getSuperTables")
+                        .withTypes(String.class,String.class,String.class)
+                        .withParameters(catalog,schemaPattern,tableNamePattern)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getAttributes")
+                        .withTypes(String.class,String.class,String.class,String.class)
+                        .withParameters(catalog,schemaPattern,typeNamePattern,attributeNamePattern)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+
+    @Override
+    public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getSchemas")
+                        .withTypes(String.class,String.class)
+                        .withParameters(catalog,schemaPattern)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public ResultSet getClientInfoProperties() throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getClientInfoProperties")
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getFunctions")
+                        .withTypes(String.class,String.class,String.class)
+                        .withParameters(catalog,schemaPattern,functionNamePattern)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public ResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern, String columnNamePattern) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getFunctionColumns")
+                        .withTypes(String.class,String.class,String.class,String.class)
+                        .withParameters(catalog,schemaPattern,functionNamePattern,columnNamePattern)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
+        var result = (JdbcResultSet)engine.execute(new Exec(this,
+                        "getPseudoColumns")
+                        .withTypes(String.class,String.class,String.class,String.class)
+                        .withParameters(catalog,schemaPattern,tableNamePattern,columnNamePattern)
+                ,connection.getTraceId(),getTraceId());
+        result.setEngine(engine);
+        result.setConnection(connection);
+        return result;
+    }
+
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return (T)this;
+    }
+
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return iface.isAssignableFrom(JdbcDatabaseMetaData.class);
+    }
+
+    @Override
+    public RowIdLifetime getRowIdLifetime() throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(this,
+                        "getRowIdLifetime")
+                ,connection.getTraceId(),getTraceId())).getResult();
+    }
+
+    @Override
+    public boolean supportsConvert(int fromType, int toType) throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(this,
+                        "supportsConvert")
+                        .withTypes(int.class,int.class)
+                        .withParameters(fromType,toType)
+                ,connection.getTraceId(),getTraceId())).getResult();
+    }
+
+    @Override
+    public boolean supportsTransactionIsolationLevel(int level) throws SQLException {
+        return ((ObjectResult)engine.execute(new Exec(this,
+                        "supportsTransactionIsolationLevel")
+                        .withTypes(int.class)
+                        .withParameters(level)
+                ,connection.getTraceId(),getTraceId())).getResult();
+    }
+
+    @Override
     public boolean supportsResultSetType(int type) throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(this,
                         "supportsResultSetType")
@@ -1195,89 +1445,6 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
     }
 
     @Override
-    public boolean supportsBatchUpdates() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsBatchUpdates")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public ResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getUDTs")
-                        .withTypes(String.class,String.class,String.class,int[].class)
-                        .withParameters(catalog,schemaPattern,typeNamePattern,types)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public boolean supportsSavepoints() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsSavepoints")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsNamedParameters() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsNamedParameters")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsMultipleOpenResults() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsMultipleOpenResults")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsGetGeneratedKeys() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsGetGeneratedKeys")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public ResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getSuperTypes")
-                        .withTypes(String.class,String.class,String.class)
-                        .withParameters(catalog,schemaPattern,typeNamePattern)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getSuperTables")
-                        .withTypes(String.class,String.class,String.class)
-                        .withParameters(catalog,schemaPattern,tableNamePattern)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getAttributes")
-                        .withTypes(String.class,String.class,String.class,String.class)
-                        .withParameters(catalog,schemaPattern,typeNamePattern,attributeNamePattern)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
     public boolean supportsResultSetHoldability(int holdability) throws SQLException {
         return ((ObjectResult)engine.execute(new Exec(this,
                         "supportsResultSetHoldability")
@@ -1286,156 +1453,8 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
                 ,connection.getTraceId(),getTraceId())).getResult();
     }
 
-    @Override
-    public int getResultSetHoldability() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getResultSetHoldability")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getDatabaseMajorVersion() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getDatabaseMajorVersion")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getDatabaseMinorVersion() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getDatabaseMinorVersion")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getJDBCMajorVersion() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getJDBCMajorVersion")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getJDBCMinorVersion() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getJDBCMinorVersion")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public int getSQLStateType() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getSQLStateType")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean locatorsUpdateCopy() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "locatorsUpdateCopy")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean supportsStatementPooling() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsStatementPooling")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-
-    @Override
-    public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getSchemas")
-                        .withTypes(String.class,String.class)
-                        .withParameters(catalog,schemaPattern)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "supportsStoredFunctionsUsingCallSyntax")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "autoCommitFailureClosesAllResultSets")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public ResultSet getClientInfoProperties() throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getClientInfoProperties")
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getFunctions")
-                        .withTypes(String.class,String.class,String.class)
-                        .withParameters(catalog,schemaPattern,functionNamePattern)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public ResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern, String columnNamePattern) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getFunctionColumns")
-                        .withTypes(String.class,String.class,String.class,String.class)
-                        .withParameters(catalog,schemaPattern,functionNamePattern,columnNamePattern)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
-        var result = (JdbcResultSet)engine.execute(new Exec(this,
-                        "getPseudoColumns")
-                        .withTypes(String.class,String.class,String.class,String.class)
-                        .withParameters(catalog,schemaPattern,tableNamePattern,columnNamePattern)
-                ,connection.getTraceId(),getTraceId());
-        result.setEngine(engine);
-        result.setConnection(connection);
-        return result;
-    }
-
-    @Override
-    public boolean generatedKeyAlwaysReturned() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "generatedKeyAlwaysReturned")
-                ,connection.getTraceId(),getTraceId())).getResult();
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        return (T)this;
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return iface.isAssignableFrom(JdbcDatabaseMetaData.class);
-    }
-
-    @Override
-    public RowIdLifetime getRowIdLifetime() throws SQLException {
-        return ((ObjectResult)engine.execute(new Exec(this,
-                        "getRowIdLifetime")
-                ,connection.getTraceId(),getTraceId())).getResult();
+    public void initialize(JdbcConnection jdbcConnection, Engine engine) {
+        this.connection=jdbcConnection;
+        this.engine=engine;
     }
 }

@@ -62,6 +62,7 @@ public class JdbcTypesConverter {
         }if(ClassUtils.isAssignable(resultObject.getClass(), DatabaseMetaData.class)){
             var rstst = (DatabaseMetaData)resultObject;
             var result = new JdbcDatabaseMetaData();
+            result.fill(rstst);
             result.setTraceId(traceId.get());
             return result;
         }

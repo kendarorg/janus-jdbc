@@ -170,6 +170,7 @@ public class JdbcDriver implements Driver {
     }
 
     public void refreshConnection(Long connectionId) {
-
+        long time = Calendar.getInstance().getTimeInMillis();
+        connections.get(connectionId).setExpiration(time+5000);
     }
 }

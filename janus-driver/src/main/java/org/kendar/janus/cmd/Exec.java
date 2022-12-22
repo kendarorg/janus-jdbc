@@ -34,6 +34,9 @@ public class Exec implements JdbcCommand {
 
     public Exec(Object initiator,String name) {
         this.initiator = initiator.getClass().getSimpleName();
+        if(this.initiator.startsWith("Jdbc")){
+            this.initiator = this.initiator.substring(4);
+        }
         this.name = name;
         this.paramType = EMPTY_TYPES;
         this.parameters = EMPTY_PARAMS;

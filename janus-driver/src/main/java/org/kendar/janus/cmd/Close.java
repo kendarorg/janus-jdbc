@@ -20,7 +20,11 @@ public class Close implements JdbcCommand {
     }
 
     public Close(Object initiator){
+
         this.initiator = initiator.getClass().getSimpleName();
+        if(this.initiator.startsWith("Jdbc")){
+            this.initiator = this.initiator.substring(4);
+        }
     }
 
 

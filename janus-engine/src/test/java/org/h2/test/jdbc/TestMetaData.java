@@ -724,10 +724,13 @@ public class TestMetaData extends TestDb {
         stat.execute("SET DEFAULT_NULL_ORDERING LOW");
         testNullsAreSortedAt(meta, DefaultNullOrdering.LOW);
         stat.execute("SET DEFAULT_NULL_ORDERING HIGH");
+        meta = conn.getMetaData();
         testNullsAreSortedAt(meta, DefaultNullOrdering.HIGH);
         stat.execute("SET DEFAULT_NULL_ORDERING FIRST");
+        meta = conn.getMetaData();
         testNullsAreSortedAt(meta, DefaultNullOrdering.FIRST);
         stat.execute("SET DEFAULT_NULL_ORDERING LAST");
+        meta = conn.getMetaData();
         testNullsAreSortedAt(meta, DefaultNullOrdering.LAST);
         stat.execute("SET DEFAULT_NULL_ORDERING LOW");
         conn.close();
