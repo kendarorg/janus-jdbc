@@ -30,12 +30,16 @@ public class DriverEngine implements Engine {
         jdbcDriver.refreshConnection(connectionId);
         var ser = serializer.newInstance();
         try {
+            var path = url+command.getPath()+"/"+uid;
+            if(command.getPath().startsWith("/Connection/")){
+                path = url+command.getPath();
+            }
             ser.write("command", command);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .header("Content-type","application/json")
                     .header("X-Connection-Id",connectionId.toString())
-                    .uri(URI.create(url+command.getPath()+"/"+uid))
+                    .uri(URI.create(path))
                     .POST(HttpRequest.BodyPublishers.ofString((String) ser.getSerialized()))
                     .build();
 

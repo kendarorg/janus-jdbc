@@ -29,7 +29,11 @@ public class JsonServer implements Engine {
         JdbcCommand deserialized = getIjCommand(command);
 
         System.out.println("============================================");
-        System.out.println("INPUT "+deserialized);
+        var toPrint = deserialized.toString();
+        if(toPrint.length()>1000){
+            toPrint = toPrint.substring(0,1000);
+        }
+        System.out.println("INPUT "+toPrint);
         var result = engine.execute(deserialized,connectionId,uid);
 
         if(result instanceof ObjectResult){
