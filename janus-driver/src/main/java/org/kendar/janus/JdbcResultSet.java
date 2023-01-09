@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.base.Converter;
+//import com.google.common.base.Converter;
 import com.toddfast.util.convert.TypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.kendar.janus.cmd.Close;
@@ -181,6 +181,7 @@ public class JdbcResultSet implements JdbcResult, ResultSet {
             }
         }
 
+        lastRow=true;
         var rowsCount = 0;
         rows = new ArrayList<>();
         while(rs.next()){
