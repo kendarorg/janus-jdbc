@@ -1,17 +1,16 @@
 package org.kendar.janus.cmd.preparedstatement;
 
-import jdk.jshell.spi.ExecutionControl;
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcBatchPreparedStatementParameters;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcSqlCommand;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 
-import javax.naming.OperationNotSupportedException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
-public class PreparedStatementExecuteLargeUpdate implements JdbcCommand {
+public class PreparedStatementExecuteLargeUpdate implements JdbcCommand, JdbcSqlCommand, JdbcBatchPreparedStatementParameters {
     private int[] columnIndexes;
     private  String[] columnNames;
     private List<List<PreparedStatementParameter>> batches;
@@ -102,5 +101,15 @@ public class PreparedStatementExecuteLargeUpdate implements JdbcCommand {
     @Override
     public String getPath() {
         return "/PreparedStatement/executeLargeUpdate";
+    }
+
+    @Override
+    public String getSql() {
+        return sql;
+    }
+
+    @Override
+    public List<List<PreparedStatementParameter>> getBatches() {
+        return batches;
     }
 }

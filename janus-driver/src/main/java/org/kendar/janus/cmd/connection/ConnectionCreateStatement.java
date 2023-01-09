@@ -1,6 +1,6 @@
 package org.kendar.janus.cmd.connection;
 
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;

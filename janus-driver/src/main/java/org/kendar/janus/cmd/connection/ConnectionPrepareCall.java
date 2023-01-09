@@ -1,8 +1,6 @@
 package org.kendar.janus.cmd.connection;
 
-import org.kendar.janus.cmd.JdbcCommand;
 import org.kendar.janus.enums.ResultSetHoldability;
-import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 
 import java.sql.Connection;

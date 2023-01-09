@@ -1,6 +1,7 @@
 package org.kendar.janus.cmd.statement;
 
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcSqlBatches;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 
@@ -8,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-public class StatementExecuteBatch implements JdbcCommand {
+public class StatementExecuteBatch implements JdbcCommand, JdbcSqlBatches {
     private List<String> batches;
 
     public StatementExecuteBatch(){
@@ -49,5 +50,10 @@ public class StatementExecuteBatch implements JdbcCommand {
     @Override
     public String getPath() {
         return "/Statement/executeBatch";
+    }
+
+    @Override
+    public List<String> getBatches() {
+        return batches;
     }
 }

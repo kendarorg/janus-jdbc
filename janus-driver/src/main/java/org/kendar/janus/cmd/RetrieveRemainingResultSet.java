@@ -1,5 +1,6 @@
 package org.kendar.janus.cmd;
 
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.results.RemainingResultSetResult;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;

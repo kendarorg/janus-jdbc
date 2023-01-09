@@ -1,7 +1,7 @@
 package org.kendar.janus.cmd.resultset;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 import org.kendar.janus.types.*;

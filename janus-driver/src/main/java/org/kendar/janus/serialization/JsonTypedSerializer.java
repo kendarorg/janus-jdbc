@@ -1,21 +1,31 @@
 package org.kendar.janus.serialization;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.PropertyFilter;
+import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class JsonTypedSerializer implements TypedSerializer {
     public static final String MAP_KEY_INDEX = "_key";
@@ -23,13 +33,20 @@ public class JsonTypedSerializer implements TypedSerializer {
     public static final String ARRAY_ITEM_INDEX = "_";
     private static ObjectMapper mapper = new ObjectMapper();
 
+
     static{
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+
+
     }
+
+
+
 
     private JsonNode root = null;
     private JsonNode currentNode = null;
+
 
     @Override
     public void write(String key, Object value) {
@@ -243,7 +260,7 @@ public class JsonTypedSerializer implements TypedSerializer {
         return constructor.newInstance();
     }
 
-    public TypedSerializer newInstance(Object ... params) {
+    public TypedSerializer newInstance() {
         return new JsonTypedSerializer();
     }
 
@@ -255,6 +272,43 @@ public class JsonTypedSerializer implements TypedSerializer {
             throw new RuntimeException(e);
         }
     }
+
+    public Object getSimpleSerialized(){
+        String serialized = (String) getSerialized();
+        try{
+            var nd = mapper.readTree(serialized);
+            cleanNd(nd);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(nd);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void cleanNd(JsonNode jsonNode) {
+        if (jsonNode.isObject()) {
+            ObjectNode objectNode = (ObjectNode) jsonNode;
+            Iterator<Map.Entry<String, JsonNode>> iter = objectNode.fields();
+
+            List<String> toRemove = new ArrayList<>();
+            while (iter.hasNext()) {
+                Map.Entry<String, JsonNode> entry = iter.next();
+                if(entry.getKey().startsWith("[")||entry.getKey().startsWith(":")||entry.getKey().startsWith("|")){
+                    toRemove.add(entry.getKey());
+                }
+                cleanNd( entry.getValue());
+            }
+            for(var tor:toRemove){
+                objectNode.remove(tor);
+            }
+        } else if (jsonNode.isArray()) {
+            ArrayNode arrayNode = (ArrayNode) jsonNode;
+
+            for (int i = 0; i < arrayNode.size(); i++) {
+                cleanNd( arrayNode.get(i));
+            }
+        }
+    }
+
 
     @Override
     public void deserialize(Object toDeserialize) {

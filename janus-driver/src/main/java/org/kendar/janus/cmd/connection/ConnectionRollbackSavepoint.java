@@ -1,7 +1,6 @@
 package org.kendar.janus.cmd.connection;
 
-import org.kendar.janus.JdbcConnection;
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 

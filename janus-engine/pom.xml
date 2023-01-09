@@ -5,7 +5,7 @@
     <parent>
         <artifactId>janus</artifactId>
         <groupId>org.kendar</groupId>
-        <version>1.0.11-SNAPSHOT</version>
+        <version>1.0.14-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.kendar</groupId>
             <artifactId>janus-driver</artifactId>
-            <version>1.0.11-SNAPSHOT</version>
+            <version>1.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

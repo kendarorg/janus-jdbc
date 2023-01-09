@@ -1,9 +1,8 @@
 package org.kendar.janus.server;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.kendar.janus.JdbcConnection;
 import org.kendar.janus.cmd.Close;
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.cmd.connection.ConnectionConnect;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.JdbcResult;
@@ -72,7 +71,7 @@ public class ServerEngine implements Engine {
                 expireConnections();
             }
         }, 0, 500);
-        this.maxRows = 3;
+        this.maxRows = 100;
         this.prefetchMetadata = false;
         this.charset = "UTF-8";
         this.queryTimeout = 0;
@@ -98,7 +97,9 @@ public class ServerEngine implements Engine {
 
     @Override
     public Engine create() {
-        return new ServerEngine(connectionString,login,password);
+        var result = new ServerEngine(connectionString,login,password);
+        result.setMaxRows(this.maxRows);
+        return result;
     }
 
     private JdbcResult handleClose(Close command, Long connectionId, Long uid) throws SQLException {

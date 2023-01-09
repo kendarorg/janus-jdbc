@@ -1,19 +1,25 @@
 package org.kendar.janus.cmd.preparedstatement;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcPreparedStatementParameters;
+import org.kendar.janus.cmd.interfaces.JdbcSqlCommand;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PreparedStatementExecuteBase implements JdbcCommand {
+public abstract class PreparedStatementExecuteBase implements JdbcCommand, JdbcSqlCommand, JdbcPreparedStatementParameters {
     protected String sql;
     protected List<PreparedStatementParameter> parameters;
+
+    public String getSql(){
+        return sql;
+    }
 
     public PreparedStatementExecuteBase(){
 
@@ -71,5 +77,11 @@ public abstract class PreparedStatementExecuteBase implements JdbcCommand {
                 "\n\tsql='" + sql + '\'' +
                 ", \n\tparameters=" + parameters +
                 '}';
+    }
+
+
+    @Override
+    public List<PreparedStatementParameter> getParameters() {
+        return parameters;
     }
 }

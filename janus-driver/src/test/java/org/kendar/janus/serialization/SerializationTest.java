@@ -194,4 +194,28 @@ public class SerializationTest {
         var deserialized = (int[][]) serializer.read("command");
         assertArrayEquals(data, deserialized);
     }
+
+    @Test
+    void testConnectCommandSimple() {
+        String expected ="{\n" +
+                "  \"command\" : {\n" +
+                "    \"database\" : \"https://www.google.com\",\n" +
+                "    \"properties\" : [ {\n" +
+                "      \"_key\" : \"test\",\n" +
+                "      \"_value\" : \"value\"\n" +
+                "    } ],\n" +
+                "    \"clientinfo\" : [ ]\n" +
+                "  }\n" +
+                "}";
+        var serializer = (TypedSerializer) new JsonTypedSerializer();
+        var properties = new Properties();
+        properties.put("test", "value");
+        var clientInfo = new Properties();
+        var data = new ConnectionConnect(("https://www.google.com"), properties, clientInfo);
+        serializer.write("command", data);
+        var result = (String)serializer.getSimpleSerialized();
+        assertEquals(expected,result);
+    }
+
+
 }

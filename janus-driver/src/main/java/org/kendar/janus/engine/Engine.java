@@ -1,6 +1,6 @@
 package org.kendar.janus.engine;
 
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.results.JdbcResult;
 
 import java.sql.SQLException;

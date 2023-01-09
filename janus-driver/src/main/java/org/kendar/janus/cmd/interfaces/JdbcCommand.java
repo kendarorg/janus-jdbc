@@ -1,4 +1,4 @@
-package org.kendar.janus.cmd;
+package org.kendar.janus.cmd.interfaces;
 
 import org.kendar.janus.serialization.TypedSerializable;
 import org.kendar.janus.server.JdbcContext;

@@ -1,6 +1,7 @@
 package org.kendar.janus.cmd.statement;
 
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcSqlCommand;
 import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
@@ -8,7 +9,7 @@ import org.kendar.janus.server.JdbcContext;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class StatementExecuteQuery implements JdbcCommand {
+public class StatementExecuteQuery implements JdbcCommand, JdbcSqlCommand {
     private String sql;
     private ResultSetType resultSetType;
 
