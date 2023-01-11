@@ -130,10 +130,10 @@ public class Exec implements JdbcCommand {
         var result = "Exec{" +
                 "\n\tname='" + name + '\'';
         if(paramType!=null && paramType.length>0) {
-            result += ", \n\tparamType=" + Arrays.toString(paramType);
+            result += ", \n\tparamType=" + Arrays.deepToString(paramType);
         }
         if(parameters!=null && parameters.length>0) {
-            result+= ", \n\tparameters=" + Arrays.toString(parameters);
+            result+= ", \n\tparameters=" + Arrays.deepToString(parameters);
         }
         result+= '}';
         return result;
