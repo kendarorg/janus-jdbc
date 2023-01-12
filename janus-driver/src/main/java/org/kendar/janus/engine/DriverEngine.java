@@ -36,6 +36,7 @@ public class DriverEngine implements Engine {
             }
             ser.write("command", command);
             HttpClient client = HttpClient.newHttpClient();
+
             HttpRequest request = HttpRequest.newBuilder()
                     .header("Content-type","application/json")
                     .header("X-Connection-Id",connectionId.toString())
