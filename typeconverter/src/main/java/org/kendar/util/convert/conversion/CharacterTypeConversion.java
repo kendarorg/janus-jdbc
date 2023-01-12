@@ -1,6 +1,6 @@
-package com.toddfast.util.convert.conversion;
+package org.kendar.util.convert.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
+import org.kendar.util.convert.TypeConverter;
 
 /**
  * Convert to a character by parsing the first character of the value

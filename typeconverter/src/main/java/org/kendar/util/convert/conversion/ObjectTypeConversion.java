@@ -1,6 +1,6 @@
-package com.toddfast.util.convert.conversion;
+package org.kendar.util.convert.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
+import org.kendar.util.convert.TypeConverter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;

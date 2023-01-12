@@ -1,13 +1,9 @@
 package org.kendar.janus;
 
-import com.toddfast.util.convert.TypeConverter;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CharSequenceReader;
 import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.preparedstatement.*;
 import org.kendar.janus.cmd.preparedstatement.parameters.*;
-import org.kendar.janus.cmd.statement.StatementExecuteLargeBatch;
-import org.kendar.janus.cmd.statement.StatementExecuteLargeUpdate;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
@@ -22,10 +18,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.time.OffsetTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;

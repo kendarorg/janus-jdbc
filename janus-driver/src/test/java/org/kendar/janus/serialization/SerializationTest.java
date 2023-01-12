@@ -214,7 +214,7 @@ public class SerializationTest {
         var data = new ConnectionConnect(("https://www.google.com"), properties, clientInfo);
         serializer.write("command", data);
         var result = (String)serializer.getSimpleSerialized();
-        assertEquals(expected,result);
+        assertEquals(expected,result.replaceAll("\r\n","\n"));
     }
 
 

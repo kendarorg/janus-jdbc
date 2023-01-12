@@ -1,10 +1,8 @@
-package com.toddfast.util.convert.conversion;
+package org.kendar.util.convert.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
-import com.toddfast.util.convert.TypeConverterException;
+import org.kendar.util.convert.TypeConverter;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.Locale;
 
 /**

@@ -1,11 +1,7 @@
 package org.kendar.janus;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 //import com.google.common.base.Converter;
-import com.toddfast.util.convert.TypeConverter;
+import org.kendar.util.convert.TypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.kendar.janus.cmd.Close;
 import org.kendar.janus.cmd.Exec;
@@ -26,17 +22,12 @@ import org.kendar.janus.utils.JdbcTypesConverter;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
+        import java.math.RoundingMode;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+        import java.util.*;
 
 public class JdbcResultSet implements JdbcResult, ResultSet {
     private JdbcResultsetMetaData metadata;

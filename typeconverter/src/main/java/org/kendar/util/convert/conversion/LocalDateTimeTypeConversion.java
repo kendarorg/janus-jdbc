@@ -1,14 +1,11 @@
-package com.toddfast.util.convert.conversion;
+package org.kendar.util.convert.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
+import org.kendar.util.convert.TypeConverter;
 
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Locale;
 
 /**
@@ -17,14 +14,14 @@ import java.util.Locale;
  *
  * @see	Date#valueOf(String)
  */
-public class LocalDateTypeConversion implements TypeConverter.Conversion {
+public class LocalDateTimeTypeConversion implements TypeConverter.Conversion {
 
 	@Override
 	public Object[] getTypeKeys() {
 		return new Object[] {
-			LocalDate.class,
-				LocalDate.class.getName(),
-			TypeConverter.TYPE_LOCAL_DATE
+			LocalDateTime.class,
+				LocalDateTime.class.getName(),
+			TypeConverter.TYPE_LOCAL_DATE_TIME
 		};
 	}
 
@@ -37,21 +34,26 @@ public class LocalDateTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
-					return ((Date) value).toLocalDate();
+				return ((Date)value).toInstant()
+						.atZone(ZoneId.systemDefault())
+						.toLocalDateTime();
 			}
-			case("localdatetime"): {
-				return ((LocalDateTime)value).toLocalDate();
+			case("localdate"): {
+				return ((LocalDate)value).atStartOfDay();
 			}
 			case("localtime"): {
 				LocalDate today = LocalDate.now();
-				return ((LocalTime)value).atDate(today).toLocalDate();
+				return ((LocalTime)value).atDate(today);
 			}
 			case("time"): {
 				LocalDate today = LocalDate.now();
-				return ((Time)value).toLocalTime().atDate(today).toLocalDate();
+				return ((Time)value).toLocalTime().atDate(today);
 			}
 			case ("timestamp"): {
-				return ((Timestamp)value).toLocalDateTime().toLocalDate();
+				return ((Timestamp)value).toLocalDateTime();
+			}
+			case ("offsetdatetime"): {
+				return ((OffsetDateTime)value).atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 			}
 			default: {
 				throw new RuntimeException("Can't convert type to timestamp: " + value.getClass());

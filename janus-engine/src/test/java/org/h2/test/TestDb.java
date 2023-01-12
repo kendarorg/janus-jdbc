@@ -1,6 +1,6 @@
 package org.h2.test;
 
-import com.toddfast.util.convert.TypeConverter;
+import org.kendar.util.convert.TypeConverter;
 import org.junit.jupiter.api.Assertions;
 import org.kendar.janus.utils.TestBase;
 

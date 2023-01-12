@@ -1,6 +1,7 @@
 package com.toddfast.util.convert;
 
 import org.junit.jupiter.api.Test;
+import org.kendar.util.convert.TypeConverter;
 
 import java.math.BigDecimal;
 
@@ -19,7 +20,7 @@ public class TypeConverterTest {
 
 		String big="1234567890123456789012345678901234567890123456789012345678";
 		in=big;
-		out=TypeConverter.convert(BigDecimal.class,in);
+		out= TypeConverter.convert(BigDecimal.class,in);
 		assertTrue(out instanceof BigDecimal);
 		assertEquals(new BigDecimal(big),out);
 	}

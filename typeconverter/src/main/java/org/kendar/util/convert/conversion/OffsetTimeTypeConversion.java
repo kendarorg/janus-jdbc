@@ -1,14 +1,9 @@
-package com.toddfast.util.convert.conversion;
+package org.kendar.util.convert.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
+import org.kendar.util.convert.TypeConverter;
 
 import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.*;
-import java.util.Locale;
-
-import static com.toddfast.util.convert.Utils.getPureTime;
 
 /**
  * Convert to a {@link SqlTime} by parsing a value as a string of

@@ -3,15 +3,14 @@
 	<parent>
 		<artifactId>janus</artifactId>
 		<groupId>org.kendar</groupId>
-		<version>1.0.16-SNAPSHOT</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<groupId>org.kendar</groupId>
 	<artifactId>typeconverter</artifactId>
-	<version>1.0.16-SNAPSHOT</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>toddfast-typeconverter</name>
 
 	<description>Provides an efficient and robust mechanism for converting an
 		object to a different type.</description>

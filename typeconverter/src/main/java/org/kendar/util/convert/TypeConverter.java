@@ -1,7 +1,7 @@
-package com.toddfast.util.convert;
+package org.kendar.util.convert;
 
-import com.toddfast.util.convert.conversion.IdentityTypeConversion;
-import com.toddfast.util.convert.conversion.ObjectTypeConversion;
+import org.kendar.util.convert.conversion.IdentityTypeConversion;
+import org.kendar.util.convert.conversion.ObjectTypeConversion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -884,7 +884,6 @@ public class TypeConverter {
 			ServiceLoader.load(Conversion.class);
 
 		for (Conversion<?> conversion: loader) {
-			System.out.println(conversion.getClass().getSimpleName());
 			registerTypeConversion(conversion);
 		}
 

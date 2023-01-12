@@ -1,4 +1,4 @@
-package com.toddfast.util.convert;
+package org.kendar.util.convert;
 
 import java.sql.Date;
 import java.sql.Time;
