@@ -76,7 +76,7 @@ public class JdbcDriver implements Driver {
             try{
                 var uri = URI.create(url.substring(JDBC_IDENTIFIER.length()));
 
-                log.info("IjDriver-URL: {0}", uri);
+                log.debug("IjDriver-URL: "+ uri);
                 if(!isHttpOrHttps(uri)){
                     throw new SQLException("Unknown protocol: " + uri.getScheme());
                 }
