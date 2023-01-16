@@ -16,7 +16,34 @@ So using the driver means
 * Connect to the Janus-server like "jdbc:janus:http://localhost/db?fetchSize=3&charset=UTF-8"
 * Look all messages passing
 
-Tested (poorly but tested) with Hibernate
+Tested with Hibernate
+
+## Repository
+
+Add this to your repositories in poms
+
+
+        <repositories>
+            <repository>
+                <id>kendar</id>
+                <name>Kendar Repository</name>
+                <url>https://maven.kendar.org/maven2/releases</url>
+                <layout>default</layout>
+                <snapshots>
+                    <enabled>false</enabled>
+                </snapshots>
+            </repository>
+            <repository>
+                <id>kendar2</id>
+                <name>Kendar Repository2</name>
+                <url>https://maven.kendar.org/maven2/snapshots</url>
+                <layout>default</layout>
+                <snapshots>
+                    <enabled>true</enabled>
+                </snapshots>
+            </repository>
+        </repositories>
+
 
 ## Implementation
 

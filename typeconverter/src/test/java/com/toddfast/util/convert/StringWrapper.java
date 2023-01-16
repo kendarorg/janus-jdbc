@@ -1,5 +1,7 @@
 package com.toddfast.util.convert;
 
+import org.kendar.util.convert.TypeConverter;
+
 /**
  *
  *
@@ -30,5 +32,5 @@ public class StringWrapper {
 		}
 	}
 
-	private String value;
+	private final String value;
 }

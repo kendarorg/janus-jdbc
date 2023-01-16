@@ -1,5 +1,7 @@
 package com.toddfast.util.convert;
 
+import org.kendar.util.convert.TypeConverter;
+
 /**
  * Potentially returns a different set of
  *

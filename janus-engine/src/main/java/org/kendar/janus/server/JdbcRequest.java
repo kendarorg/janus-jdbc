@@ -1,6 +1,6 @@
 package org.kendar.janus.server;
 
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 
 public class JdbcRequest {
     private JdbcCommand command;

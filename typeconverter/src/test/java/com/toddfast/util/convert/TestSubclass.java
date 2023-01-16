@@ -1,8 +1,8 @@
 package com.toddfast.util.convert;
 
-import com.toddfast.util.convert.TypeConverter.Convertible;
-import com.toddfast.util.convert.TypeConverter.Listener;
-import com.toddfast.util.convert.TypeConverter.Conversion;
+import org.kendar.util.convert.TypeConverter.Convertible;
+import org.kendar.util.convert.TypeConverter.Listener;
+import org.kendar.util.convert.TypeConverter.Conversion;
 
 /**
  *
@@ -36,7 +36,7 @@ public class TestSubclass extends TestSuperclass
 				return "Converted Test value";
 			}
 
-			private Object key=targetTypeKey;
+			private final Object key=targetTypeKey;
 		};
 	}
 }

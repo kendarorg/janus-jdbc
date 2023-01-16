@@ -2,26 +2,28 @@ package org.kendar.janus.server;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.kendar.janus.cmd.Close;
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.cmd.connection.ConnectionConnect;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.JdbcResult;
+import org.kendar.janus.results.ObjectResult;
 import org.kendar.janus.utils.JdbcTypesConverter;
 import org.kendar.janus.utils.LoggerWrapper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class ServerEngine implements Engine {
     static ConcurrentHashMap<Long, JdbcContext> contexts = new ConcurrentHashMap<>();
+    static ConcurrentLinkedQueue<Long> indexes = new ConcurrentLinkedQueue<>();
     static LoggerWrapper log = LoggerWrapper.getLogger(ServerEngine.class);
+    private final Timer timer;
     private int maxRows;
 
     public void setMaxRows(int maxRows) {
@@ -51,9 +53,9 @@ public class ServerEngine implements Engine {
     private boolean prefetchMetadata;
     private String charset;
     private int queryTimeout;
-    private String connectionString;
-    private String login;
-    private String password;
+    private final String connectionString;
+    private final String login;
+    private final String password;
     private final AtomicLong traceId = new AtomicLong();
 
     private long getTraceId(){
@@ -62,7 +64,14 @@ public class ServerEngine implements Engine {
 
     public ServerEngine(String connectionString, String login, String password) {
 
-        this.maxRows = 3;
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                expireConnections();
+            }
+        }, 0, 500);
+        this.maxRows = 100;
         this.prefetchMetadata = false;
         this.charset = "UTF-8";
         this.queryTimeout = 0;
@@ -71,9 +80,37 @@ public class ServerEngine implements Engine {
         this.password = password;
     }
 
+    protected void expireConnections(){
+        var all = new ArrayList<>(contexts.entrySet());
+        for(var context: all) {
+            long time = Calendar.getInstance().getTimeInMillis();
+            //noinspection CatchMayIgnoreException
+            try {
+                if (context.getValue().getConnection().isClosed() ||
+                        !context.getValue().getConnection().isValid(500)) {
+                    handle(new Close(context.getValue().getConnection()), context.getKey(), context.getKey());
+                }
+            }catch(Exception ex){
+
+            }
+        }
+    }
+
     @Override
     public Engine create() {
-        return new ServerEngine(connectionString,login,password);
+        var result = new ServerEngine(connectionString,login,password);
+        result.setMaxRows(this.maxRows);
+        return result;
+    }
+
+    private JdbcResult handleClose(Close command, Long connectionId, Long uid) throws SQLException {
+        command.execute(contexts.get(connectionId),uid);
+        return null;
+    }
+
+    private void removeContext(long id) {
+        contexts.remove(id);
+        indexes.add(id);
     }
 
     @Override
@@ -83,21 +120,41 @@ public class ServerEngine implements Engine {
                 var recording = recordings.get(currentRecording);
                 var result = recording.get((int) replayIndex);
                 replayIndex++;
-                return (JdbcResult) result.getResponse();
+                return result.getResponse();
             }
-            JdbcResult result = null;
-            Object resultObject = null;
-            Long traceId = null;
+            JdbcResult result;
+            Object resultObject;
+            var traceId = new FinalContainer<Long>();
             if (command instanceof ConnectionConnect) {
                 resultObject = handleConnect((ConnectionConnect) command);
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId,()-> traceId.data);
             } else if (command instanceof Close) {
+                var closeCommand = (Close)command;
                 resultObject = handleClose((Close) command, connectionId, uid);
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId,()-> traceId.data);
+                if(closeCommand.isOnConnection()) {
+                    removeContext(connectionId);
+                }
             } else {
                 resultObject = handle(command, connectionId, uid);
-                traceId = getTraceId();
-                contexts.get(connectionId).put(traceId, resultObject);
+                //System.out.println(resultObject.getClass().getSimpleName());
+                var context = contexts.get(connectionId);
+                //traceId = context.getNext();
+
+                result = JdbcTypesConverter.convertResult(this, resultObject, connectionId,()->{
+                    traceId.data = context.getNext();
+                    return traceId.data;
+                });
+                if(resultObject!=null && !ClassUtils.isAssignable(result.getClass(), ObjectResult.class)) {
+                    contexts.get(connectionId).put(traceId.data, resultObject);
+                }
+                var connection = contexts.get(connectionId).getConnection();
+
+                long time = Calendar.getInstance().getTimeInMillis();
+                time+=connection.getNetworkTimeout();
+                contexts.get(connectionId).updateExpiration(time);
             }
-            var toret = JdbcTypesConverter.convertResult(this, resultObject, connectionId, traceId);
+
             if (isRecording) {
                 var recording = recordings.get(currentRecording);
                 var rr = new ResponseRequest();
@@ -106,10 +163,10 @@ public class ServerEngine implements Engine {
                 jdbcRequest.setConnectionId(connectionId);
                 jdbcRequest.setConnectionId(uid);
                 rr.setRequest(jdbcRequest);
-                rr.setResponse(toret);
+                rr.setResponse(result);
                 recording.add(rr);
             }
-            return toret;
+            return result;
         }catch(SQLException ex){
             int maxDepth = 10;
 
@@ -145,7 +202,7 @@ public class ServerEngine implements Engine {
         return charset;
     }
 
-    private HashMap<UUID,List<ResponseRequest>> recordings = new HashMap<>();
+    private final HashMap<UUID,List<ResponseRequest>> recordings = new HashMap<>();
     private boolean isRecording =false;
     private boolean isReplaying =false;
     private UUID currentRecording = null;
@@ -190,12 +247,7 @@ public class ServerEngine implements Engine {
         return result;
     }
 
-    private JdbcResult handleClose(Close command, Long connectionId, Long uid) throws SQLException {
-        command.execute(contexts.get(connectionId),uid);
-        //FIXME Close everything
-        contexts.remove(traceId);
-        return null;
-    }
+
 
     private Long handleConnect(ConnectionConnect command) throws SQLException {
         log.debug("Connected to "+command.getDatabase());
@@ -212,9 +264,15 @@ public class ServerEngine implements Engine {
         Connection conn = DriverManager.
                 getConnection(connectionString, login, password);
 
-        var traceId = getTraceId();
+        var lastConnectionId =indexes.poll();
+        long traceId;
+        if(lastConnectionId!=null){
+            traceId=lastConnectionId;
+        }else {
+            traceId=getTraceId();
+        }
         contexts.put(traceId,new JdbcContext());
-        contexts.get(traceId).put(traceId,conn);
+        contexts.get(traceId).setConnection(conn);
 
         return traceId;
     }
