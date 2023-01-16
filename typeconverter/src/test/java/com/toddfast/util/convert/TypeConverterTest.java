@@ -31,7 +31,7 @@ public class TypeConverterTest {
 		Object in;
 		Object out;
 
-		in=new Integer(12);
+		in= Integer.valueOf(12);
 		out=TypeConverter.asString(in);
 		assertTrue(out instanceof String);
 		assertEquals("12",out);

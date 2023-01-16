@@ -6,18 +6,21 @@
 
     <groupId>org.kendar</groupId>
     <artifactId>janus</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <modules>
         <module>janus-driver</module>
+        <module>janus-driver-plain</module>
         <module>janus-engine</module>
         <module>typeconverter</module>
         <module>jacoco</module>
+        <module>janus-test</module>
     </modules>
     <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <janus.version>1.1.1-SNAPSHOT</janus.version>
     </properties>
 
     <repositories>

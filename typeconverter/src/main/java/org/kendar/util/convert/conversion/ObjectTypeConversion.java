@@ -29,39 +29,15 @@ public class ObjectTypeConversion implements TypeConverter.Conversion {
 		if (value.getClass().isArray()) {
 			// This is a byte array; presume we can convert it to an object
 			if (value.getClass().getComponentType()==Byte.TYPE) {
-				ByteArrayInputStream bis=
-					new ByteArrayInputStream((byte[])value);
-				ObjectInputStream ois=null;
-				try {
-					ois=new ObjectInputStream(bis);
-					value=ois.readObject();
-				}
-				catch (Exception e) {
+				try (ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) value); ObjectInputStream ois = new ObjectInputStream(bis)) {
+					value = ois.readObject();
+				} catch (Exception e) {
 					throw new IllegalArgumentException(
-						"Could not deserialize object",e);
+							"Could not deserialize object", e);
 				}
-				finally {
-					try {
-						if (ois!=null) {
-							ois.close();
-						}
-					}
-					catch (IOException e) {
-						// Ignore
-					}
-					try {
-						if (bis!=null) {
-							bis.close();
-						}
-					}
-					catch (IOException e) {
-						// Ignore
-					}
-				}
-			}
-			else {
-				; // value is OK as is
-			}
+				// Ignore
+				// Ignore
+			}//else value is OK as is
 		}
 
 		return value;

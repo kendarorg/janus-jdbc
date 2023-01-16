@@ -36,7 +36,7 @@ public class TestSubclass extends TestSuperclass
 				return "Converted Test value";
 			}
 
-			private Object key=targetTypeKey;
+			private final Object key=targetTypeKey;
 		};
 	}
 }

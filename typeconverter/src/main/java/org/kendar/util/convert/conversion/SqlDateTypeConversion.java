@@ -36,7 +36,7 @@ public class SqlDateTypeConversion implements TypeConverter.Conversion {
 		}
 		var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
 
-		Date result=null;
+		Date result;
 		switch (name) {
 			case("date"): {
 				result= (Date)value;

@@ -52,7 +52,7 @@ public class SqlTimestampTypeConversion implements TypeConverter.Conversion {
 				return new Timestamp(((Time)value).getTime());
 			}
 			case ("timestamp"): {
-				return (Timestamp)value;
+				return value;
 			}
 			default: {
 				throw new RuntimeException("Can't convert type to timestamp: " + value.getClass());

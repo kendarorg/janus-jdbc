@@ -53,9 +53,9 @@ public class ServerEngine implements Engine {
     private boolean prefetchMetadata;
     private String charset;
     private int queryTimeout;
-    private String connectionString;
-    private String login;
-    private String password;
+    private final String connectionString;
+    private final String login;
+    private final String password;
     private final AtomicLong traceId = new AtomicLong();
 
     private long getTraceId(){
@@ -81,9 +81,10 @@ public class ServerEngine implements Engine {
     }
 
     protected void expireConnections(){
-        var all = contexts.entrySet().stream().collect(Collectors.toList());
+        var all = new ArrayList<>(contexts.entrySet());
         for(var context: all) {
             long time = Calendar.getInstance().getTimeInMillis();
+            //noinspection CatchMayIgnoreException
             try {
                 if (context.getValue().getConnection().isClosed() ||
                         !context.getValue().getConnection().isValid(500)) {
@@ -119,10 +120,10 @@ public class ServerEngine implements Engine {
                 var recording = recordings.get(currentRecording);
                 var result = recording.get((int) replayIndex);
                 replayIndex++;
-                return (JdbcResult) result.getResponse();
+                return result.getResponse();
             }
-            JdbcResult result = null;
-            Object resultObject = null;
+            JdbcResult result;
+            Object resultObject;
             var traceId = new FinalContainer<Long>();
             if (command instanceof ConnectionConnect) {
                 resultObject = handleConnect((ConnectionConnect) command);
@@ -201,7 +202,7 @@ public class ServerEngine implements Engine {
         return charset;
     }
 
-    private HashMap<UUID,List<ResponseRequest>> recordings = new HashMap<>();
+    private final HashMap<UUID,List<ResponseRequest>> recordings = new HashMap<>();
     private boolean isRecording =false;
     private boolean isReplaying =false;
     private UUID currentRecording = null;
@@ -264,7 +265,7 @@ public class ServerEngine implements Engine {
                 getConnection(connectionString, login, password);
 
         var lastConnectionId =indexes.poll();
-        long traceId = 0L;
+        long traceId;
         if(lastConnectionId!=null){
             traceId=lastConnectionId;
         }else {

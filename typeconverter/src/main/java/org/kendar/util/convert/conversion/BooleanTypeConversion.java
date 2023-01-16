@@ -29,7 +29,7 @@ public class BooleanTypeConversion implements TypeConverter.Conversion {
 		var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
 		switch (name){
 			case("boolean"):
-				return (boolean) value;
+				return value;
 			case("int"):
 			case("integer"):
 				return ((int) value)!=0;

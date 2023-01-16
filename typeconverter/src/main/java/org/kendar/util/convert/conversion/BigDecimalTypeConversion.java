@@ -28,7 +28,7 @@ public class BigDecimalTypeConversion implements TypeConverter.Conversion {
 		BigDecimal result;
 		switch (name){
 			case("boolean"):
-				result = new BigDecimal(((boolean)value) ? 1.0 : 0.0);
+				result = BigDecimal.valueOf(((boolean) value) ? 1.0 : 0.0);
 				break;
 			case("int"):
 			case("integer"):
@@ -44,10 +44,10 @@ public class BigDecimalTypeConversion implements TypeConverter.Conversion {
 				result= new BigDecimal((long)value);
 				break;
 			case("float"):
-				result= new BigDecimal((float)value);
+				result= BigDecimal.valueOf((float) value);
 				break;
 			case("double"):
-				result= new BigDecimal((double)value);
+				result= BigDecimal.valueOf((double) value);
 				break;
 			case("bigdecimal"):
 				result = (BigDecimal) value;

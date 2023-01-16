@@ -3,28 +3,25 @@ Java Type Conversion (Done Well)
 
 This lightweight library (*with no dependencies*) provides a versatile, extensible, and robust mechanism for converting a Java object to a different type. For example, you can convert a `String` to an `Integer` using the TypeConverter like this:
 
-```java
+        // Convert
+        Integer i=TypeConverter.convert(Integer.class,"123");
+        
+        // Or more simply
+                int i=TypeConverter.asInt("123");
 
-
-// Convert
-Integer i=TypeConverter.convert(Integer.class,"123");
-
-// Or more simply
-        int i=TypeConverter.asInt("123");
-```
 
 Converting from a string to an integer is hardly noteworthy, but you can use the `TypeConverter` class to convert from any type to any other type just as easily, in exactly the same way. For example:
 
-```java
-// Register your custom conversion class
-TypeConverter.registerTypeConversion(new FooConversion());
 
-Bar bar = new Bar();
-Foo foo = TypeConverter.convert(Foo.class, bar);
-// -- or e.g. --
-String s = "bar";
-Foo foo = TypeConverter.convert(Foo.class, s);
-```
+        
+        // Register your custom conversion class
+        TypeConverter.registerTypeConversion(new FooConversion());
+
+        Bar bar = new Bar();
+        Foo foo = TypeConverter.convert(Foo.class, bar);
+        // -- or e.g. --
+        String s = "bar";
+        Foo foo = TypeConverter.convert(Foo.class, s);
 
 Why?
 ----
@@ -42,15 +39,15 @@ The primary class, `TypeConverter`, comes ready to convert all the primitive Jav
 
 `TypeConverter` allows specification of an arbitrary type key in the `registerTypeConversion(Object,TypeConversion)` and `convert(Object,Object)` methods. This allows a conversion object to simultaneously be registered under various keys, such as a `Class` instance, a class name, and one or more logical type names. For example, the following are valid ways of converting a string to an int:
 
-```java
-Integer i = TypeConverter.convert(Integer.class, "123");
-Integer i = (Integer) TypeConverter.convert("java.lang.Integer", "123");
-Integer i = (Integer) TypeConverter.convert(TypeConverter.TYPE_INT, "123");
-Integer i = (Integer) TypeConverter.convert(TypeConverter.TYPE_INTEGER, "123");
-Integer i = (Integer) TypeConverter.convert("int", "123");
-Integer i = (Integer) TypeConverter.convert("integer", "123");
-int i = TypeConverter.asInt("123");
-```
+
+        Integer i = TypeConverter.convert(Integer.class, "123");
+        Integer i = (Integer) TypeConverter.convert("java.lang.Integer", "123");
+        Integer i = (Integer) TypeConverter.convert(TypeConverter.TYPE_INT, "123");
+        Integer i = (Integer) TypeConverter.convert(TypeConverter.TYPE_INTEGER, "123");
+        Integer i = (Integer) TypeConverter.convert("int", "123");
+        Integer i = (Integer) TypeConverter.convert("integer", "123");
+        int i = TypeConverter.asInt("123");
+
 
 Default type conversions have been registered under the following keys:
 
@@ -116,35 +113,35 @@ Default type conversions have been registered under the following keys:
 
 The `TypeConverter` treats type keys of type `Class` slightly differently than other keys. If the provided value is already of the type specified by the type key class, it is returned without a conversion taking place. For example, a value of type `MySub` that extends the class `MySuper` would not be converted in the following situation because it is already of the necessary type:
 
-```java
+
 MySub o = TypeConverter.convert(MySuper.class, mySub);
-```
+
 
 Extensibility
 -------------
 
 `TypeConverter` is extensible by registering classes that implement the `TypeConverter.Conversion` interface for conversion to a custom type. For example, you can define a class to convert arbitrary objects to type `Foo`, and register it for use throughout your application:
 
-```java
-// Register your custom conversion class
-TypeConverter.registerTypeConversion(new FooConversion());
 
-Foo foo;
+        // Register your custom conversion class
+        TypeConverter.registerTypeConversion(new FooConversion());
+        
+        Foo foo;
+        
+        Bar bar = new Bar();
+        foo = TypeConverter.convert(Foo.class, bar);
+        
+        String s = "bar";
+        foo = TypeConverter.convert(Foo.class, s);
 
-Bar bar = new Bar();
-foo = TypeConverter.convert(Foo.class, bar);
-
-String s = "bar";
-foo = TypeConverter.convert(Foo.class, s);
-```
 
 ### Discovery
 
 `TypeConverter.Conversion` classes are also discovered using the JDK's standard `java.util.ServiceLoader` mechanism. To make a conversion discoverable, place a file named
 
-```
+
 META-INF/services/com.toddfast.util.typeconverter.TypeConverter$Conversion
-```
+
 
 in your project, the contents of which are fully qualified `TypeConverter.Conversion` class names, one per line. See the `ServiceLoader` [documentation](http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) for more details on how to use the `META-INF/services` mechanism, or [take a look at how registration of the default conversions is done](https://github.com/toddfast/typeconverter/blob/master/src/main/resources/META-INF/services/com.toddfast.util.convert.TypeConverter%24Conversion).
 
@@ -159,12 +156,12 @@ Getting started
 
 This library is in Maven Central and can be used with the following dependency:
 
-```xml
-<dependency>
-  <groupId>com.toddfast.typeconverter</groupId>
-  <artifactId>typeconverter</artifactId>
-  <version>1.0</version>
-</dependency>
-```
+
+        <dependency>
+          <groupId>com.toddfast.typeconverter</groupId>
+          <artifactId>typeconverter</artifactId>
+          <version>1.0</version>
+        </dependency>
+
 
 Or, you can [download the artifacts directly](http://search.maven.org/#search%7Cga%7C1%7Ccom.toddfast.typeconverter).
