@@ -9,6 +9,8 @@ import java.time.*;
 import java.util.Locale;
 
 import static org.kendar.util.convert.Utils.getPureTime;
+import static org.kendar.util.convert.conversion.SqlUtilDate.toSqlDate;
+import static org.kendar.util.convert.conversion.StringUtilDate.toMaxDateTime;
 
 /**
  * Convert to a {@link SqlTime} by parsing a value as a string of
@@ -36,7 +38,7 @@ public class SqlTimeTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
-				return getPureTime(((Date)value).getTime());
+				return getPureTime(toSqlDate(value).getTime());
 			}
 			case("localdatetime"): {
 				return getPureTime(Date.from(((LocalDateTime) value).atZone(ZoneId.systemDefault()).toInstant()).getTime());
@@ -53,6 +55,9 @@ public class SqlTimeTypeConversion implements TypeConverter.Conversion {
 			}
 			case ("offsettime"): {
 				return Time.valueOf(((OffsetTime)value).toLocalTime());
+			}
+			case ("string"): {
+				return convert(toMaxDateTime((String)value));
 			}
 			default: {
 				throw new RuntimeException("Can't convert type to time: " + value.getClass());

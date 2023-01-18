@@ -9,6 +9,8 @@ import java.time.*;
 import java.util.Locale;
 
 import static org.kendar.util.convert.Utils.getPureDate;
+import static org.kendar.util.convert.conversion.SqlUtilDate.toSqlDate;
+import static org.kendar.util.convert.conversion.StringUtilDate.toMaxDateTime;
 
 /**
  * Convert to a {@link SqlDate} by parsing a value as a string of
@@ -37,7 +39,7 @@ public class UtilDateTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
-				return (Date)value;
+				return toSqlDate(value);
 			}
 			case("localdatetime"): {
 				return Date.from(((LocalDateTime) value).atZone(ZoneId.systemDefault()).toInstant());
@@ -55,6 +57,9 @@ public class UtilDateTypeConversion implements TypeConverter.Conversion {
 			}
 			case ("timestamp"): {
 				return getPureDate(((Timestamp)value).getTime());
+			}
+			case ("string"): {
+				return convert(toMaxDateTime((String)value));
 			}
 			default: {
 				throw new RuntimeException("Can't convert type to date: " + value.getClass());

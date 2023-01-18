@@ -8,6 +8,9 @@ import java.sql.Timestamp;
 import java.time.*;
 import java.util.Locale;
 
+import static org.kendar.util.convert.conversion.SqlUtilDate.toSqlDate;
+import static org.kendar.util.convert.conversion.StringUtilDate.toMaxDateTime;
+
 /**
  * Convert to a {@link SqlTimestamp} by parsing a value as a string of
  * form <code>yyyy-[m]m-[d]d hh:mm:ss[.f...]</code>.
@@ -34,12 +37,7 @@ public class LocalTimeTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
-				if(value instanceof java.util.Date){
-					return ((java.util.Date)value).toInstant()
-							.atZone(ZoneId.systemDefault())
-							.toLocalTime();
-				}
-				return ((Date)value).toInstant()
+				return toSqlDate(value).toInstant()
 						.atZone(ZoneId.systemDefault())
 						.toLocalTime();
 			}
@@ -57,6 +55,9 @@ public class LocalTimeTypeConversion implements TypeConverter.Conversion {
 			}
 			case ("zoneddatetime"): {
 				return ((ZonedDateTime)value).toLocalDateTime().toLocalTime();
+			}
+			case ("string"): {
+				return convert(toMaxDateTime((String)value));
 			}
 			default: {
 				throw new RuntimeException("Can't convert type to timestamp: " + value.getClass());

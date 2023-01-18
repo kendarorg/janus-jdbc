@@ -118,4 +118,90 @@ public class ResultSetConverterTest extends TestBase {
         statement.close();
         conn.close();
     }
+
+    @Test
+    void testGetResultSetString() throws Exception {
+        var target = new ResultSetConverter();
+        var connb = getConnection();
+        connb.createStatement().execute("create table if not exists " +
+                "persons(" +
+                "   id IDENTITY NOT NULL PRIMARY KEY, " +
+                "   name varchar(255)," +
+                "   tst TIMESTAMP);");
+
+
+        //insertInSimpleTable("test");
+        var conn = driver.connect(CONNECT_URL,null);
+        var statement = conn.createStatement();
+        assertNotNull(statement);
+        var result = statement.executeQuery("SELECT * FROM persons");
+
+        var hamResultSet = target.toHam((JdbcResultSet) result);
+        var newData = new ArrayList<List<Object>>();
+
+        newData.add(fill(1L,"first","2010-01-01"));
+        newData.add(fill(2L,"second","2011-01-01"));
+        hamResultSet.fill(newData);
+        var newRs = target.fromHam(hamResultSet);
+
+        assertTrue(newRs.next());
+        assertEquals("first",newRs.getString(2));
+        assertEquals(1L,newRs.getLong("id"));
+        assertEquals("2010-01-01 00:00:00.0",newRs.getTimestamp("tst").toString());
+
+        assertTrue(newRs.next());
+        assertEquals("second",newRs.getString(2));
+        assertEquals(2L,newRs.getLong("id"));
+        assertEquals("2011-01-01 00:00:00.0",newRs.getTimestamp("tst").toString());
+
+
+        assertFalse(newRs.next());
+        result.close();
+        statement.close();
+        conn.close();
+    }
+
+
+
+    @Test
+    void testGetResultSetStringTime() throws Exception {
+        var target = new ResultSetConverter();
+        var connb = getConnection();
+        connb.createStatement().execute("create table if not exists " +
+                "persons(" +
+                "   id IDENTITY NOT NULL PRIMARY KEY, " +
+                "   name varchar(255)," +
+                "   tst TIMESTAMP);");
+
+
+        //insertInSimpleTable("test");
+        var conn = driver.connect(CONNECT_URL,null);
+        var statement = conn.createStatement();
+        assertNotNull(statement);
+        var result = statement.executeQuery("SELECT * FROM persons");
+
+        var hamResultSet = target.toHam((JdbcResultSet) result);
+        var newData = new ArrayList<List<Object>>();
+
+        newData.add(fill(1L,"first","12:22:04"));
+        newData.add(fill(2L,"second","13:11:15.001"));
+        hamResultSet.fill(newData);
+        var newRs = target.fromHam(hamResultSet);
+
+        assertTrue(newRs.next());
+        assertEquals("first",newRs.getString(2));
+        assertEquals(1L,newRs.getLong("id"));
+        assertEquals("12:22:04",newRs.getTime("tst").toString());
+
+        assertTrue(newRs.next());
+        assertEquals("second",newRs.getString(2));
+        assertEquals(2L,newRs.getLong("id"));
+        assertTrue(newRs.getTimestamp("tst").toString().endsWith("13:11:15.001"));
+
+
+        assertFalse(newRs.next());
+        result.close();
+        statement.close();
+        conn.close();
+    }
 }

@@ -1,4 +1,4 @@
-package com.toddfast.util.convert.conversion;
+package org.kendar.util.convert.conversion;
 
 public class SqlUtilDate {
 
