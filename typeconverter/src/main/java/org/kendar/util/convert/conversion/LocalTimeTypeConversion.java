@@ -34,6 +34,11 @@ public class LocalTimeTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
+				if(value instanceof java.util.Date){
+					return ((java.util.Date)value).toInstant()
+							.atZone(ZoneId.systemDefault())
+							.toLocalTime();
+				}
 				return ((Date)value).toInstant()
 						.atZone(ZoneId.systemDefault())
 						.toLocalTime();

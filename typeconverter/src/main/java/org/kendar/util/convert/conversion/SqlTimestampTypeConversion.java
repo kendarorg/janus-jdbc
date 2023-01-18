@@ -36,7 +36,10 @@ public class SqlTimestampTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
-				return new Timestamp(((Date)value).getTime());
+				if(value instanceof java.util.Date){
+					return new Timestamp(((java.util.Date) value).getTime());
+				}
+				return new Timestamp(((Date) value).getTime());
 			}
 			case("localdatetime"): {
 				return Timestamp.valueOf((LocalDateTime) value);

@@ -2,14 +2,14 @@ package com.toddfast.util.convert.conversion;
 
 import com.toddfast.util.convert.TypeConverter;
 
-import java.sql.Date;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Locale;
+
+import static com.toddfast.util.convert.conversion.SqlUtilDate.toSqlDate;
 
 /**
  * Convert to a {@link SqlTimestamp} by parsing a value as a string of
@@ -37,7 +37,7 @@ public class SqlTimestampTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
-				return new Timestamp(((Date)value).getTime());
+				return new Timestamp(toSqlDate(value).getTime());
 			}
 			case("localdatetime"): {
 				return Timestamp.valueOf((LocalDateTime) value);

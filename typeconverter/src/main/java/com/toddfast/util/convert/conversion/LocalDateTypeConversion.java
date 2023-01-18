@@ -8,8 +8,9 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.Locale;
+
+import static com.toddfast.util.convert.conversion.SqlUtilDate.toSqlDate;
 
 /**
  * Convert to a {@link SqlTimestamp} by parsing a value as a string of
@@ -37,7 +38,7 @@ public class LocalDateTypeConversion implements TypeConverter.Conversion {
 
 		switch (name) {
 			case("date"): {
-					return ((Date) value).toLocalDate();
+				return toSqlDate(value).toLocalDate();
 			}
 			case("localdatetime"): {
 				return ((LocalDateTime)value).toLocalDate();
