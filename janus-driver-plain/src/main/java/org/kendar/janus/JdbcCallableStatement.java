@@ -347,10 +347,11 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
             var command = new CallableStatementExecute(
                     sql,
                     parameters,
-                    outParameters
+                    outParameters,
+                    connection.isLoadRsOnExec()
             );
-            var result = (ObjectResult)this.engine.execute(command,connection.getTraceId(),getTraceId());
-            return result.getResult();
+            var result = this.engine.execute(command,connection.getTraceId(),getTraceId());
+            return setupExecuteResult(result);
         }
         catch (SQLException e) {
             throw e;

@@ -19,16 +19,26 @@ public class CallableStatementExecute extends PreparedStatementExecuteBase {
     }
 
     private List<PreparedStatementParameter> outParameters;
+    private boolean loadRsOnExec;
 
-    public CallableStatementExecute(String sql, List<PreparedStatementParameter> parameters, List<PreparedStatementParameter> outParameters){
+    public CallableStatementExecute(String sql, List<PreparedStatementParameter> parameters, List<PreparedStatementParameter> outParameters,boolean loadRsOnExec){
         super(sql,parameters);
         this.outParameters = outParameters;
+        this.loadRsOnExec = loadRsOnExec;
     }
 
 
     @Override
     protected Object executeInternal(PreparedStatement statement) throws SQLException {
-        return statement.execute();
+        var result = statement.execute();
+
+        if(!loadRsOnExec){
+            return result;
+        }
+        if(result){
+            return statement.getResultSet();
+        }
+        return false;
     }
 
 
@@ -37,6 +47,7 @@ public class CallableStatementExecute extends PreparedStatementExecuteBase {
         builder.write("sql",sql);
         builder.write("parameters",parameters);
         builder.write("outParameters",outParameters);
+        builder.write("loadRsOnExec",loadRsOnExec);
 
     }
 
@@ -45,6 +56,7 @@ public class CallableStatementExecute extends PreparedStatementExecuteBase {
         sql = input.read("sql");
         parameters = input.read("parameters");
         outParameters = input.read("outParameters");
+        loadRsOnExec =input.read("loadRsOnExec");
         return this;
     }
 

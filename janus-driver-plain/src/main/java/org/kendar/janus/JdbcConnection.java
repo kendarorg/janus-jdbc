@@ -20,11 +20,13 @@ public class JdbcConnection implements Connection {
     private long traceId;
 
     private final Engine engine;
+    private boolean loadRsOnExec;
     private boolean closed = false;
 
-    public JdbcConnection(long traceId, Engine engine) {
+    public JdbcConnection(long traceId, Engine engine, boolean loadRsOnExec) {
         this.traceId = traceId;
         this.engine = engine;
+        this.loadRsOnExec = loadRsOnExec;
     }
 
     private JdbcStatement getJdbcStatement(ConnectionCreateStatement command) throws SQLException {
@@ -513,5 +515,9 @@ public class JdbcConnection implements Connection {
     @Override
     public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
         throw new UnsupportedOperationException("?setNetworkTimeout");
+    }
+
+    public boolean isLoadRsOnExec() {
+        return loadRsOnExec;
     }
 }

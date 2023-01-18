@@ -4,12 +4,12 @@ import org.kendar.janus.cmd.connection.ConnectionConnect;
 import org.kendar.janus.engine.DriverEngine;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.results.ObjectResult;
-import org.kendar.janus.utils.ExceptionsWrapper;
-import org.kendar.janus.utils.LocalProperties;
-import org.kendar.janus.utils.LoggerWrapper;
-import org.kendar.janus.utils.TimedOutConnection;
+import org.kendar.janus.utils.*;
 
 import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,7 +66,6 @@ public class JdbcDriver implements Driver {
         result.engine = engine;
         return result;
     }
-
     @Override
     public Connection connect(String url, Properties properties) throws SQLException {
 
@@ -75,7 +74,12 @@ public class JdbcDriver implements Driver {
         if (this.acceptsURL(url)) {
             try{
                 var uri = URI.create(url.substring(JDBC_IDENTIFIER.length()));
-
+                var up = new URLParser(uri.toString());
+                var loadRsOnExec = false;
+                var loadRsOnExecString = up.get("loadRsOnExec");
+                if(!loadRsOnExecString.isEmpty()){
+                    loadRsOnExec = Boolean.valueOf(loadRsOnExecString);
+                }
                 log.debug("IjDriver-URL: "+ uri);
                 if(!isHttpOrHttps(uri)){
                     throw new SQLException("Unknown protocol: " + uri.getScheme());
@@ -95,7 +99,7 @@ public class JdbcDriver implements Driver {
                         properties,
                         LocalProperties.build(localProperties));
                 var connResult = (ObjectResult) engineToUse.execute(command,-1L,-1L);
-                result = new JdbcConnection(connResult.getResult(), engineToUse);
+                result = new JdbcConnection(connResult.getResult(), engineToUse,loadRsOnExec);
                 var toConnection = new TimedOutConnection();
                 toConnection.setConnection(result);
                 long time = Calendar.getInstance().getTimeInMillis();

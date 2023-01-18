@@ -1,7 +1,7 @@
 package org.kendar.janus.cmd.call;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.kendar.janus.cmd.JdbcCommand;
+import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.cmd.preparedstatement.PreparedStatementExecuteBase;
 import org.kendar.janus.cmd.preparedstatement.PreparedStatementParameter;
 import org.kendar.janus.cmd.preparedstatement.parameters.ObjectParameter;
@@ -15,6 +15,10 @@ import java.util.List;
 
 public class CallableStatementExecuteQuery extends PreparedStatementExecuteBase {
 
+    @Override
+    public String getPath() {
+        return "/CallableStatement/executeQuery";
+    }
     private List<PreparedStatementParameter> outParameters;
 
     public CallableStatementExecuteQuery(){

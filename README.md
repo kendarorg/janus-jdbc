@@ -14,6 +14,7 @@ So using the driver means
 
 * Passing a "real" connection string to the db like "jdbc:h2:mem:test"
 * Connect to the Janus-server like "jdbc:janus:http://localhost/db?fetchSize=3&charset=UTF-8"
+  * loadRsOnExec: load resultset on ".exec(" calls (useful to simplify recording)
 * Look all messages passing
 
 Tested with Hibernate
