@@ -48,6 +48,12 @@ public class LocalDateTimeTypeConversion implements TypeConverter.Conversion {
 				LocalDate today = LocalDate.now();
 				return ((LocalTime)value).atDate(today);
 			}
+			case ("long"): {
+				return convert(TypeConverter.convert(Timestamp.class,value));
+			}
+			case ("bigdecimal"): {
+				return convert(TypeConverter.convert(Long.class,value));
+			}
 			case("time"): {
 				LocalDate today = LocalDate.now();
 				return ((Time)value).toLocalTime().atDate(today);

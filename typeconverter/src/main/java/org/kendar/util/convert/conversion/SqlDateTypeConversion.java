@@ -52,6 +52,12 @@ public class SqlDateTypeConversion implements TypeConverter.Conversion {
 				result=  Date.from(((LocalDate) value).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 				break;
 			}
+			case ("bigdecimal"): {
+				return convert(TypeConverter.convert(Long.class,value));
+			}
+			case ("long"): {
+				return convert(TypeConverter.convert(Timestamp.class,value));
+			}
 			case("time"): {
 				result=  getPureDate(((Time)value).getTime());
 				break;

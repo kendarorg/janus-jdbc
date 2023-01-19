@@ -57,6 +57,13 @@ public class SqlTimestampTypeConversion implements TypeConverter.Conversion {
 			case ("timestamp"): {
 				return value;
 			}
+			case ("long"): {
+				return new Timestamp((long)value);
+			}
+
+			case ("bigdecimal"): {
+				return convert(TypeConverter.convert(Long.class,value));
+			}
 			case ("string"): {
 				return convert(toMaxDateTime((String)value));
 			}

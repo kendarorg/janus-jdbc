@@ -50,10 +50,16 @@ public class UtilDateTypeConversion implements TypeConverter.Conversion {
 			case("time"): {
 				return getPureDate(((Time)value).getTime());
 			}
+			case ("long"): {
+				return convert(TypeConverter.convert(Timestamp.class,value));
+			}
 			case("localtime"): {
 
 				LocalDate today = LocalDate.now();
 				return Date.from(((LocalTime)value).atDate(today).atZone(ZoneId.systemDefault()).toInstant());
+			}
+			case ("bigdecimal"): {
+				return convert(TypeConverter.convert(Long.class,value));
 			}
 			case ("timestamp"): {
 				return getPureDate(((Timestamp)value).getTime());
