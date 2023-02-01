@@ -3,6 +3,7 @@ package org.kendar.janus.serialization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.kendar.janus.cmd.Exec;
 import org.kendar.janus.cmd.connection.ConnectionConnect;
 
 import java.util.ArrayList;
@@ -26,6 +27,21 @@ public class SerializationTest {
         var result = serializer.getSerialized();
         serializer.deserialize(result);
         var deserialized = (ConnectionConnect) serializer.read("command");
+        assertEquals(data, deserialized);
+    }
+
+    @Test
+    void testExecCommand() {
+        var serializer = (TypedSerializer) new JsonTypedSerializer();
+        var data = new Exec(this,
+                "setClientInfo")
+                .withParameters("a",1)
+                .withTypes(String.class,int.class)
+                .onConnection();
+        serializer.write("command", data);
+        var result = serializer.getSerialized();
+        serializer.deserialize(result);
+        var deserialized = (Exec) serializer.read("command");
         assertEquals(data, deserialized);
     }
 
@@ -179,7 +195,7 @@ public class SerializationTest {
     @Test
     void testMultidimensionalArrayOfString() {
         var serializer = (TypedSerializer) new JsonTypedSerializer();
-        int[][] data = { { 1, 2 }, { 3, 4,5 } };
+        int[][] data = { { 1, 2,3 }, { 3, 4,5 } };
 
         for (int i = 0; i < data.length; i++) {
             var subData = data[i];
@@ -193,6 +209,23 @@ public class SerializationTest {
         serializer.deserialize(result);
         var deserialized = (int[][]) serializer.read("command");
         assertArrayEquals(data, deserialized);
+    }
+
+    @Test
+    void testPrepare() {
+        var serializer = (TypedSerializer) new JsonTypedSerializer();
+        int[][] data = { { 1, 2 }, { 3, 4 } };
+
+        for (int i = 0; i < data.length; i++) {
+            var subData = data[i];
+            for (int j = 0; j < subData.length; j++) {
+                System.out.println("arr[" + i + "][" + j + "] = "
+                        + data[i][j]);
+            }
+        }
+        serializer.write("command", data);
+        var result = serializer.getSerialized();
+        System.out.println("a");
     }
 
     @Test

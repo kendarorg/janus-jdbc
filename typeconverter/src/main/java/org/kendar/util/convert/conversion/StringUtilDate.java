@@ -23,9 +23,11 @@ public class StringUtilDate {
                 return new Timestamp(Long.valueOf(input));
             }
             if (yyyymmdd.matcher(input).matches()) {
-                return LocalDate.parse(input);
-            } else if (hhmm.matcher(input).matches()){
-                return LocalTime.parse(input);
+                var inputs = input.split(" ");
+                return LocalDate.parse(inputs[0]);
+            }else if (hhmm.matcher(input).matches()){
+                var inputs = input.split(" ");
+                return LocalTime.parse(inputs[0]);
             }
         }catch (Exception ex){
             throw new RuntimeException(ex);
