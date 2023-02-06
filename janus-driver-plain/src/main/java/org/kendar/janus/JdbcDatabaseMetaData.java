@@ -582,6 +582,7 @@ public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
     @Override
     public boolean supportsRefCursors(){ return supportsRefCursors;}
 
+
     public void fill(DatabaseMetaData src) throws SQLException {
         isReadOnly=src.isReadOnly();
         getURL=src.getURL();

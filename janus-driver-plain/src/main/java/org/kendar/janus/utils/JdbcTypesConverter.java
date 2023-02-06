@@ -78,6 +78,12 @@ public class JdbcTypesConverter {
             if(maxRows==0){
                 maxRows = engine.getMaxRows();
             }
+            ResultSetHoldability holdability= ResultSetHoldability.DEFAULT;
+            try{
+                holdability = ResultSetHoldability.valueOf(rstst.getHoldability());
+            }catch (Exception ex){
+
+            }
             var result = new JdbcResultSet(
                     traceId.get(),
                     ResultSetType.valueOf(rstst.getType()),
@@ -85,7 +91,7 @@ public class JdbcTypesConverter {
                     engine.getPrefetchMetadata(),
                     engine.getCharset(),
                     ResultSetConcurrency.valueOf(rstst.getConcurrency()),
-                    ResultSetHoldability.valueOf(rstst.getHoldability()));
+                    holdability);
             result.intialize(rstst);
             return result;
         }
