@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Locale;
 import java.util.UUID;
 
 public class DriverEngine implements Engine {
@@ -27,13 +28,17 @@ public class DriverEngine implements Engine {
     }
 
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid){
-        jdbcDriver.refreshConnection(connectionId);
+
         var ser = serializer.newInstance();
         try {
             var path = url+command.getPath()+"/"+uid;
             if(command.getPath().startsWith("/Connection/")){
                 path = url+command.getPath();
             }
+
+            var pathSplitted = url.split("/");
+            var db = pathSplitted[pathSplitted.length-1].toLowerCase(Locale.ROOT);
+            jdbcDriver.refreshConnection(db,connectionId);
             ser.write("command", command);
             HttpClient client = HttpClient.newHttpClient();
 

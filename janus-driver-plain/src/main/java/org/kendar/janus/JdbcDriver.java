@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class JdbcDriver implements Driver {
 
-    static ConcurrentHashMap<Long, TimedOutConnection> connections = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, ConcurrentHashMap<Long, TimedOutConnection>> connections = new ConcurrentHashMap<>();
 
     private static final Timer timer;
     private static final String JDBC_IDENTIFIER = "jdbc:janus:";
@@ -76,6 +76,11 @@ public class JdbcDriver implements Driver {
                 var uri = URI.create(url.substring(JDBC_IDENTIFIER.length()));
                 var up = new URLParser(uri.toString());
                 var loadRsOnExec = false;
+                var path = uri.getPath().split("/");
+                var db = path[path.length-1].toLowerCase(Locale.ROOT);
+                if(!connections.containsKey(db)){
+                    connections.put(db,new ConcurrentHashMap<>());
+                }
                 var loadRsOnExecString = up.get("loadRsOnExec");
                 if(!loadRsOnExecString.isEmpty()){
                     loadRsOnExec = Boolean.valueOf(loadRsOnExecString);
@@ -104,7 +109,7 @@ public class JdbcDriver implements Driver {
                 toConnection.setConnection(result);
                 long time = Calendar.getInstance().getTimeInMillis();
                 toConnection.setExpiration(time+5000);
-                connections.put(connResult.getResult(),toConnection);
+                connections.get(db).put(connResult.getResult(),toConnection);
                 log.info("Connected");
             }
             catch (Exception e)
@@ -119,18 +124,24 @@ public class JdbcDriver implements Driver {
 
 
     protected static void expireConnections(){
-        var all = new ArrayList<>(connections.entrySet());
-        for(var context: all) {
-            long time = Calendar.getInstance().getTimeInMillis();
-            //noinspection CatchMayIgnoreException
-            try {
-                if (context.getValue().getConnection().isClosed() ||
-                        time>context.getValue().getExpiration()) {
-                    context.getValue().getConnection().close();
-                    connections.remove(context.getKey());
-                }
-            }catch(Exception ex){
+        var alldb = new ArrayList<>(connections.values());
+        for(var connection:alldb){
+            var all = new ArrayList<>(connection.entrySet());
+                 for(
+            var context:all)
 
+            {
+                long time = Calendar.getInstance().getTimeInMillis();
+                //noinspection CatchMayIgnoreException
+                try {
+                    if (context.getValue().getConnection().isClosed() ||
+                            time > context.getValue().getExpiration()) {
+                        context.getValue().getConnection().close();
+                        connections.remove(context.getKey());
+                    }
+                } catch (Exception ex) {
+
+                }
             }
         }
     }
@@ -169,9 +180,10 @@ public class JdbcDriver implements Driver {
         throw new SQLFeatureNotSupportedException("getParentLogger");
     }
 
-    public void refreshConnection(Long connectionId) {
-        if(!connections.containsKey(connectionId))return;
+    public void refreshConnection(String db,Long connectionId) {
+        if(!connections.containsKey(db.toLowerCase(Locale.ROOT)))return;
+        if(!connections.get(db.toLowerCase(Locale.ROOT)).containsKey(connectionId))return;
         long time = Calendar.getInstance().getTimeInMillis();
-        connections.get(connectionId).setExpiration(time+5000);
+        connections.get(db.toLowerCase(Locale.ROOT)).get(connectionId).setExpiration(time+5000);
     }
 }
