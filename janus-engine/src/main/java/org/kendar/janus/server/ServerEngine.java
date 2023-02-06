@@ -20,8 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class ServerEngine implements Engine {
-    static ConcurrentHashMap<Long, JdbcContext> contexts = new ConcurrentHashMap<>();
-    static ConcurrentLinkedQueue<Long> indexes = new ConcurrentLinkedQueue<>();
+    ConcurrentHashMap<Long, JdbcContext> contexts = new ConcurrentHashMap<>();
+    ConcurrentLinkedQueue<Long> indexes = new ConcurrentLinkedQueue<>();
     static LoggerWrapper log = LoggerWrapper.getLogger(ServerEngine.class);
     private final Timer timer;
     private int maxRows;
