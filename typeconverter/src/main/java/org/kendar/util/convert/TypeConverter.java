@@ -875,6 +875,10 @@ public class TypeConverter {
 	/** Logical type name "sqltimestamp" */
 	public static final String TYPE_SQL_TIMESTAMP="sqltimestamp";
 
+
+
+	public static final Object TYPE_OFFSET_DATE_TIME = "offsetdatetime";
+
 	private static final Conversion<?> IDENTITY_CONVERSION=
 		new IdentityTypeConversion();
 

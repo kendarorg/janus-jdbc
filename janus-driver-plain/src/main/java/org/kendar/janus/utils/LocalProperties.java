@@ -17,9 +17,11 @@ public class LocalProperties {
                 localProperties.put("janus.client.name", address.getHostName());
                 Arrays.stream(toMerge.split(";"))
                         .forEach(key -> {
+                            if(key!=null && !key.trim().isEmpty()){
                             String value = System.getProperty(key);
                             if (value != null) {
                                 localProperties.put(key, value);
+                            }
                             }
                         });
             }catch (Exception ex){

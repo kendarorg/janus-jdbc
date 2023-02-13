@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.ClassUtils;
+import org.kendar.util.convert.TypeConverter;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -61,9 +62,19 @@ public class JsonTypedSerializer implements TypedSerializer {
             writePrimitive(key, value);
         } else {
             if (currentNode instanceof ObjectNode) {
-
-                ((ObjectNode) currentNode).set(key, mapper.valueToTree(value));
+                if(value.getClass().getName().contains("Date")||
+                        value.getClass().getName().contains("Time")){
+                    if(value.getClass().getSimpleName().equalsIgnoreCase("Date")){
+                        ((ObjectNode) currentNode).set(key, mapper.valueToTree(value));
+                    }else {
+                        var realVal = value.toString();
+                        ((ObjectNode) currentNode).set(key, mapper.valueToTree(realVal));
+                    }
+                }else{
+                    ((ObjectNode) currentNode).set(key, mapper.valueToTree(value));
+                }
                 ((ObjectNode) currentNode).put(":" + key + ":", value.getClass().getName());
+
             }
         }
     }
@@ -177,6 +188,13 @@ public class JsonTypedSerializer implements TypedSerializer {
                 return (T)mapper.treeToValue(item, typeClass);
             } else if (ClassUtils.isAssignable(typeClass, TypedSerializable.class)) {
                 return (T)readSerializable(item, typeClass);
+            }else if (typeClass.getName().contains("Time")||
+                    typeClass.getName().contains("Date")) {
+                if(item.isTextual()) {
+                    return (T) TypeConverter.convert(typeClass, item.textValue());
+                }else{
+                    return (T) TypeConverter.convert(typeClass, item.longValue());
+                }
             } else {
                 return (T)mapper.treeToValue(item, typeClass);
             }

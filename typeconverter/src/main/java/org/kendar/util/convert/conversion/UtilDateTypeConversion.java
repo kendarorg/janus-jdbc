@@ -26,7 +26,7 @@ public class UtilDateTypeConversion implements TypeConverter.Conversion {
 		return new Object[] {
 			java.util.Date.class,
 			java.util.Date.class.getName(),
-			TypeConverter.TYPE_SQL_DATE
+			TypeConverter.TYPE_UTIL_DATE
 		};
 	}
 

@@ -18,4 +18,5 @@ public class ExtraConvertersTest {
         assertTrue(out instanceof Integer);
         assertEquals(12,out);
     }
+
 }

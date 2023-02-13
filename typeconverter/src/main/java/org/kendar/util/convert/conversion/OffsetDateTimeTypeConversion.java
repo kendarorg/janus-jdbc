@@ -13,19 +13,19 @@ import static org.kendar.util.convert.conversion.SqlUtilDate.toSqlDate;
 import static org.kendar.util.convert.conversion.StringUtilDate.toMaxDateTime;
 
 /**
- * Convert to a {@link } by parsing a value as a string of
+ * Convert to a {@link SqlTimestamp} by parsing a value as a string of
  * form <code>yyyy-[m]m-[d]d hh:mm:ss[.f...]</code>.
  *
  * @see	Date#valueOf(String)
  */
-public class LocalDateTimeTypeConversion implements TypeConverter.Conversion {
+public class OffsetDateTimeTypeConversion implements TypeConverter.Conversion {
 
 	@Override
 	public Object[] getTypeKeys() {
 		return new Object[] {
-			LocalDateTime.class,
-				LocalDateTime.class.getName(),
-			TypeConverter.TYPE_LOCAL_DATE_TIME
+			OffsetDateTime.class,
+				OffsetDateTime.class.getName(),
+			TypeConverter.TYPE_OFFSET_DATE_TIME
 		};
 	}
 
@@ -34,22 +34,24 @@ public class LocalDateTimeTypeConversion implements TypeConverter.Conversion {
 		if (value==null) {
 			return null;
 		}
+		if(value.getClass()==OffsetDateTime.class){
+			return value;
+		}
 		var name = value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
 
 		switch (name) {
 			case("date"): {
 				var cal = new GregorianCalendar();
 				cal.setTime(toSqlDate(value));
-				return  cal.toInstant()
-						.atZone(ZoneId.systemDefault())
-						.toLocalDateTime();
+				return  OffsetDateTime.ofInstant(cal.toInstant(),ZoneId.systemDefault());
 			}
 			case("localdate"): {
-				return ((LocalDate)value).atStartOfDay();
+				return OffsetDateTime.ofInstant(((LocalDate)value).atStartOfDay()
+						.toInstant((ZoneOffset) ZoneOffset.systemDefault()),ZoneId.systemDefault());
 			}
 			case("localtime"): {
 				LocalDate today = LocalDate.now();
-				return ((LocalTime)value).atDate(today);
+				return convert(((LocalTime)value).atDate(today));
 			}
 			case ("long"): {
 				return convert(TypeConverter.convert(Timestamp.class,value));
@@ -59,13 +61,10 @@ public class LocalDateTimeTypeConversion implements TypeConverter.Conversion {
 			}
 			case("time"): {
 				LocalDate today = LocalDate.now();
-				return ((Time)value).toLocalTime().atDate(today);
+				return convert(((Time)value).toLocalTime().atDate(today));
 			}
 			case ("timestamp"): {
-				return ((Timestamp)value).toLocalDateTime();
-			}
-			case ("offsetdatetime"): {
-				return ((OffsetDateTime)value).toLocalDateTime();
+				return convert(((Timestamp)value).toLocalDateTime());
 			}
 			case ("string"): {
 				return convert(toMaxDateTime((String)value));

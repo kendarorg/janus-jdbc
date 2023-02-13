@@ -1,4 +1,4 @@
-package org.kendar.json;
+package org.kendar.servers.dbproxy.utils;
 
 import org.kendar.janus.JdbcConnection;
 import org.kendar.janus.JdbcResultsetMetaData;
@@ -7,7 +7,6 @@ import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
 import org.kendar.janus.enums.ResultSetType;
 import org.kendar.janus.results.ColumnDescriptor;
-import org.kendar.janus.results.JdbcResult;
 import org.kendar.janus.serialization.TypedSerializable;
 import org.kendar.janus.serialization.TypedSerializer;
 
@@ -19,7 +18,7 @@ import java.sql.Date;
 import java.sql.*;
 import java.util.*;
 
-public class HamResultSet implements ResultSet, TypedSerializable<HamResultSet> {
+public class HamResultSetImpl implements ResultSet, TypedSerializable<HamResultSetImpl> {
     private JdbcResultsetMetaData metadata;
     private Map<String,Integer> labelsToId;
     private Map<String,Integer> namesToId;
@@ -33,7 +32,7 @@ public class HamResultSet implements ResultSet, TypedSerializable<HamResultSet> 
     private int lastColumn = 0;
     private Statement statement;
 
-    public HamResultSet(){
+    public HamResultSetImpl(){
 
     }
     private long traceId;
@@ -60,7 +59,7 @@ public class HamResultSet implements ResultSet, TypedSerializable<HamResultSet> 
         builder.write("metadata",metadata);
     }
 
-    public HamResultSet deserialize(TypedSerializer input) {
+    public HamResultSetImpl deserialize(TypedSerializer input) {
         traceId= input.read("traceId");
         type= input.read("type");
         concurrency = input.read("concurrency");

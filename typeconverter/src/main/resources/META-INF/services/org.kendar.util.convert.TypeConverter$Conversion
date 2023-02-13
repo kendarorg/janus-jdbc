@@ -18,4 +18,6 @@ org.kendar.util.convert.conversion.LocalDateTimeTypeConversion
 org.kendar.util.convert.conversion.LocalTimeTypeConversion
 org.kendar.util.convert.conversion.LocalDateTypeConversion
 org.kendar.util.convert.conversion.OffsetTimeTypeConversion
+org.kendar.util.convert.conversion.OffsetDateTimeTypeConversion
 org.kendar.util.convert.conversion.ZoneDateTimeTypeConversion
+org.kendar.util.convert.conversion.UtilDateTypeConversion

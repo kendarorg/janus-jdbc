@@ -553,4 +553,36 @@ public class TestCallableStatementTest extends TestDb {
         }
     }
 
+
+
+    @Test
+    public void testGetters01() throws SQLException {
+
+        var conn = getConnection("callableStatement");
+        CallableStatement call;
+        call = conn.prepareCall("{?=call ?}");
+
+        call.setTimestamp(2, java.sql.Timestamp.valueOf(
+                "2001-02-03 04:05:06.789"));
+        call.registerOutParameter(1, Types.TIMESTAMP);
+        call.execute();
+        Assertions.assertEquals("2001-02-03 04:05:06.789", call.getTimestamp(1).toString());
+        Assertions.assertEquals("2001-02-03T04:05:06.789", call.getObject(1, LocalDateTime.class).toString());
+
+        call.setBoolean(2, true);
+        call.registerOutParameter(1, Types.BIT);
+        call.execute();
+        Assertions.assertEquals(true, call.getBoolean(1));
+
+        call.setShort(2, (short) 123);
+        call.registerOutParameter(1, Types.SMALLINT);
+        call.execute();
+        Assertions.assertEquals(123, call.getShort(1));
+
+        call.setBigDecimal(2, BigDecimal.TEN);
+        call.registerOutParameter(1, Types.DECIMAL);
+        call.execute();
+        Assertions.assertEquals("10", call.getBigDecimal(1).toString());
+    }
+
 }

@@ -50,7 +50,7 @@ public class ResultSetConverterTest extends TestBase {
         assertNotNull(statement);
         var result = statement.executeQuery("SELECT * FROM persons");
 
-        var hamResultSet = target.toHam((JdbcResultSet) result);
+        var hamResultSet = target.toHam( result);
         var newData = new ArrayList<List<Object>>();
         newData.add(fill(1L,"first",LocalDateTime.of(2010,1,1,1,1,1,1)));
         newData.add(fill(2L,"second", LocalDateTime.of(2011,1,1,1,1,1,1)));

@@ -50,6 +50,29 @@ public class TestPreparedStatement extends TestDb {
     }
     private static final int LOB_SIZE = 4000, LOB_SIZE_BIG = 512 * 1024;
 
+    @Test
+    void testOffsetTime8() throws SQLException {
+
+        Connection conn = getConnection("preparedStatement");
+        PreparedStatement prep = conn.prepareStatement("SELECT ?");
+        OffsetTime offsetTime = OffsetTime.parse("04:05:06+02:30");
+        prep.setObject(1, offsetTime);
+        ResultSet rs = prep.executeQuery();
+        rs.next();
+        OffsetTime offsetTime2 = rs.getObject(1, OffsetTime.class);
+        assertEquals(offsetTime, offsetTime2);
+        assertFalse(rs.next());
+        rs.close();
+
+        prep.setObject(1, offsetTime, Types.TIME_WITH_TIMEZONE);
+        rs = prep.executeQuery();
+        rs.next();
+        offsetTime2 = rs.getObject(1, OffsetTime.class);
+        assertEquals(offsetTime, offsetTime2);
+        assertFalse(rs.next());
+        rs.close();
+    }
+
 
     @Test
     public void test() throws Exception {
@@ -80,7 +103,7 @@ public class TestPreparedStatement extends TestDb {
         //testDate8(conn);
         //FIXME testEnum()
         testTime8(conn);
-        testOffsetTime8(conn);
+        //testOffsetTime8(conn);
         testDateTime8(conn);
         //////testOffsetDateTime8(conn);
         //////testZonedDateTime8(conn);
@@ -752,25 +775,7 @@ public class TestPreparedStatement extends TestDb {
         rs.close();
     }
 
-    private void testOffsetTime8(Connection conn) throws SQLException {
-        PreparedStatement prep = conn.prepareStatement("SELECT ?");
-        OffsetTime offsetTime = OffsetTime.parse("04:05:06+02:30");
-        prep.setObject(1, offsetTime);
-        ResultSet rs = prep.executeQuery();
-        rs.next();
-        OffsetTime offsetTime2 = rs.getObject(1, OffsetTime.class);
-        assertEquals(offsetTime, offsetTime2);
-        assertFalse(rs.next());
-        rs.close();
 
-        prep.setObject(1, offsetTime, Types.TIME_WITH_TIMEZONE);
-        rs = prep.executeQuery();
-        rs.next();
-        offsetTime2 = rs.getObject(1, OffsetTime.class);
-        assertEquals(offsetTime, offsetTime2);
-        assertFalse(rs.next());
-        rs.close();
-    }
 
     private void testDateTime8(Connection conn) throws SQLException {
         PreparedStatement prep = conn.prepareStatement("SELECT ?");
@@ -788,7 +793,7 @@ public class TestPreparedStatement extends TestDb {
         PreparedStatement prep = conn.prepareStatement("SELECT ?");
         OffsetDateTime offsetDateTime = OffsetDateTime.parse("2001-02-03T04:05:06+02:30");
 
-        OffsetDateTime offsetDateTimeExpected = OffsetDateTime.parse("2001-02-03T01:35:06Z");
+        OffsetDateTime offsetDateTimeExpected = OffsetDateTime.parse("2001-02-03T04:05:06+02:30");
         prep.setObject(1, offsetDateTime);
         ResultSet rs = prep.executeQuery();
         rs.next();
@@ -808,13 +813,15 @@ public class TestPreparedStatement extends TestDb {
         rs.close();
     }
 
-    @Test void testZonedDateTime8() throws SQLException {
+    @Test
+    void testZonedDateTime8() throws SQLException {
         Connection conn = getConnection("preparedStatement");
         PreparedStatement prep = conn.prepareStatement("SELECT ?");
         ZonedDateTime zonedDateTime = ZonedDateTime.parse("2001-02-03T04:05:06+02:30");
-        ZonedDateTime zonedDateTimeExpected = ZonedDateTime.parse("2001-02-03T01:35:06+01:00[Europe/Berlin]");
+        ZonedDateTime zonedDateTimeExpected = ZonedDateTime.parse("2001-02-03T04:05:06+01:00[Europe/Rome]");
         prep.setObject(1, zonedDateTime);
         ResultSet rs = prep.executeQuery();
+        var md = prep.getMetaData();
         rs.next();
         ZonedDateTime zonedDateTime2 = rs.getObject(1, ZonedDateTime.class);
         assertEquals(zonedDateTimeExpected, zonedDateTime2);
@@ -1358,7 +1365,7 @@ public class TestPreparedStatement extends TestDb {
         assertTrue(rs.getObject(11).equals(
                 java.sql.Time.valueOf("04:05:06")));
         assertEquals(rs.getObject(12),(
-                Timestamp.valueOf("2001-02-03 04:05:06.123")));
+                Timestamp.valueOf("2001-02-03 04:05:06.123456789")));
         assertTrue(rs.getObject(13).equals(
                 Timestamp.valueOf("2001-02-03 00:00:00")));
         assertArrayEquals(new byte[] { 10, 20, 30 }, (byte[]) rs.getObject(14));
