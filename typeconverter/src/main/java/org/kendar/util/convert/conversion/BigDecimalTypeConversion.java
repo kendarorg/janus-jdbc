@@ -2,6 +2,7 @@ package org.kendar.util.convert.conversion;
 
 import org.kendar.util.convert.TypeConverter;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Locale;
 
@@ -42,6 +43,9 @@ public class BigDecimalTypeConversion implements TypeConverter.Conversion {
 				break;
 			case("long"):
 				result= new BigDecimal((long)value);
+				break;
+			case("biginteger"):
+				result= new BigDecimal((BigInteger) value);
 				break;
 			case("float"):
 				result= BigDecimal.valueOf((float) value);

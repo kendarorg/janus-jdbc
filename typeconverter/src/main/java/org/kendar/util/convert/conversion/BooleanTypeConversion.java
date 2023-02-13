@@ -3,6 +3,7 @@ package org.kendar.util.convert.conversion;
 import org.kendar.util.convert.TypeConverter;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Locale;
 
 /**
@@ -33,6 +34,8 @@ public class BooleanTypeConversion implements TypeConverter.Conversion {
 			case("int"):
 			case("integer"):
 				return ((int) value)!=0;
+			case("biginteger"):
+				return ((BigInteger)value).longValue()>0;
 			case("byte"):
 				return ((byte) value)!=0;
 			case("short"):

@@ -3,6 +3,7 @@ package org.kendar.util.convert.conversion;
 import org.kendar.util.convert.TypeConverter;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Locale;
 
 /**
@@ -34,6 +35,8 @@ public class IntegerTypeConversion implements TypeConverter.Conversion {
 			case("int"):
 			case("integer"):
 				return ((Integer)value).intValue();
+			case("biginteger"):
+				return ((BigInteger)value).intValue();
 			case("byte"):
 				return ((Byte)value).intValue();
 			case("short"):

@@ -3,6 +3,7 @@ package org.kendar.util.convert.conversion;
 import org.kendar.util.convert.TypeConverter;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -39,6 +40,8 @@ public class LongTypeConversion implements TypeConverter.Conversion {
 				return ((Byte)value).longValue();
 			case("short"):
 				return ((Short)value).longValue();
+			case("biginteger"):
+				return ((BigInteger)value).longValue();
 			case("long"):
 				return ((Long)value).longValue();
 			case("float"):
