@@ -29,6 +29,7 @@ public class DriverEngine implements Engine {
 
     public JdbcResult execute(JdbcCommand command, Long connectionId, Long uid){
 
+
         var ser = serializer.newInstance();
         try {
             var path = url+command.getPath()+"/"+uid;
@@ -38,6 +39,9 @@ public class DriverEngine implements Engine {
 
             var pathSplitted = url.split("/");
             var db = pathSplitted[pathSplitted.length-1].toLowerCase(Locale.ROOT);
+            if(System.getenv().containsKey("LOGJANUS_"+db.toUpperCase(Locale.ROOT))){
+                System.out.println(command.toString());
+            }
             jdbcDriver.refreshConnection(db,connectionId);
             ser.write("command", command);
             HttpClient client = HttpClient.newHttpClient();
