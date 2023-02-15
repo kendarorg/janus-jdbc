@@ -74,10 +74,16 @@ public class JdbcDriver implements Driver {
         if (this.acceptsURL(url)) {
             try{
                 var uri = URI.create(url.substring(JDBC_IDENTIFIER.length()));
-                var up = new URLParser(uri.toString());
-                var loadRsOnExec = false;
                 var path = uri.getPath().split("/");
                 var db = path[path.length-1].toLowerCase(Locale.ROOT);
+
+                var up = new URLParser(uri.toString());
+                var env = "JANUS_"+db.toUpperCase(Locale.ROOT);
+                if(System.getenv().containsKey(env)){
+                    up = new URLParser(System.getenv(env));
+                }
+
+                var loadRsOnExec = false;
                 if(!connections.containsKey(db)){
                     connections.put(db,new ConcurrentHashMap<>());
                 }
@@ -85,6 +91,7 @@ public class JdbcDriver implements Driver {
                 if(!loadRsOnExecString.isEmpty()){
                     loadRsOnExec = Boolean.valueOf(loadRsOnExecString);
                 }
+
                 log.debug("IjDriver-URL: "+ uri);
                 if(!isHttpOrHttps(uri)){
                     throw new SQLException("Unknown protocol: " + uri.getScheme());

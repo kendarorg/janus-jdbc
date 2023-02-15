@@ -818,7 +818,7 @@ public class TestPreparedStatement extends TestDb {
         Connection conn = getConnection("preparedStatement");
         PreparedStatement prep = conn.prepareStatement("SELECT ?");
         ZonedDateTime zonedDateTime = ZonedDateTime.parse("2001-02-03T04:05:06+02:30");
-        ZonedDateTime zonedDateTimeExpected = ZonedDateTime.parse("2001-02-03T04:05:06+01:00[Europe/Rome]");
+        ZonedDateTime zonedDateTimeExpected = ZonedDateTime.parse("2001-02-03T04:05:06+01:00[Europe/Berlin]");
         prep.setObject(1, zonedDateTime);
         ResultSet rs = prep.executeQuery();
         var md = prep.getMetaData();
