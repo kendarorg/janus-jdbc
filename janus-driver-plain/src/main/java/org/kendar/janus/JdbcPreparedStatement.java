@@ -195,11 +195,12 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
 
     @Override
     public ResultSet executeQuery() throws SQLException {
+        var command = new PreparedStatementExecuteQuery(
+                sql,
+                parameters
+        );
         try {
-            var command = new PreparedStatementExecuteQuery(
-                    sql,
-                    parameters
-            );
+
             var result = (JdbcResultSet)this.engine.execute(command,connection.getTraceId(),getTraceId());
             result.setEngine(engine);
             result.setConnection(connection);
@@ -209,6 +210,9 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
         }
         catch (SQLException e) {
             throw e;
+        }
+        catch (ClassCastException e2) {
+            throw ExceptionsWrapper.toSQLException(e2,command);
         }
         catch (Exception e2) {
             throw ExceptionsWrapper.toSQLException(e2);

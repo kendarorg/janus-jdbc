@@ -319,12 +319,13 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
 
     @Override
     public ResultSet executeQuery() throws SQLException {
+        var command = new CallableStatementExecuteQuery(
+                sql,
+                parameters,
+                outParameters
+        );
         try {
-            var command = new CallableStatementExecuteQuery(
-                    sql,
-                    parameters,
-                    outParameters
-            );
+
             var result = (JdbcResultSet)this.engine.execute(command,connection.getTraceId(),getTraceId());
             result.setEngine(engine);
             result.setConnection(connection);
@@ -334,6 +335,9 @@ public class JdbcCallableStatement extends JdbcPreparedStatement  implements Cal
         }
         catch (SQLException e) {
             throw e;
+        }
+        catch (ClassCastException e2) {
+            throw ExceptionsWrapper.toSQLException(e2,command);
         }
         catch (Exception e2) {
             throw ExceptionsWrapper.toSQLException(e2);

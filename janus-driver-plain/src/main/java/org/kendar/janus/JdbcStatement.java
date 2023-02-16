@@ -111,11 +111,12 @@ public class JdbcStatement implements Statement {
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
+        var command = new StatementExecuteQuery(
+                sql,
+                this.resultSetType
+        );
         try {
-            var command = new StatementExecuteQuery(
-                    sql,
-                    this.resultSetType
-            );
+
             var result = (JdbcResultSet)this.engine.execute(command,connection.getTraceId(),getTraceId());
             result.setEngine(engine);
             result.setConnection(connection);
@@ -125,6 +126,9 @@ public class JdbcStatement implements Statement {
         }
         catch (SQLException e) {
             throw e;
+        }
+        catch (ClassCastException e2) {
+            throw ExceptionsWrapper.toSQLException(e2,command);
         }
         catch (Exception e2) {
             throw ExceptionsWrapper.toSQLException(e2);
@@ -204,11 +208,24 @@ public class JdbcStatement implements Statement {
     public ResultSet getResultSet() throws SQLException {
         if(resultSet==null){
             var command = new StatementGetResultSet();
-            var result = (JdbcResultSet)this.engine.execute(command,connection.getTraceId(),getTraceId());
-            result.setEngine(engine);
-            result.setConnection(connection);
-            result.setStatement(this);
-            this.resultSet = result;
+
+            try {
+
+                var result = (JdbcResultSet) this.engine.execute(command, connection.getTraceId(), getTraceId());
+                result.setEngine(engine);
+                result.setConnection(connection);
+                result.setStatement(this);
+                this.resultSet = result;
+
+            }catch (ClassCastException e2) {
+                    throw ExceptionsWrapper.toSQLException(e2,command);
+                }
+            catch (SQLException e) {
+                throw e;
+            }
+            catch (Exception e2) {
+                throw ExceptionsWrapper.toSQLException(e2);
+            }
         }
         return resultSet;
     }

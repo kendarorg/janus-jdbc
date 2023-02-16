@@ -11,5 +11,12 @@ public class ExceptionsWrapper
         return new SQLException(e);
     }
 
+    public static SQLException toSQLException(Throwable e,Object source) {
+        if (e instanceof SQLException) {
+            return (SQLException)e;
+        }
+        return new SQLException(source.toString(),e);
+    }
+
 
 }
