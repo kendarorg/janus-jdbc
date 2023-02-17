@@ -2,6 +2,7 @@ package org.kendar.servers.dbproxy.utils;
 
 import org.kendar.janus.JdbcConnection;
 import org.kendar.janus.JdbcResultsetMetaData;
+import org.kendar.janus.TraceAwareType;
 import org.kendar.janus.engine.Engine;
 import org.kendar.janus.enums.ResultSetConcurrency;
 import org.kendar.janus.enums.ResultSetHoldability;
@@ -18,7 +19,7 @@ import java.sql.Date;
 import java.sql.*;
 import java.util.*;
 
-public class HamResultSetImpl implements ResultSet, TypedSerializable<HamResultSetImpl> {
+public class HamResultSetImpl implements ResultSet, TypedSerializable<HamResultSetImpl>, TraceAwareType {
     private JdbcResultsetMetaData metadata;
     private Map<String,Integer> labelsToId;
     private Map<String,Integer> namesToId;
@@ -1062,5 +1063,15 @@ public class HamResultSetImpl implements ResultSet, TypedSerializable<HamResultS
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
+    }
+
+    @Override
+    public long getTraceId() {
+        return traceId;
+    }
+
+    @Override
+    public void setTraceId(long traceId) {
+        this.traceId=traceId;
     }
 }

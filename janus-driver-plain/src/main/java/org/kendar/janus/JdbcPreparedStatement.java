@@ -212,6 +212,7 @@ public class JdbcPreparedStatement extends JdbcStatement implements PreparedStat
             throw e;
         }
         catch (ClassCastException e2) {
+            System.out.println(command.toString());
             throw ExceptionsWrapper.toSQLException(e2,command);
         }
         catch (Exception e2) {

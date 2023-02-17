@@ -14,7 +14,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcStatement implements Statement {
+public class JdbcStatement implements Statement,TraceAwareType {
     protected final ResultSetType resultSetType;
     protected ResultSetConcurrency concurrency;
     private final ResultSetHoldability holdability;
@@ -151,6 +151,10 @@ public class JdbcStatement implements Statement {
         return traceId;
     }
 
+    @Override
+    public void setTraceId(long traceId) {
+        this.traceId=traceId;
+    }
 
 
     @Override

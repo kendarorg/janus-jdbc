@@ -29,7 +29,7 @@ import java.sql.Date;
 import java.sql.*;
         import java.util.*;
 
-public class JdbcResultSet implements JdbcResult, ResultSet {
+public class JdbcResultSet implements JdbcResult, ResultSet,TraceAwareType {
     private JdbcResultsetMetaData metadata;
     private Map<String,Integer> labelsToId;
     private Map<String,Integer> namesToId;

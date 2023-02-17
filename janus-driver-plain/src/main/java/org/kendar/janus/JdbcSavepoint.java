@@ -6,7 +6,7 @@ import org.kendar.janus.serialization.TypedSerializer;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 
-public class JdbcSavepoint implements Savepoint, JdbcResult {
+public class JdbcSavepoint implements Savepoint, JdbcResult,TraceAwareType {
     public long getTraceId() {
         return traceId;
     }

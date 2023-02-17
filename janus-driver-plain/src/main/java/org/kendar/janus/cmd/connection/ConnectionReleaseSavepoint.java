@@ -1,5 +1,6 @@
 package org.kendar.janus.cmd.connection;
 
+import org.kendar.janus.TraceAwareType;
 import org.kendar.janus.cmd.interfaces.JdbcCommand;
 import org.kendar.janus.serialization.TypedSerializer;
 import org.kendar.janus.server.JdbcContext;
@@ -8,7 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 
-public class ConnectionReleaseSavepoint implements JdbcCommand {
+public class ConnectionReleaseSavepoint implements JdbcCommand, TraceAwareType {
 
     private long traceId;
 
@@ -41,5 +42,15 @@ public class ConnectionReleaseSavepoint implements JdbcCommand {
     @Override
     public String getPath() {
         return "/Connection/releaseSavepoint";
+    }
+
+    @Override
+    public long getTraceId() {
+        return traceId;
+    }
+
+    @Override
+    public void setTraceId(long traceId) {
+        this.traceId=traceId;
     }
 }

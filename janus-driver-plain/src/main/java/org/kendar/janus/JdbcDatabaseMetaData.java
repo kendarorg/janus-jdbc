@@ -8,7 +8,7 @@ import org.kendar.janus.serialization.TypedSerializer;
 
 import java.sql.*;
 
-public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult {
+public class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcResult,TraceAwareType {
     private JdbcConnection connection;
     private Engine engine;
     private long traceId;

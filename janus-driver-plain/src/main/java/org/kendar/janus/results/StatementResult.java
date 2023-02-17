@@ -1,8 +1,9 @@
 package org.kendar.janus.results;
 
+import org.kendar.janus.TraceAwareType;
 import org.kendar.janus.serialization.TypedSerializer;
 
-public class StatementResult implements JdbcResult {
+public class StatementResult implements JdbcResult, TraceAwareType {
     private long traceId;
     private int maxRows;
     private int queryTimeout;
