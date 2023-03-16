@@ -220,6 +220,7 @@ public class TestMetaData extends TestDb {
         assertFalse(rs.next());
         stat.execute("DROP TABLE TEST");
         conn.close();
+        ;
     }
 
      void testProcedureColumns() throws SQLException {
