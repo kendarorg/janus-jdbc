@@ -14,6 +14,7 @@
         <module>typeconverter</module>
         <module>jacoco</module>
         <module>janus-test</module>
+        <module>typedserializer</module>
     </modules>
     <packaging>pom</packaging>
 
